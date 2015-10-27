@@ -1,0 +1,34 @@
+<html>
+<head>
+	<title>Learning AngularJS</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.4/angular.min.js"></script>
+	<script src="app.js"></script>
+	<script src="maincontroller.js"></script>
+</head>
+<body>
+	<div id='content' ng-app='MyTutorialApp' ng-controller='MainController'>
+		<select ng-model='selectedPerson' ng-options='obj.name for obj in people'></select>
+		<select ng-model='selectedGenre'>
+			<option ng-repeat='label in people[selectedPerson.id].music'>{{label}}</option>
+		</select>
+		
+		<input type='text' ng-model='searchText' />
+        <ul>
+            <li ng-repeat='person in people | filter:searchText' ng-show='person.live == true'>#{{person.id}} {{person.name}}</li>
+        </ul>
+        <ul>
+            <li ng-repeat='person in people | filter:searchText' ng-hide='person.live == false'>#{{person.id}} {{person.name}}</li>
+        </ul>
+        
+        
+        <input type='text' ng-model='newPerson' />
+        <button ng-click='addNew()'>Add</button>
+        
+        
+        
+        <div>{{hej}}</div>
+        <div style="border-color:red;border-width:10px;border:solid;">{{hej.name}} temp</div>
+        <button ng-click='callJson()'>getTroops</button>
+	</div>
+</body>
+</html>
