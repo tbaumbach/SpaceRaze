@@ -372,6 +372,7 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		}
 	}
 
+	@JsonIgnore
 	public List<ResearchAdvantage> getParents(){
 		return parents;
 	}

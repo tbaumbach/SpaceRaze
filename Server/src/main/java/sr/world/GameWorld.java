@@ -559,7 +559,7 @@ public class GameWorld implements Serializable{
 		assert found != null : "Faction with name " + aFactionName + " does not exist";
 		return found;
 	}
-
+	/*
 	@JsonIgnore
 	public String getSpaceshipTypesTableContentHTML(){
 		StringBuffer retHTML = new StringBuffer();
@@ -627,6 +627,7 @@ public class GameWorld implements Serializable{
 		return retHTML.toString();
 	}
 
+	*/
 	public boolean isSquadronsSurviveOutsideCarriers() {
 		return squadronsSurviveOutsideCarriers;
 	}

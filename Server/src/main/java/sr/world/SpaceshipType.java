@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.enums.BlackMarketFrequency;
 import sr.enums.SpaceshipRange;
 import sr.enums.SpaceshipTargetingType;
@@ -85,7 +87,7 @@ public class SpaceshipType implements Serializable{
 	public SpaceshipType(String name, String shortName, int tonnage, int shields, int hits, SpaceshipRange range, int upkeep, int buildCost, UniqueIdCounter uic, int weaponsStrengthSmall){
     	this(name,shortName,tonnage,shields,hits,range,upkeep,buildCost,uic,weaponsStrengthSmall,0);
     }
-    
+    /*
     public static String getHTMLHeaderRow(){
   	  StringBuffer sb = new StringBuffer();
   	  sb.append("<tr>");
@@ -127,7 +129,8 @@ public class SpaceshipType implements Serializable{
   	  sb.append("</tr>\n");
   	  return sb.toString();
     }
-    
+    */
+    /*
     public static String getHTMLHeaderRowNO(){
   	  StringBuffer sb = new StringBuffer();
   	  sb.append("<tr height=1 class='ListheaderRow'><td colspan='38'></td></tr>");
@@ -190,7 +193,8 @@ public class SpaceshipType implements Serializable{
   	  sb.append("</tr>\n");
   	  return sb.toString();
     }
-    
+    */
+    /*
     public String getHTMLTableRow(){
   	  StringBuffer sb = new StringBuffer();
   	  sb.append("<tr>");
@@ -246,7 +250,8 @@ public class SpaceshipType implements Serializable{
   	  sb.append("</tr>\n");
   	  return sb.toString();
     }
-    
+    */
+    /*
     public String getHTMLTableRowNO(){
   	  StringBuffer sb = new StringBuffer();
   	  sb.append("<tr class='TRMain' onMouseOver='OnMouseOver(this)'; onMouseOut='OnMouseOut(this)'; >");
@@ -306,7 +311,9 @@ public class SpaceshipType implements Serializable{
   	  sb.append("</tr>\n");
   	  return sb.toString();
     }
-     
+    */
+	
+	@JsonIgnore
     public String getIncomeOpenString(){
     	StringBuffer sb = new StringBuffer();
         if (getIncOwnOpenBonus() > 0){
@@ -334,7 +341,7 @@ public class SpaceshipType implements Serializable{
         }
     	return sb.toString();
     }
-
+	@JsonIgnore
     public String getIncomeClosedString(){
     	StringBuffer sb = new StringBuffer();
         if (getIncOwnClosedBonus() > 0){
@@ -544,7 +551,7 @@ public class SpaceshipType implements Serializable{
     public void setBuildCost(int buildCost){
     	this.buildCost = buildCost;
     }
-    
+    @JsonIgnore
     public int getBuildCost(VIP vipWithBonus){
       int tempBuildCost = buildCost;
       if (vipWithBonus != null){
@@ -557,7 +564,7 @@ public class SpaceshipType implements Serializable{
       }
       return tempBuildCost;
     }
-
+    @JsonIgnore
     public UniqueIdCounter getUniqueIdCounter(){
       return uic;
     }
@@ -627,6 +634,7 @@ public class SpaceshipType implements Serializable{
         return initDefence;
       }
 
+    @JsonIgnore
     public String getRangeString(){
 /*
  * String returnValue = "short"; if (range == LONG){ returnValue = "long"; }else
@@ -643,6 +651,7 @@ public class SpaceshipType implements Serializable{
       noRetreat = newValue;
     }
 
+    @JsonIgnore
     public String getNoRetreatString(){
       String returnString = "No";
       if (noRetreat){
@@ -908,6 +917,7 @@ public class SpaceshipType implements Serializable{
 		return !isCivilian() & !squadron & (range == SpaceshipRange.NONE); 
 	}
 	
+	@JsonIgnore
 	public String getTotalDescription(){
 		String totalDescription = "";
     	
@@ -1197,6 +1207,7 @@ public class SpaceshipType implements Serializable{
 		return constructible;
 	}
 	
+	@JsonIgnore
 	public boolean isReadyToUseInBlackMarket(Galaxy aGalaxy){
 		boolean constructible =  false;
 		
@@ -1232,6 +1243,7 @@ public class SpaceshipType implements Serializable{
 		return constructible;
 	}
 	
+	@JsonIgnore
 	public boolean isBluePrintReadyToUseInBlackMarket(Galaxy aGalaxy){
 		boolean constructible =  false;
 		
@@ -1297,279 +1309,6 @@ public class SpaceshipType implements Serializable{
 		this.blackMarketFrequency = blackMarketFrequency;
 	}
 
-    private String getWeaponsStringDroid(){
-    	StringBuffer sb = new StringBuffer();
-        sb.append(getWeaponsStrengthSmall());
-        sb.append(" / ");
-        if (getWeaponsStrengthMedium() > 0){
-        	sb.append(getWeaponsStrengthMedium());
-        	if ((getWeaponsMaxSalvoesMedium() > 0) & (getWeaponsMaxSalvoesMedium() < Integer.MAX_VALUE)){
-        		sb.append(" (");
-        		sb.append(getWeaponsMaxSalvoesMedium());
-        		sb.append(")");
-        	}
-        }else{
-        	sb.append("-");
-        }
-        sb.append(" / ");
-        if (getWeaponsStrengthLarge() > 0){
-        	sb.append(getWeaponsStrengthLarge());
-        	if ((getWeaponsMaxSalvoesLarge() > 0) & (getWeaponsMaxSalvoesLarge() < Integer.MAX_VALUE)){
-        		sb.append(" (");
-        		sb.append(getWeaponsMaxSalvoesLarge());
-        		sb.append(")");
-        	}
-        }else{
-        	sb.append("-");
-        }
-        sb.append(" / ");
-        if (getWeaponsStrengthHuge() > 0){
-        	sb.append(getWeaponsStrengthHuge());
-        	if ((getWeaponsMaxSalvoesHuge() > 0) & (getWeaponsMaxSalvoesHuge() < Integer.MAX_VALUE)){
-        		sb.append(" (");
-        		sb.append(getWeaponsMaxSalvoesHuge());
-        		sb.append(")");
-        	}
-        }else{
-        	sb.append("-");
-        }
-    	return sb.toString();
-    }
-
-    private String getArmorStringDroid(){
-    	StringBuffer sb = new StringBuffer();
-        if (getArmorSmall() > 0){
-            sb.append(getArmorSmall());
-            sb.append(" / ");
-            if (getArmorMedium() > 0){
-                sb.append(getArmorMedium());
-            }else{
-            	sb.append("-");
-            }
-            sb.append(" / ");
-            if (getArmorLarge() > 0){
-                sb.append(getArmorLarge());
-            }else{
-            	sb.append("-");
-            }
-            sb.append(" / ");
-            if (getArmorHuge() > 0){
-                sb.append(getArmorHuge());
-            }else{
-            	sb.append("-");
-            }
-        }else{
-        	sb.append("none");
-        }
-    	return sb.toString();
-    }
-
-	public boolean getHasAbilityDroid(int abilityNr){
-		boolean hasAbility = false;
-		if ((abilityNr == 1) & squadron){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 2) & civilian){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 3) & !civilian){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 4) & (range == SpaceshipRange.NONE) & (!squadron)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 5) & (!civilian) & (!squadron)){ // capital ship
-			hasAbility = true;
-		}else
-		if ((abilityNr == 6) & (squadronCapacity > 0)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 7) & noRetreat){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 8) & lookAsCivilian & !civilian){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 9) & ((incEnemyClosedBonus > 0) | (incNeutralClosedBonus > 0) | (incFrendlyClosedBonus > 0) | (incOwnClosedBonus > 0) | (incEnemyOpenBonus > 0) | (incNeutralOpenBonus > 0) | (incFrendlyOpenBonus > 0) | (incOwnOpenBonus > 0))){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 10) & (bombardment > 0)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 11) & initSupport & (increaseInitiative > 0)){ // sqd init bonus
-			hasAbility = true;
-		}else
-		if ((abilityNr == 12) & !initSupport & (increaseInitiative > 0)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 13) & (initDefence > 0)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 14) & (psychWarfare > 0)){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 15) & planetarySurvey){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 16) & ((incEnemyClosedBonus > 0) | (incNeutralClosedBonus > 0) | (incFrendlyClosedBonus > 0) | (incOwnClosedBonus > 0))){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 17) & ((incEnemyOpenBonus > 0) | (incNeutralOpenBonus > 0) | (incFrendlyOpenBonus > 0) | (incOwnOpenBonus > 0))){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 18) & screened){
-			hasAbility = true;
-		}else
-		if ((abilityNr == 19) & !visibleOnMap){
-			hasAbility = true;
-		}
-		return hasAbility;
-	}
-	
-	private List<String> getAbilitiesStringDroid(){
-		List<String> allStrings = new LinkedList<String>();
-		if (squadronCapacity > 0){
-			allStrings.add("Carrier, capacity: " + squadronCapacity);
-		}		
-		if (psychWarfare > 0){
-			allStrings.add("Siege level: " + psychWarfare);
-		}
-		if (bombardment > 0){
-			allStrings.add("Bombardment: " + bombardment);
-		}
-		if (!initSupport & (increaseInitiative > 0)){
-			allStrings.add("Initiative bonus: " + increaseInitiative + "%");
-		}
-		if (initSupport & (increaseInitiative > 0)){
-			allStrings.add("Squadron initiative bonus: " + increaseInitiative + "%");
-		}
-		if (initDefence > 0){
-			allStrings.add("Initiative defence bonus: " + initDefence + "%");
-		}
-		if ((incEnemyOpenBonus > 0) | (incNeutralOpenBonus > 0) | (incFrendlyOpenBonus > 0) | (incOwnOpenBonus > 0)){
-			allStrings.add("Open planet income bonus (o/f/n/e): " + getIncomeOpenString());
-		}
-		if ((incEnemyClosedBonus > 0) | (incNeutralClosedBonus > 0) | (incFrendlyClosedBonus > 0) | (incOwnClosedBonus > 0)){
-			allStrings.add("Closed planet income bonus (o/f/n/e): " + getIncomeClosedString());
-		}
-		if (noRetreat){
-			allStrings.add("Stop retreats");
-		}
-		if (planetarySurvey){
-			allStrings.add("Planetary Survey");
-		}
-		if (!visibleOnMap){
-			allStrings.add("Stealth");
-		}
-		if (screened){
-			allStrings.add("Always screened if possible");
-		}
-		if (lookAsCivilian & !civilian){
-			allStrings.add("Look as civilian");
-		}
-		return allStrings;
-	}
-
-	public String getShiptypeInfoDroid() {
-		  StringBuffer sb = new StringBuffer();
-		  sb.append("<h4>Shiptype: ");
-		  sb.append(name);
-		  sb.append(" (");
-		  sb.append(shortName);
-		  sb.append(")");
-		  sb.append("</h4>");
-		  sb.append("<p>");
-		  sb.append(description);
-		  sb.append("</p>");
-		  
-		  sb.append("<b>Type: </b>");
-		  sb.append(getTypeTextDroid());
-		  sb.append("<br>");
-		  
-		  sb.append("<b>Size: </b>");
-		  sb.append(getSizeString().substring(0, 1).toUpperCase() + getSizeString().substring(1));
-		  sb.append("<br>");
-
-		  sb.append("<b>Range: </b>");
-		  sb.append(getRangeString().substring(0, 1).toUpperCase() + getRangeString().substring(1));
-		  sb.append("<br>");
-
-		  sb.append("<b>Costs (build/upkeep): </b>");
-		  sb.append(getBuildCost(null));
-		  sb.append(" / ");
-		  sb.append(getUpkeep());
-		  sb.append("<br>");
-
-		  if (!civilian){
-			  sb.append("<br>");
-
-			  sb.append("<b>Weapons (s/m/l/h): </b>");
-			  sb.append(getWeaponsStringDroid());
-			  sb.append("<br>");
-
-			  sb.append("<b>Weapons (vs. squadron): </b>");
-			  sb.append(getWeaponsStrengthSquadron());
-			  sb.append("<br>");
-
-			  sb.append("<b>Targeting type: </b>");
-			  sb.append(getTargetingType());
-			  sb.append("<br>");
-
-			  sb.append("<b>Damage capacity: </b>");
-			  sb.append(getHits());
-			  sb.append("<br>");
-
-			  sb.append("<b>Armor (s/m/l/h): </b>");
-			  sb.append(getArmorStringDroid());
-			  sb.append("<br>");
-
-			  sb.append("<b>Shields: </b>");
-			  if (getShields() == 0){
-				  sb.append("none");
-			  }else{
-				  sb.append(getShields());
-			  }
-			  sb.append("<br>");
-		  }
-		  
-		  List<String> abilitiesStrings = getAbilitiesStringDroid();
-		  if (abilitiesStrings.size() > 0){
-			  sb.append("<br><b>Other abilities:</b><br>");
-			  for (String string : abilitiesStrings) {
-				  sb.append(string);
-				  sb.append("<br>");
-			  }
-		  }
-		  
-		  return sb.toString();
-	}
-	
-	public String getTypeTextDroid(){
-		String type = null;
-		if (civilian){
-			type = "Civilian ship";
-		}else
-		if (isSquadron()){
-			if (targetingType == SpaceshipTargetingType.ANTIAIR){
-				type = "Fighter Squadron";
-			}else
-			if (targetingType == SpaceshipTargetingType.ANTIMBU){
-				type = "Bomber Squadron";
-			}else{ // ALLROUND
-				type = "Multirole Squadron";
-			}
-		}else
-		if (range == SpaceshipRange.NONE){
-			type = "Defence ship";
-		}else
-		if (screened){
-			type = "Support ship";
-		}else{
-			type = "Capital Ship";
-		}	
-		return type;
-	}
-	
     public boolean isAlwaysRetreat() {
 		return alwaysRetreat;
 	}

@@ -334,7 +334,7 @@ public class Faction implements Serializable {
   public BuildingType getBuildingTypeByName(String bname){
 	  return buildings.getBuildingType(bname);
   }
-
+/*
 	public String getSpaceshipTypesTableContentHTML(){
 		StringBuffer retHTML = new StringBuffer();
 		retHTML.append(SpaceshipType.getHTMLHeaderRow());
@@ -361,7 +361,7 @@ public class Faction implements Serializable {
 		}
 		return retHTML.toString();
 	}
-	
+	*/
 	public String getTotalDescription(){
 		String totalDescription = "";
     	
