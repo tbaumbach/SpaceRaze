@@ -74,7 +74,7 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
  
   $scope.callJson = function(){$http({
 	  method: 'GET',
-	  url: 'http://localhost:8080/Server/api/PlanetInfo2/get?gamename=test&planet=1'  
+	  url: 'http://localhost:8080/Server/api/PlanetInfo2/gameworld/thelastgreatwar/2/'
 	}).then(function successCallback(response) {
 		$scope.hej = response.data;
 	  }, function errorCallback(response) {
