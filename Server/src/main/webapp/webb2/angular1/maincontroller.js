@@ -80,7 +80,26 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 	  }, function errorCallback(response) {
 		  $scope.hej = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
 	  })};
-  
+	  
+	  
+	  /*
+	   * {gameWorldName:"thelastgreatwar",gameName:"",mapName:"wigge9",steps:"10",autoBalance:"yes",time:"0",emailPlayers:"no",maxNrPlayers:"9",,gamePassword:"",groupFaction:"yes",selectableFactionNames:[],randomFaction:"no",diplomacy:"",singlePlayer:false,ranked:"no",singleVictory:60,factionVictory:60,endTurn:0,numberOfStartPlanet:1,statisticGameType:"ALL"}
+	   * 
+	   */
+	  $scope.callCreateNewgame = function(){$http({
+		  method: 'POST',
+		  url: 'http://localhost:8080/Server/api/creategame/create/',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			data: {gameWorldName:"thelastgreatwar",gameName:"Tobber äger fett!",mapName:"wigge9",steps:"10",autoBalance:"yes",time:"0",emailPlayers:"no",maxNrPlayers:"9",gamePassword:"",groupFaction:"yes",selectableFactionNames:[],randomFaction:"no",diplomacy:"",ranked:"no",singleVictory:60,factionVictory:60,endTurn:0,numberOfStartPlanet:1,statisticGameType:"ALL"}
+		}).then(function successCallback(response) {
+			$scope.hej = response.data;
+		  }, function errorCallback(response) {
+			  $scope.hej = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
+		  
 	  
 /*	  
   $scope.callJson = function(){$http.get("http://www.w3schools.com/angular/customers.php")
