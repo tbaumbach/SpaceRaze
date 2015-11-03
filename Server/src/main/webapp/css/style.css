@@ -1,3 +1,164 @@
-.body{
-	#background-color: #000000;
+
+html{
+	/*height: 100%;*/
+	background-color: red;
 }
+
+body{
+	#background-color: #000000;
+/*	height: 100%;*/
+	background-color: blue;
+}
+
+.container-fluid{
+	/*height: 100%;*/
+}
+
+.sr-first-row{
+	padding-top: 100px;
+	/*height: 100%;*/
+	background-color: black;
+	height:	100vh;
+}
+
+.sr-right-panel{
+/*	min-height: 100%;*/
+	color:	#000;
+	background-color: #9DA0A5;
+	border-color: #757575;
+	/*background-color: #9DA0A5;*/
+}
+
+.sr-tab-content{
+	height: 100%;
+	display: flex;
+}
+
+.panel-default{
+	color:	#000;
+	background-color: #9DA0A5;
+	border-color: #757575;
+	width:	100%;
+}
+
+.navbar-fixed-top .navbar-collapse{
+	max-height: none;
+	
+}
+
+
+
+#map-panel{
+	/*background-color: black;*/
+	flex: 1;
+/*	min-height: 100%;*/
+}
+
+.sr-container{
+	
+}
+.navbar-fixed-top{
+	border-radius: 4px;
+	top: 20px;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+.navbar-collapse {
+  padding-right: 15px;
+  padding-left: 15px;
+  overflow-x: visible;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid transparent;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+
+/* @media (min-width: 768px) and (max-width: 1000px) {*/
+/* override the default menu and replace it with sr-menu menu (buttons and a selectbox with the rest of the links)*/
+@media (min-width: 768px) and (max-width: 1300px) {
+  .navbar-collapse {
+    width: inherit;
+    border-top: 1px solid transparent;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+  }
+  .navbar-collapse.collapse {
+    display: none !important;
+    height: 1px !important;
+    padding-bottom: 0px;
+    overflow: hidden !important;
+  }
+  .navbar-collapse.in {
+    overflow-y: hidden;
+  }
+  .navbar-fixed-top .navbar-collapse,
+  .navbar-static-top .navbar-collapse,
+  .navbar-fixed-bottom .navbar-collapse {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  .navbar-collapse.sr-menu {
+    width: auto;
+    border-top: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  .navbar-collapse.collapse.sr-menu {
+    display: block !important;
+    height: auto !important;
+    padding-bottom: 0;
+    overflow: visible !important;
+  }
+  .navbar-collapse.sr-menu.in {
+    overflow-y: visible;
+  }
+}
+
+/*used by the default menu but triggers on higher width = 1300px */
+@media (min-width: 1300px) {
+	.navbar-collapse.sr-menu {
+    width: inherit;
+    border-top: 1px solid transparent;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+  }
+  .navbar-collapse.collapse.sr-menu {
+    display: none !important;
+    height: 1px !important;
+    padding-bottom: 0px;
+    overflow: hidden !important;
+  }
+  .navbar-collapse.sr-menu.in {
+    overflow-y: hidden;
+  }
+}
+
+
+
+/*
+
+@media (min-width: 768px) and (max-width: 1400px){
+  .navbar-collapse.tobbe {
+    width: auto;
+    border-top: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  .navbar-collapse.collapse.tobbe {
+    display: block !important;
+    height: auto !important;
+    padding-bottom: 0;
+    overflow: visible !important;
+  }
+  .navbar-collapse.tobbe.in {
+    overflow-y: visible;
+  }
+  .navbar-fixed-top .navbar-collapse,
+  .navbar-static-top .navbar-collapse,
+  .navbar-fixed-bottom .navbar-collapse {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+*/
