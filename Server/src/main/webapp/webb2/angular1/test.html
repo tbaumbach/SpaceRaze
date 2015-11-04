@@ -26,6 +26,26 @@
         
         
         
+        <input type='text' ng-model='gameParameters.gameName' />
+        <input type='text' ng-model='gameParameters.gameWorldName' />
+        <input type='text' ng-model='gameParameters.steps' />
+        <input type='text' ng-model='gameParameters.time' />
+        <input type='text' ng-model='gameParameters.maxNrPlayers' />
+        <input type='text' ng-model='gameParameters.gamePassword' />
+        <input type='text' ng-model='gameParameters.groupFaction' />
+        <input type='text' ng-model='gameParameters.selectableFactionNames' />
+        <input type='text' ng-model='gameParameters.randomFaction' />
+        <input type='text' ng-model='gameParameters.numberOfStartPlanet' />
+        
+        <button ng-click='getContract()'>Get contract</button>
+        <button ng-click='callCreateNewgame()'>Create a new game</button>
+        <input type='text' ng-model='message' />
+        
+        <!-- 
+        {"gameWorldName":"thelastgreatwar","gameName":"","mapName":"wigge9","steps":"10","autoBalance":"yes","time":"0","emailPlayers":"no","maxNrPlayers":"9",
+        "gamePassword":"","groupFaction":"yes","selectableFactionNames":["China","USA"],"randomFaction":"no","diplomacy":"faction","ranked":"no","singleVictory":60,"factionVictory":60,"endTurn":0,"numberOfStartPlanet":1,"statisticGameType":"ALL"}
+         -->
+        
         <div>{{hej}}</div>
         <div style="border-color:red;border-width:10px;border:solid;">{{hej.name}} temp</div>
         <button ng-click='callJson()'>getTroops</button>

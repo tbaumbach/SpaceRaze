@@ -1,8 +1,11 @@
 package spaceraze.servlet;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,11 +19,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sun.jersey.spi.container.servlet.PerSession;
 
 import spaceraze.servlet.create.GameParameters;
 import sr.server.GameWorldHandler;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
+import sr.webb.users.User;
 import sr.world.GameWorld;
 import sr.world.Planet;
 import sr.world.StatisticGameType;
@@ -34,36 +39,53 @@ public class GameCreater{
 	@Path("/create")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response create(GameParameters parameters) throws JsonProcessingException {
+	public String create(GameParameters parameters, @Context HttpServletRequest req) throws JsonProcessingException {
 		
-		//System.out.println("Call aginst creategame/create: " + parameters);
 		
-		System.out.println("Call aginst creategame/create: " + parameters.getGameName());
-		System.out.println("Call aginst creategame/create: " + parameters.getMaxNrPlayers());
-		System.out.println("Call aginst creategame/create: " + parameters.getGameWorldName());
+		System.out.println("Call aginst creategame/create: " + parameters.toString());
 		
 		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
 		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		System.out.println("Call aginst creategame/create User.getName: " + user.getName());
 		
 		
-		//sh.startNewGame(gameWorldFileName, gameName, mapName, stepsString, autoBalanceString, timeString, emailPlayers, maxNrPlayers, userLogin, gamePassword, groupFaction, selectableFactionNames, randomFactionString, diplomacy, singlePlayer, ranked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType)
 		
-		//Hämta användaren från context
 		
-		// Läg till retur objekt om så önskas. Om så är fallet ska nog denna servelet retunera den typen av objekt i stället och inte ett Response objekt.
-		return Response.ok().build();
+		parameters.setUser(user.getName());
+		
+		String report = sh.StartNewGame(parameters);
+		
+		
+		
+		return report;
 		
 	}
 	
 	@GET
 	@Path("/create/contract")
 	@Produces(MediaType.APPLICATION_JSON)
-	public GameParameters contract() throws JsonProcessingException {
+	public GameParameters contract(@Context HttpServletRequest req) throws JsonProcessingException {
 		
 		System.out.println("Call aginst creategame/create/contract: ");
 		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		
+		System.out.println("Call aginst creategame/create User.getName: " + user.getName());
+		System.out.println("Call aginst creategame/create User.getPassword: " + user.getPassword());
+		System.out.println("Call aginst creategame/create User.getRole: " + user.getRole());
+		System.out.println("Call aginst creategame/create User.getEmails: " + user.getEmails());
+		
+		List<String> factions = new ArrayList<String>();
+		factions.add("China");
+		factions.add("USA");
+		
 		return new GameParameters("thelastgreatwar", "", "wigge9", "10", "yes", "0", "no", "9", 
-				"", "", "yes", new ArrayList<String>(), "no", "", false, 
+				"", "", "yes", factions, "no", "faction", false, 
 				"no", 60, 60, 0, 1, StatisticGameType.ALL);
 		
 	//	ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");

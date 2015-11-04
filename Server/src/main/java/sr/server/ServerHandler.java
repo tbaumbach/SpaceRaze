@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import spaceraze.servlet.create.GameParameters;
 import sr.enums.DiplomacyGameType;
 import sr.general.logging.Logger;
 import sr.server.persistence.PHash;
@@ -1170,6 +1171,17 @@ public class ServerHandler {
 			}
 		}
 		return nr;
+	}
+	
+	public String StartNewGame(GameParameters gameParameters){
+		
+		return startNewGame(gameParameters.getGameWorldName(), gameParameters.getGameName(), gameParameters.getMapName(), 
+				gameParameters.getSteps(), gameParameters.getAutoBalance(), 
+				gameParameters.getTime(), gameParameters.getEmailPlayers(), gameParameters.getMaxNrPlayers(), gameParameters.getUser(), 
+				gameParameters.getGamePassword(), gameParameters.getGroupFaction(), gameParameters.getSelectableFactionNames(), 
+				gameParameters.getRandomFaction(), gameParameters.getDiplomacy(), false, gameParameters.getRanked(), 
+				gameParameters.getSingleVictory(), gameParameters.getFactionVictory(), gameParameters.getEndTurn(), 
+				gameParameters.getNumberOfStartPlanet(), gameParameters.getStatisticGameType());
 	}
 
 	/**

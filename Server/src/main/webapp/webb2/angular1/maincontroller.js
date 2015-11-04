@@ -57,9 +57,28 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
       }
   }
   
-  $scope.hej = "tryck!!!"
+  $scope.hej = "tryck!!!";
   
+  $scope.message = null;
+  $scope.gameParameters = null;
+  $scope.error = null;
   
+  /*
+  $scope.createGame = function(){
+	  
+	  
+	  <input type='text' ng-model='gameName' />
+	        <input type='text' ng-model='gameWorldName' />
+	        <input type='text' ng-model='steps' />
+	        <input type='text' ng-model='time' />
+	        <input type='text' ng-model='maxNrPlayers' />
+	        <input type='text' ng-model='gamePassword' />
+	        <input type='text' ng-model='groupFaction' />
+	        <input type='text' ng-model='selectableFactionNames' />
+	        <input type='text' ng-model='randomFaction' />
+	        <input type='text' ng-model='numberOfStartPlanet' />
+  }
+  */
 	  delete $http.defaults.headers.common['X-Requested-With'];  
   /*
   $scope.callJson = function(){
@@ -71,6 +90,25 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
   
   // url: 'http://localhost:8080/Server/api/PlanetInfo/get?gamename=test&planet=1'
   //url: 'http://localhost:8080/SpaceRaze/servletjson/JSONAndHTMLServlet?gamename=test&planet=2'
+	  
+	  
+	  /*
+	   * Gets a contract for creating a new game
+	   * 
+	   * {"gameWorldName":"thelastgreatwar","gameName":"","mapName":"wigge9","steps":"10","autoBalance":"yes",
+	   * "time":"0","emailPlayers":"no","maxNrPlayers":"9","gamePassword":"","groupFaction":"yes",
+	   * "selectableFactionNames":["China","USA"],"randomFaction":"no","diplomacy":"faction","ranked":"no",
+	   * "singleVictory":60,"factionVictory":60,"endTurn":0,"numberOfStartPlanet":1,"statisticGameType":"ALL"}
+	   */
+	  $scope.getContract = function(){$http({
+		  method: 'GET',
+		  url: 'http://localhost:8080/Server/api/creategame/create/contract'
+		}).then(function successCallback(response) {
+			$scope.gameParameters = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
  
   $scope.callJson = function(){$http({
 	  method: 'GET',
@@ -92,11 +130,12 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 		  headers: {
 			   'Content-Type': 'application/json'
 			 },
-			data: {gameWorldName:"thelastgreatwar",gameName:"Tobber äger fett!",mapName:"wigge9",steps:"10",autoBalance:"yes",time:"0",emailPlayers:"no",maxNrPlayers:"9",gamePassword:"",groupFaction:"yes",selectableFactionNames:[],randomFaction:"no",diplomacy:"",ranked:"no",singleVictory:60,factionVictory:60,endTurn:0,numberOfStartPlanet:1,statisticGameType:"ALL"}
+			 data: $scope.gameParameters
+			//data: {gameWorldName:"thelastgreatwar",gameName:"Tobbe",mapName:"wigge9",steps:"10",autoBalance:"yes",time:"0",emailPlayers:"no",maxNrPlayers:"9",gamePassword:"",groupFaction:"yes",selectableFactionNames:["China","USA"],randomFaction:"no",diplomacy:"faction",ranked:"no",singleVictory:60,factionVictory:60,endTurn:0,numberOfStartPlanet:1,statisticGameType:"ALL"}
 		}).then(function successCallback(response) {
-			$scope.hej = response.data;
+			$scope.message = response.data;
 		  }, function errorCallback(response) {
-			  $scope.hej = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
 		  })};
 		  
 		  

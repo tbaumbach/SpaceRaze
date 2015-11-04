@@ -123,7 +123,6 @@ public class GameParameters {
 		return randomFaction;
 	}
 
-	@JsonIgnore
 	public String getDiplomacy() {
 		return diplomacy;
 	}
@@ -239,6 +238,18 @@ public class GameParameters {
 
 	public void setStatisticGameType(StatisticGameType statisticGameType) {
 		this.statisticGameType = statisticGameType;
+	}
+
+	@Override
+	public String toString() {
+		return "GameParameters [gameWorldName=" + gameWorldName + ", gameName=" + gameName + ", mapName=" + mapName
+				+ ", steps=" + steps + ", autoBalance=" + autoBalance + ", time=" + time + ", emailPlayers="
+				+ emailPlayers + ", maxNrPlayers=" + maxNrPlayers + ", user=" + user + ", gamePassword=" + gamePassword
+				+ ", groupFaction=" + groupFaction + ", selectableFactionNames=" + selectableFactionNames
+				+ ", randomFaction=" + randomFaction + ", diplomacy=" + diplomacy + ", singelPlayer=" + singelPlayer
+				+ ", ranked=" + ranked + ", singleVictory=" + singleVictory + ", factionVictory=" + factionVictory
+				+ ", endTurn=" + endTurn + ", numberOfStartPlanet=" + numberOfStartPlanet + ", statisticGameType="
+				+ statisticGameType + "]";
 	}
 
 }
