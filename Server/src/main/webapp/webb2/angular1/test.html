@@ -27,9 +27,15 @@
         
         
         <input type='text' ng-model='gameParameters.gameName' />
-        <input type='text' ng-model='gameParameters.gameWorldName' />
+        <select ng-model='selectedGameWorld' ng-options='gameWorld.name for gameWorld in gameWorlds track by gameWorld.id' ng-change='selectGameWorld()'></select>
+        <!--  <select ng-model='gameParameters.mapName' ng-options='map.name for map in maps track by map.fileName' ng-change='selectMap()'></select>-->
+        <select ng-model='selectedMap' ng-options='map.name for map in maps track by map.fileName' ng-change='selectMap()'></select>
         <input type='text' ng-model='gameParameters.steps' />
         <input type='text' ng-model='gameParameters.time' />
+        <!-- ng-options="map.maxNrStartPlanets for map in maps | filter:map.mapName:gameParameters.mapName]" 
+        ng-options="map.maxNrStartPlanets for map in maps | filter:gameParameters.mapName"
+        
+        -->
         <input type='text' ng-model='gameParameters.maxNrPlayers' />
         <input type='text' ng-model='gameParameters.gamePassword' />
         <input type='text' ng-model='gameParameters.groupFaction' />
@@ -38,8 +44,10 @@
         <input type='text' ng-model='gameParameters.numberOfStartPlanet' />
         
         <button ng-click='getContract()'>Get contract</button>
+        <button ng-click='getGameWorlds()'>Get gameworlds</button>
+        <button ng-click='getMaps()'>Get Maps</button>
         <button ng-click='callCreateNewgame()'>Create a new game</button>
-        <input type='text' ng-model='message' />
+        <div style="border-color:red;border-width:10px;border:solid;">message: {{message}}</div>
         
         <!-- 
         {"gameWorldName":"thelastgreatwar","gameName":"","mapName":"wigge9","steps":"10","autoBalance":"yes","time":"0","emailPlayers":"no","maxNrPlayers":"9",
@@ -47,9 +55,9 @@
          -->
         
         <div>{{hej}}</div>
-        <div style="border-color:red;border-width:10px;border:solid;">{{hej.name}} temp</div>
+        <div style="border-color:red;border-width:10px;border:solid;">hej: {{hej.name}}</div>
         <button ng-click='callJson()'>getTroops</button>
-        <button ng-click='callCreateNewgame()'>CreateGame</button>
+        
 	</div>
 </body>
 </html>

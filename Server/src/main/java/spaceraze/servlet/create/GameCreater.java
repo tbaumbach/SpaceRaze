@@ -1,4 +1,4 @@
-package spaceraze.servlet;
+package spaceraze.servlet.create;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jersey.spi.container.servlet.PerSession;
 
-import spaceraze.servlet.create.GameParameters;
 import sr.server.GameWorldHandler;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
@@ -66,19 +65,12 @@ public class GameCreater{
 	@GET
 	@Path("/create/contract")
 	@Produces(MediaType.APPLICATION_JSON)
-	public GameParameters contract(@Context HttpServletRequest req) throws JsonProcessingException {
+	public GameParameters contract() throws JsonProcessingException {
 		
 		System.out.println("Call aginst creategame/create/contract: ");
 		
 		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
 		
-		HttpSession session = req.getSession();
-		User user = (User)session.getAttribute("user");
-		
-		System.out.println("Call aginst creategame/create User.getName: " + user.getName());
-		System.out.println("Call aginst creategame/create User.getPassword: " + user.getPassword());
-		System.out.println("Call aginst creategame/create User.getRole: " + user.getRole());
-		System.out.println("Call aginst creategame/create User.getEmails: " + user.getEmails());
 		
 		List<String> factions = new ArrayList<String>();
 		factions.add("China");
@@ -87,20 +79,7 @@ public class GameCreater{
 		return new GameParameters("thelastgreatwar", "", "wigge9", "10", "yes", "0", "no", "9", 
 				"", "", "yes", factions, "no", "faction", false, 
 				"no", 60, 60, 0, 1, StatisticGameType.ALL);
-		
-	//	ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
-		
-		//ObjectMapper mapper = new ObjectMapper();
-		
-		//GameWorld gameWorld = TheLastGreatWar.getGameWorld();
-		
-	//	SR_Server aGame = sh.findGame(gameName);
-		
-		//GameWorld gameWorld = aGame.getGalaxy().getGameWorld();
-		
-		//Planet planet1 = aGame.getGalaxy().getPlanets().get(0);
-		
-	//	return aGame.getGalaxy().getPlanets().get(new Integer(planet));
+	
 	}
 	
 	/*

@@ -62,6 +62,10 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
   $scope.message = null;
   $scope.gameParameters = null;
   $scope.error = null;
+  $scope.gameWorlds = null;
+  $scope.maps = null;
+  $scope.selectedMap = null;
+  $scope.selectedMap = null;
   
   /*
   $scope.createGame = function(){
@@ -108,6 +112,44 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 		  }, function errorCallback(response) {
 			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
 		  })};
+	
+
+		  $scope.getGameWorlds = function(){$http({
+			  method: 'GET',
+			  url: 'http://localhost:8080/Server/api/gameworld/list'
+			}).then(function successCallback(response) {
+				$scope.gameWorlds = response.data;
+				$scope.message = response.data;
+			  }, function errorCallback(response) {
+				  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+			  })};
+			  
+		  $scope.getMaps = function(){$http({
+			  method: 'GET',
+			  url: 'http://localhost:8080/Server/api/map/list'
+			}).then(function successCallback(response) {
+				$scope.maps = response.data;
+				$scope.message = response.data;
+			  }, function errorCallback(response) {
+				  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+			  })};
+			  
+		$scope.selectMap = function (){
+			console.log('$scope.selectedMap ', $scope.selectedMap);
+			
+			$scope.gameParameters.mapName = $scope.selectedMap.fileName;
+			$scope.gameParameters.maxNrPlayers = $scope.selectedMap.maxNrStartPlanets;
+			console.log('$scope.gameParameters.mapName ', $scope.gameParameters.mapName);
+						
+		};
+
+		$scope.selectGameWorld = function (){
+			
+			console.log('$scope.selectedGameWorld ', $scope.selectedGameWorld);
+			
+			$scope.gameParameters.gameWorldName = $scope.selectedGameWorld.id;
+			console.log('$scope.gameParameters.gameWorldName ', $scope.gameParameters.gameWorldName);			
+		};
 		  
  
   $scope.callJson = function(){$http({
