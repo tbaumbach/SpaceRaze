@@ -39,7 +39,12 @@
         <input type='text' ng-model='gameParameters.maxNrPlayers' />
         <input type='text' ng-model='gameParameters.gamePassword' />
         <input type='text' ng-model='gameParameters.groupFaction' />
+        <!-- 
         <input type='text' ng-model='gameParameters.selectableFactionNames' />
+         -->
+        
+        <select multiple ng-model='gameParameters.selectableFactionNames' ng-options='faction for faction in selectedGameWorld.factions'></select>
+        
         <input type='text' ng-model='gameParameters.randomFaction' />
         <input type='text' ng-model='gameParameters.numberOfStartPlanet' />
         

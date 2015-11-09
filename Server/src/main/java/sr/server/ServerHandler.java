@@ -54,6 +54,7 @@ public class ServerHandler {
 		}
 	}
 	
+	
 	public String getCurrentGamesList(User aUser){
 		String retStr = "<table>";
 		retStr = retStr + "<tr><td>Game Name&nbsp;&nbsp;&nbsp;</td><td>Map Name&nbsp;&nbsp;&nbsp;</td><td>Current Turn&nbsp;&nbsp;&nbsp;</td><td>Game State&nbsp;&nbsp;&nbsp;</td><td>Started by&nbsp;&nbsp;&nbsp;</td><td></td><td></td></tr>\n";
@@ -1143,7 +1144,7 @@ public class ServerHandler {
 		return retStr;
 	}
 	
-	private SR_Server[] getServers(){
+	public SR_Server[] getServers(){
 		SR_Server[] allServersArray = new SR_Server[allServers.size()];
 		int i = 0;
 		for (SR_Server aServer : allServers) {

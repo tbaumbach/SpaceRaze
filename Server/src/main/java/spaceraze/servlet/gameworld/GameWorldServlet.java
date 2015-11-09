@@ -51,6 +51,23 @@ public class GameWorldServlet{
 		return gameWorldsLights;
 		
 	}
+	
+	//TODO skapa en GameWorldLight för att retunera till klienten.
+	@GET
+	@Path("/{name}/{version}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GameWorld getGameWorld(@PathParam("name") String name, @PathParam("version") int version) throws NumberFormatException, JsonProcessingException {
+		
+		
+		//thelastgreatwar
+		GameWorld gameWorld = GameWorldHandler.getGameWorld(name);
+		
+		return gameWorld;
+		
+	}
+	
+	
+	
 	/*
 	@GET
 	@Path("/create/contract")
