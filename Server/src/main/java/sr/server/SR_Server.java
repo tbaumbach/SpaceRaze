@@ -331,6 +331,35 @@ public class SR_Server {
     	return okToDelete;
     }
     
+    /*
+     * Used then a player joins a game(this). The password is removed and set to "".
+     */
+    public String join(String name, String govenorName, String factionName){
+    	
+    	String message = "";
+    	
+        if (g.getTurn() > 0){
+        	message = "Game has already begun. No more players can join.";
+        }else{ // turn == 0
+          if ((g.getPlayer(name,"")).getErrorMessage()==null){
+          	Logger.fine("Player already exists.");
+          	message = "Player already exists.";
+          }else
+          if (!factionIsOpenAndSelectable(factionName)){
+        	  message = "All slots in the " + factionName + " faction have just been taken. Choose another faction.";
+          }else{
+              Player player = g.getNewPlayer(name,"",govenorName,factionName);
+              
+              if(player.getErrorMessage() != null)
+              {
+            	  message = player.getErrorMessage();
+              }
+          }
+        }
+        return message;  
+    }
+    
+    
     public Player getPlayer(String pName, String pPassword){
     	return g.getPlayer(pName, pPassword);
     }

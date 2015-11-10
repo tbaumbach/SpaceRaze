@@ -268,7 +268,7 @@ public class UserHandler {
 		return true;
 	}
 	
-	public static void addUser(String userName, String userLogin, String userPassword, String userRole,String email,String turnEmail,String gameEmail,String adminEmail){
+	private static void addUser(String userName, String userLogin, String userPassword, String userRole,String email,String turnEmail,String gameEmail,String adminEmail){
 		
 		if( userPassword == null){
 			
