@@ -245,6 +245,11 @@ public class UserHandler {
 				return false;
 			}
 		}
+		for (User user : allTempUsers) {
+			if(user.getName().equals(name)){
+				return false;
+			}
+		}
 		return true;
 	}
 	
@@ -255,12 +260,22 @@ public class UserHandler {
 				return false;
 			}
 		}
+		for (User user : allTempUsers) {
+			if(user.getLogin().equals(login)){
+				return false;
+			}
+		}
 		return true;
 	}
 	
 	private static boolean isUserUniqueEmail(String email){
 		
 		for (User user : allUsers) {
+			if(user.getEmails().equals(email)){
+				return false;
+			}
+		}
+		for (User user : allTempUsers) {
 			if(user.getEmails().equals(email)){
 				return false;
 			}
@@ -307,12 +322,14 @@ public class UserHandler {
 			getTempList();
 			User theUser = findTempUser(userLogin);
 			theUser.setPassword(userPassword);
-			deleteTempUser(userLogin);
+			
 			
 			
 			getList();
 			allUsers.add(theUser);
 			saveUsers();
+			
+			deleteTempUser(userLogin);
 			
 			message = "ok";
 		}
@@ -324,6 +341,7 @@ public class UserHandler {
 	public static String addUser(String userName, String userLogin, String userRole,String email,String turnEmail,String gameEmail,String adminEmail,boolean rulesOk){
 		String message = "";
 		getList();
+		getTempList();
 		// check all fields
 		if (userName == null){
 			message = "Public name is required";
@@ -365,6 +383,8 @@ public class UserHandler {
 			User foundUser = findUser(userLogin);
 			if (foundUser == null){
 				// ok, create new user
+				
+				//TODO byt ut checked mot boolean true/false eller 1/0
 				String tmpTurnEmail = "";
 				if ((turnEmail != null) && (turnEmail.equals("checked"))){
 					tmpTurnEmail = "true";

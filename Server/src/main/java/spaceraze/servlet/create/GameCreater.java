@@ -9,24 +9,15 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.jersey.spi.container.servlet.PerSession;
 
-import sr.server.GameWorldHandler;
-import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
-import sr.world.GameWorld;
-import sr.world.Planet;
 import sr.world.StatisticGameType;
 
 @Path("/creategame")
@@ -68,9 +59,7 @@ public class GameCreater{
 	public GameParameters contract() throws JsonProcessingException {
 		
 		System.out.println("Call aginst creategame/create/contract: ");
-		
-		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
-		
+				
 		
 		List<String> factions = new ArrayList<String>();
 		factions.add("China");

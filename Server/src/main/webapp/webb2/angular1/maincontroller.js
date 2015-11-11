@@ -66,6 +66,7 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
   $scope.maps = null;
   $scope.selectedMap = null;
   $scope.selectedMap = null;
+  $scope.gameUserParameters = null;
   
   /*
   $scope.createGame = function(){
@@ -95,7 +96,72 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
   // url: 'http://localhost:8080/Server/api/PlanetInfo/get?gamename=test&planet=1'
   //url: 'http://localhost:8080/SpaceRaze/servletjson/JSONAndHTMLServlet?gamename=test&planet=2'
 	  
+	  /*
+	   * {"name":null,"login":null,"role":null,"email":null,"turnEmail":null,"gameEmail":null,
+	   * "adminEmail":null,"password":null,"repeatedPassword":null,"rulesOk":false}
+	   */
+	  $scope.getUserContract = function(){$http({
+		  method: 'GET',
+		  url: 'http://localhost:8080/Server/api/user/contract'
+		}).then(function successCallback(response) {
+			$scope.gameUserParameters = response.data;
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
+	
+	  $scope.callCreateUser = function(){$http({
+		  method: 'POST',
+		  url: 'http://localhost:8080/Server/api/user/create/',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			 data : {"name":"test testare1","login":"test1","role":"player","email": "tbaumbach@hotmail.com" ,"turnEmail":"checked","gameEmail":null, "adminEmail":null,"password":null,"repeatedPassword":null,"rulesOk":true}
+			 //data: $scope.gameUserParameters
+			 
+		}).then(function successCallback(response) {
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
 	  
+	  $scope.activate = function(){$http({
+		  method: 'POST',
+		  url: 'http://localhost:8080/Server/api/user/activate/',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			 data : {"login":"test1", "password":"test1","repeatedPassword":"test1"}
+			 //data: $scope.gameUserParameters
+		}).then(function successCallback(response) {
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
+	  $scope.login = function(){$http({
+		  method: 'POST',
+		  url: 'http://localhost:8080/Server/api/user/login/',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			 data : {"login":"test1", "password":"test1"}
+			 //data: $scope.gameUserParameters
+		}).then(function successCallback(response) {
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
+	  $scope.logout = function(){$http({
+		  method: 'GET',
+		  url: 'http://localhost:8080/Server/api/user/logout'
+		}).then(function successCallback(response) {
+			$scope.messages = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
 	  /*
 	   * Gets a contract for creating a new game
 	   * 

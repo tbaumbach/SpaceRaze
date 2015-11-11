@@ -1503,6 +1503,7 @@ public class ServerHandler {
 	}
 */
 	
+	//TODO varför måste password finns för spelaren i pågående spel? borde inte det tas bort så behövs inte detta göras?
 	/**
 	 * Called when a player has changed his password.
 	 * Update all games so that the players new password will be used.
