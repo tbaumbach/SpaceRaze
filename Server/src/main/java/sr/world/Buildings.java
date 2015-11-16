@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.logging.Logger;
 
 public class Buildings implements Serializable{
@@ -12,9 +14,6 @@ public class Buildings implements Serializable{
 	
 	private List<BuildingType> buildings;
 	
-	public List<BuildingType> getBuildings() {
-		return buildings;
-	}
 	
 	public Buildings(){
 		buildings = new ArrayList<BuildingType>();
@@ -32,6 +31,9 @@ public class Buildings implements Serializable{
 		// hoppa över relatioener då det bara är en string (men det kanske görs om så att det blir objektet.
 	}
 	
+	public List<BuildingType> getBuildings() {
+		return buildings;
+	}
 	
 	public void addBuilding(BuildingType buildingType){
 		buildings.add(buildingType);
@@ -68,12 +70,25 @@ public class Buildings implements Serializable{
     	
     }
 	
+	@JsonIgnore
 	public Vector<BuildingType> getRootBuildings(){
 		Vector<BuildingType> tempBuildingTypes = new Vector<BuildingType>(); 
     	
     	for(int i=0; i < buildings.size();i++){
     		if(buildings.get(i).getParentBuilding() == null){
     			tempBuildingTypes.add(buildings.get(i));
+    		}
+    	}
+    	return tempBuildingTypes;
+    	
+    }
+	
+	public Vector<String> getRootBuildingsName(){
+		Vector<String> tempBuildingTypes = new Vector<String>(); 
+    	
+    	for(int i=0; i < buildings.size();i++){
+    		if(buildings.get(i).getParentBuilding() == null){
+    			tempBuildingTypes.add(buildings.get(i).getName());
     		}
     	}
     	return tempBuildingTypes;
@@ -91,6 +106,7 @@ public class Buildings implements Serializable{
 		
 	}
 
+	@JsonIgnore
 	public Vector<BuildingType> getBuildingsVectorOrderByParent(){
 		Vector<BuildingType> tempBuildingTypes = new Vector<BuildingType>(); 
 		Logger.fine("Buildings");

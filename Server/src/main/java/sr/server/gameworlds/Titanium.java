@@ -10,6 +10,7 @@ import sr.enums.SpaceshipTargetingType;
 import sr.enums.TroopTargetingType;
 import sr.enums.TypeOfTroop;
 import sr.general.Functions;
+import sr.general.logging.Logger;
 import sr.world.Alignment;
 import sr.world.Alignments;
 import sr.world.BuildingType;
@@ -1097,6 +1098,7 @@ public class Titanium{
         tmpBuildingType.setDeveloped(false);
         buildingsGW.addBuilding(tmpBuildingType);
         addBuildingToFactions(tmpBuildingType,bOrb,bLancer,bCyber,bGhost,bTemplar);
+        //TODO buildings i GW används inte. Här borde buildingsGW tas bort helt.
         gw.setBuildings(buildingsGW);
   
         Research tempResearch = null;
@@ -1344,23 +1346,23 @@ public class Titanium{
         car.addParent(oHugeShips);
 
         // Buildings
-        createBTresearch(gw,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
+        createBTresearch(buildingsGW,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
 
-        ResearchAdvantage olow = createBTresearch(gw,tempResearch,"Large Orbital Wharf",oLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
-        ResearchAdvantage ohow = createBTresearch(gw,tempResearch,"Huge Orbital Wharf",olow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage olow = createBTresearch(buildingsGW,tempResearch,"Large Orbital Wharf",oLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage ohow = createBTresearch(buildingsGW,tempResearch,"Huge Orbital Wharf",olow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
         ohow.addParent(oHugeShips);
         
-        ResearchAdvantage oha = createBTresearch(gw,tempResearch,"Orb High Academy",null,"");
-        ResearchAdvantage ohu = createBTresearch(gw,tempResearch,"Orb High University",oha,"");
-        ResearchAdvantage oes = createBTresearch(gw,tempResearch,"Orb Elite School",ohu,"");
-        createBTresearch(gw,tempResearch,"Mercenary Liason Office",oes,"");
+        ResearchAdvantage oha = createBTresearch(buildingsGW,tempResearch,"Orb High Academy",null,"");
+        ResearchAdvantage ohu = createBTresearch(buildingsGW,tempResearch,"Orb High University",oha,"");
+        ResearchAdvantage oes = createBTresearch(buildingsGW,tempResearch,"Orb Elite School",ohu,"");
+        createBTresearch(buildingsGW,tempResearch,"Mercenary Liason Office",oes,"");
 
-        ResearchAdvantage oarm = createBTresearch(gw,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can produce armored troop units.");
-        createBTresearch(gw,tempResearch,"Artillery Training Base",oarm,"Enables the building of training bases which can produce artillery and support troop units.");
+        ResearchAdvantage oarm = createBTresearch(buildingsGW,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can produce armored troop units.");
+        createBTresearch(buildingsGW,tempResearch,"Artillery Training Base",oarm,"Enables the building of training bases which can produce artillery and support troop units.");
 
-        createBTresearch(gw,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
+        createBTresearch(buildingsGW,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
 
-        createSpaceportResearch(gw,tempResearch,oLargeShips,oHugeShips);
+        createSpaceportResearch(buildingsGW,tempResearch,oLargeShips,oHugeShips);
         
         // Corruption Research
         createCResearch(tempResearch);
@@ -1631,23 +1633,23 @@ public class Titanium{
         civ.addParent(lHugeShips);
 
         // Buildings
-        createBTresearch(gw,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
+        createBTresearch(buildingsGW,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
 
-        ResearchAdvantage llow = createBTresearch(gw,tempResearch,"Large Orbital Wharf",lLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
-        ResearchAdvantage lhow = createBTresearch(gw,tempResearch,"Huge Orbital Wharf",llow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage llow = createBTresearch(buildingsGW,tempResearch,"Large Orbital Wharf",lLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage lhow = createBTresearch(buildingsGW,tempResearch,"Huge Orbital Wharf",llow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
         lhow.addParent(lHugeShips);
 
-        ResearchAdvantage ls1 = createBTresearch(gw,tempResearch,"Lancer Advanced Economic School",null,"");
-        ResearchAdvantage ls2 = createBTresearch(gw,tempResearch,"Lancer High University",ls1,"");
-        ResearchAdvantage ls3 = createBTresearch(gw,tempResearch,"Lancer Elite School",ls2,"");
-        createBTresearch(gw,tempResearch,"Mercenary Liason Office",ls3,"");
+        ResearchAdvantage ls1 = createBTresearch(buildingsGW,tempResearch,"Lancer Advanced Economic School",null,"");
+        ResearchAdvantage ls2 = createBTresearch(buildingsGW,tempResearch,"Lancer High University",ls1,"");
+        ResearchAdvantage ls3 = createBTresearch(buildingsGW,tempResearch,"Lancer Elite School",ls2,"");
+        createBTresearch(buildingsGW,tempResearch,"Mercenary Liason Office",ls3,"");
 
-        ResearchAdvantage larm = createBTresearch(gw,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
-        createBTresearch(gw,tempResearch,"Artillery Training Base",larm,"Enables the building of training bases which can procude artillery and support troop units.");
+        ResearchAdvantage larm = createBTresearch(buildingsGW,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
+        createBTresearch(buildingsGW,tempResearch,"Artillery Training Base",larm,"Enables the building of training bases which can procude artillery and support troop units.");
 
-        createBTresearch(gw,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
+        createBTresearch(buildingsGW,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
 
-        createSpaceportResearch(gw,tempResearch,lLargeShips,lHugeShips);
+        createSpaceportResearch(buildingsGW,tempResearch,lLargeShips,lHugeShips);
         
         // Corruption Research
         createCResearch(tempResearch);
@@ -1932,24 +1934,24 @@ public class Titanium{
         cbs.addParent(cHugeShips);
 
         // Buildings
-        createBTresearch(gw,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
+        createBTresearch(buildingsGW,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
 
-        ResearchAdvantage clow = createBTresearch(gw,tempResearch,"Large Orbital Wharf",cLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
-        ResearchAdvantage chow = createBTresearch(gw,tempResearch,"Huge Orbital Wharf",clow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage clow = createBTresearch(buildingsGW,tempResearch,"Large Orbital Wharf",cLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage chow = createBTresearch(buildingsGW,tempResearch,"Huge Orbital Wharf",clow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
         chow.addParent(cHugeShips);
 
-        ResearchAdvantage cs1 = createBTresearch(gw,tempResearch,"Cyber Advanced Military Academy",null,"");
-        ResearchAdvantage cs2 = createBTresearch(gw,tempResearch,"Cyber Advanced Sky High University",cs1,"");
-        ResearchAdvantage cs3 = createBTresearch(gw,tempResearch,"Cyber Elite School",cs2,"");
-        createBTresearch(gw,tempResearch,"Mercenary Liason Office",cs3,"");
+        ResearchAdvantage cs1 = createBTresearch(buildingsGW,tempResearch,"Cyber Advanced Military Academy",null,"");
+        ResearchAdvantage cs2 = createBTresearch(buildingsGW,tempResearch,"Cyber Advanced Sky High University",cs1,"");
+        ResearchAdvantage cs3 = createBTresearch(buildingsGW,tempResearch,"Cyber Elite School",cs2,"");
+        createBTresearch(buildingsGW,tempResearch,"Mercenary Liason Office",cs3,"");
 
 /* Cyber can build armored training camp from beginning, and can never build any support units        
         ResearchAdvantage carm = createBTresearch(gw,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
         createBTresearch(gw,tempResearch,"Artillery Training Base",carm,"Enables the building of training bases which can procude artillery and support troop units.");
 */
-        createBTresearch(gw,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
+        createBTresearch(buildingsGW,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
 
-        createSpaceportResearch(gw,tempResearch,cLargeShips,cHugeShips);
+        createSpaceportResearch(buildingsGW,tempResearch,cLargeShips,cHugeShips);
         
         // Corruption Research
         createCResearch(tempResearch);
@@ -2193,28 +2195,28 @@ public class Titanium{
         gcap = createSTresearch(gw,tempResearch,"Ghost Light Cruiser",gcap);
         
         // buildings
-        ResearchAdvantage gms = createBTresearch(gw,tempResearch,"Ghost Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
-        createBTresearch(gw,tempResearch,"Ghost Large Planetary Shield",gms,"Upgrade planet shield building to protect against bomberdment of 3");
+        ResearchAdvantage gms = createBTresearch(buildingsGW,tempResearch,"Ghost Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
+        createBTresearch(buildingsGW,tempResearch,"Ghost Large Planetary Shield",gms,"Upgrade planet shield building to protect against bomberdment of 3");
 
-        ResearchAdvantage spw = createBTresearch(gw,tempResearch,"Small Planetary Wharf",null,"A spaceship wharf placed on the planet surface, it cannot be destrpyed by enemy besieging ships");
-        createBTresearch(gw,tempResearch,"Medium Planetary Wharf",spw,"Upgrade wharf to be able to build medium ships");
+        ResearchAdvantage spw = createBTresearch(buildingsGW,tempResearch,"Small Planetary Wharf",null,"A spaceship wharf placed on the planet surface, it cannot be destrpyed by enemy besieging ships");
+        createBTresearch(buildingsGW,tempResearch,"Medium Planetary Wharf",spw,"Upgrade wharf to be able to build medium ships");
 
-        ResearchAdvantage glow = createBTresearch(gw,tempResearch,"Large Orbital Wharf",gLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
-        ResearchAdvantage ghow = createBTresearch(gw,tempResearch,"Huge Orbital Wharf",glow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage glow = createBTresearch(buildingsGW,tempResearch,"Large Orbital Wharf",gLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage ghow = createBTresearch(buildingsGW,tempResearch,"Huge Orbital Wharf",glow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
         ghow.addParent(gHugeShips);
 
-        ResearchAdvantage gs1 = createBTresearch(gw,tempResearch,"Ghost Advanced Covert Ops School",null,"");
-        ResearchAdvantage gs2 = createBTresearch(gw,tempResearch,"Ghost Advanced Subversion University",gs1,"");
-        ResearchAdvantage gs3 = createBTresearch(gw,tempResearch,"Ghost Elite School",gs2,"");
-        createBTresearch(gw,tempResearch,"Mercenary Liason Office",gs3,"");
+        ResearchAdvantage gs1 = createBTresearch(buildingsGW,tempResearch,"Ghost Advanced Covert Ops School",null,"");
+        ResearchAdvantage gs2 = createBTresearch(buildingsGW,tempResearch,"Ghost Advanced Subversion University",gs1,"");
+        ResearchAdvantage gs3 = createBTresearch(buildingsGW,tempResearch,"Ghost Elite School",gs2,"");
+        createBTresearch(buildingsGW,tempResearch,"Mercenary Liason Office",gs3,"");
 
-        ResearchAdvantage garm = createBTresearch(gw,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
-        createBTresearch(gw,tempResearch,"Artillery Training Base",garm,"Enables the building of training bases which can procude artillery and support troop units.");
+        ResearchAdvantage garm = createBTresearch(buildingsGW,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
+        createBTresearch(buildingsGW,tempResearch,"Artillery Training Base",garm,"Enables the building of training bases which can procude artillery and support troop units.");
 
-        ResearchAdvantage dbr = createBTresearch(gw,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
-        createBTresearch(gw,tempResearch,"Ghost Advanced Bunkers",dbr,"Enables the building of advanced and hidden planet surface bunkers which dramatically increases a planets resistance.");
+        ResearchAdvantage dbr = createBTresearch(buildingsGW,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
+        createBTresearch(buildingsGW,tempResearch,"Ghost Advanced Bunkers",dbr,"Enables the building of advanced and hidden planet surface bunkers which dramatically increases a planets resistance.");
         
-        createSpaceportResearch(gw,tempResearch,gLargeShips,gHugeShips);
+        createSpaceportResearch(buildingsGW,tempResearch,gLargeShips,gHugeShips);
         
         // Corruption Research
         createCResearch(tempResearch);
@@ -2466,22 +2468,22 @@ public class Titanium{
         tcap.addParent(tHugeShips);
 
         // Buildings
-        createBTresearch(gw,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
+        createBTresearch(buildingsGW,tempResearch,"Medium Planetary Shield",null,"Upgrade planet shield building to protect against bomberdment of 2");
 
-        ResearchAdvantage tlow = createBTresearch(gw,tempResearch,"Large Orbital Wharf",tLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
-        ResearchAdvantage thow = createBTresearch(gw,tempResearch,"Huge Orbital Wharf",tlow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage tlow = createBTresearch(buildingsGW,tempResearch,"Large Orbital Wharf",tLargeShips,"Can build one large ship or some smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
+        ResearchAdvantage thow = createBTresearch(buildingsGW,tempResearch,"Huge Orbital Wharf",tlow,"Can build one huge ship or several smaller ships every turn. Is vulnerable to enemy ships since it is in orbit around the planet.");
         thow.addParent(tHugeShips);
 
-        ResearchAdvantage ts1 = createBTresearch(gw,tempResearch,"Templar of Reaping and Pathfinding",null,"");
-        ResearchAdvantage ts2 = createBTresearch(gw,tempResearch,"Temple of Harvest and Mind",ts1,"");
-        ResearchAdvantage ts3 = createBTresearch(gw,tempResearch,"Templar Fortress of Power",ts2,"");
-        createBTresearch(gw,tempResearch,"Mercenary Liason Office",ts3,"");
+        ResearchAdvantage ts1 = createBTresearch(buildingsGW,tempResearch,"Templar of Reaping and Pathfinding",null,"");
+        ResearchAdvantage ts2 = createBTresearch(buildingsGW,tempResearch,"Temple of Harvest and Mind",ts1,"");
+        ResearchAdvantage ts3 = createBTresearch(buildingsGW,tempResearch,"Templar Fortress of Power",ts2,"");
+        createBTresearch(buildingsGW,tempResearch,"Mercenary Liason Office",ts3,"");
 
-        createBTresearch(gw,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
+        createBTresearch(buildingsGW,tempResearch,"Armor Training Base",null,"Enables the building of training bases which can procude armored troop units.");
 
-        createBTresearch(gw,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
+        createBTresearch(buildingsGW,tempResearch,"Defensive Bunkers",null,"Enables the building of planet surface bunkers which increases a planets resistance.");
 
-        createSpaceportResearch(gw,tempResearch,tLargeShips,tHugeShips);
+        createSpaceportResearch(buildingsGW,tempResearch,tLargeShips,tHugeShips);
         
         // Corruption Research
         createCResearch(tempResearch);
@@ -2686,10 +2688,10 @@ public class Titanium{
 		return tempResearchAdvantage;
 	}
 
-	private static ResearchAdvantage createBTresearch(GameWorld gw, Research aResearch, String aBTName, ResearchAdvantage parent, String textSuffix){
+	private static ResearchAdvantage createBTresearch(Buildings buildingsGW, Research aResearch, String aBTName, ResearchAdvantage parent, String textSuffix){
 		ResearchAdvantage tempResearchAdvantage = new ResearchAdvantage(aBTName,"Building type: " + textSuffix);
 		tempResearchAdvantage.setTimeToResearch(2);
-		tempResearchAdvantage.addBuildingType(gw.getBuildingTypeByName(aBTName));
+		tempResearchAdvantage.addBuildingType(getBuildingTypeByName(buildingsGW, aBTName));
 		if (parent != null){
 			tempResearchAdvantage.addParent(parent);
 			aResearch.addAdvantage(tempResearchAdvantage);
@@ -2837,13 +2839,23 @@ public class Titanium{
         factionBuildings.addBuilding(tmpBuildingType);
 	}
 	
-	private static void createSpaceportResearch(GameWorld gw, Research tempResearch,ResearchAdvantage largeShips,ResearchAdvantage hugeShips){
-        ResearchAdvantage s2 = createBTresearch(gw,tempResearch,"Spaceport Class 2",null,"Enables the building of Spaceport Class 2");
-        ResearchAdvantage s3 = createBTresearch(gw,tempResearch,"Spaceport Class 3",s2,"Enables the building of Spaceport Class 3");
+	private static void createSpaceportResearch(Buildings buildingsGW, Research tempResearch,ResearchAdvantage largeShips,ResearchAdvantage hugeShips){
+        ResearchAdvantage s2 = createBTresearch(buildingsGW,tempResearch,"Spaceport Class 2",null,"Enables the building of Spaceport Class 2");
+        ResearchAdvantage s3 = createBTresearch(buildingsGW,tempResearch,"Spaceport Class 3",s2,"Enables the building of Spaceport Class 3");
         s3.addParent(largeShips);
-        ResearchAdvantage s4 = createBTresearch(gw,tempResearch,"Spaceport Class 4",s3,"Enables the building of Spaceport Class 4");
-        ResearchAdvantage s5 = createBTresearch(gw,tempResearch,"Spaceport Class 5",s4,"Enables the building of Spaceport Class 5");
+        ResearchAdvantage s4 = createBTresearch(buildingsGW,tempResearch,"Spaceport Class 4",s3,"Enables the building of Spaceport Class 4");
+        ResearchAdvantage s5 = createBTresearch(buildingsGW,tempResearch,"Spaceport Class 5",s4,"Enables the building of Spaceport Class 5");
         s5.addParent(hugeShips);
+	}
+	
+	private static BuildingType getBuildingTypeByName(Buildings buildingsGW, String name){
+		BuildingType foundbt = buildingsGW.getBuildingType(name);
+    	if (foundbt != null){
+    	}else{ // om detta inträffar så finns det antagligen en felstavning av en skeppstyp i gameworlden
+        	Logger.severe("Titanium.getBuildingTypeByName, btname:" + name + " -> " + foundbt);
+    		Thread.dumpStack();
+    	}
+    	return foundbt;
 	}
 	
 }

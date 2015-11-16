@@ -2,8 +2,6 @@
 package sr.world;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -551,6 +549,7 @@ public class SpaceshipType implements Serializable{
     public void setBuildCost(int buildCost){
     	this.buildCost = buildCost;
     }
+    
     @JsonIgnore
     public int getBuildCost(VIP vipWithBonus){
       int tempBuildCost = buildCost;
@@ -564,11 +563,13 @@ public class SpaceshipType implements Serializable{
       }
       return tempBuildCost;
     }
+    
     @JsonIgnore
     public UniqueIdCounter getUniqueIdCounter(){
       return uic;
     }
 
+    @JsonIgnore
     public Spaceship getShip(VIP vipWithBonus, int factionTechBonus, int buildingBonus){
       nrProduced++;
       return new Spaceship(Functions.deepClone(this),null,nrProduced,uic.getUniqueId(),vipWithBonus,factionTechBonus,buildingBonus);
@@ -672,6 +673,7 @@ public class SpaceshipType implements Serializable{
 		return weaponsMaxSalvoesMedium;
 	}
 
+	@JsonIgnore
 	public String getWeaponsMaxSalvoesMediumString() {
 		String retStr = "0";
 		if ((weaponsMaxSalvoesMedium > 0) & (weaponsMaxSalvoesMedium < Integer.MAX_VALUE)){
@@ -680,6 +682,7 @@ public class SpaceshipType implements Serializable{
 		return retStr;
 	}
 
+	@JsonIgnore
 	public String getWeaponsMaxSalvoesLargeString() {
 		String retStr = "0";
 		if ((weaponsMaxSalvoesLarge > 0) & (weaponsMaxSalvoesLarge < Integer.MAX_VALUE)){
@@ -688,6 +691,7 @@ public class SpaceshipType implements Serializable{
 		return retStr;
 	}
 
+	@JsonIgnore
 	public String getWeaponsMaxSalvoesHugeString() {
 		String retStr = "0";
 		if ((weaponsMaxSalvoesHuge > 0) & (weaponsMaxSalvoesHuge < Integer.MAX_VALUE)){
@@ -889,7 +893,8 @@ public class SpaceshipType implements Serializable{
 	public void setTargetingType(SpaceshipTargetingType aTargetingType){
 		targetingType = aTargetingType;
 	}
-	 
+	
+	@JsonIgnore
 	public SpaceshipTargetingType getTargetingType(){
 		return targetingType;
 	}

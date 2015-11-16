@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.logging.Logger;
 import sr.world.comparator.spaceshiptype.SpaceshipTypeComparator;
 
@@ -221,8 +223,18 @@ public class Faction implements Serializable {
     spaceshipsTypes.add(new SpaceshipType(sst));
   }
 
+  @JsonIgnore
   public List<SpaceshipType> getSpaceshipTypes(){
     return spaceshipsTypes;
+  }
+  
+  public List<String> getSpaceshipTypesName(){
+	  
+	  List<String> shipsName = new ArrayList<String>();
+	  for (SpaceshipType spaceshipType : spaceshipsTypes) {
+		  shipsName.add(spaceshipType.getName());
+	  }
+    return shipsName;
   }
   
   public boolean equals(Faction anotherFaction){
@@ -237,8 +249,13 @@ public class Faction implements Serializable {
 	  this.alignment = alignment;
   }
   
+  @JsonIgnore
   public VIPType getGovernorVIPType() {
 	  return governorVIPType;
+  }
+  
+  public String getGovernorVIPTypeName() {
+	  return governorVIPType.getName();
   }
   
   public void setGovernorVIPType(VIPType governorVIPType) {
@@ -257,24 +274,61 @@ public class Faction implements Serializable {
 	  startingTroops.add(tt);
   }
   
+  @JsonIgnore
   public List<TroopType> getStartingTroops(){
 	  return startingTroops;
+  }
+  
+  public List<String> getStartingTroopsName(){
+	  List<String> troops = new ArrayList<String>();
+	  for (TroopType troopType : startingTroops) {
+		  troops.add(troopType.getUniqueName());
+	}
+	  return troops;
   }
   
   public void addTroopType(TroopType tt){
 	  troopTypes.add(tt.clone());
   }
   
+  @JsonIgnore
   public List<TroopType> getTroopTypes(){
 	  return troopTypes;
   }
+  
+  public List<String> getTroopTypesName(){
+	  List<String> troops = new ArrayList<String>();
+	  for (TroopType troopType : troopTypes) {
+		  troops.add(troopType.getUniqueName());
+	}
+	  return troops;
+  }
 
+  @JsonIgnore
   public List<SpaceshipType> getStartingShipTypes(){
 	  return startingShipTypes;
   }
   
+  public List<String> getStartingShipTypesName(){
+	  
+	  List<String> shipsName = new ArrayList<String>();
+	  for (SpaceshipType spaceshipType : startingShipTypes) {
+		  shipsName.add(spaceshipType.getName());
+	  }
+    return shipsName;
+  }
+  
+  @JsonIgnore
   public List<BuildingType> getStartingBuildings(){
 	  return startingBuildings;
+  }
+  
+  public List<String> getStartingBuildingsname(){
+	  List<String> buildings = new ArrayList<String>();
+	  for (BuildingType buildingType : startingBuildings) {
+		  buildings.add(buildingType.getName());
+	}
+	  return buildings;
   }
 
   public int getTechBonus() {
@@ -293,8 +347,17 @@ public class Faction implements Serializable {
 	  this.nrStartingRandomVIPs = nrStartingRandomVIPs;
   }
   
+  @JsonIgnore
   public List<VIPType> getStartingVIPTypes() {
 	  return startingVIPTypes;
+  }
+  
+  public List<String> getStartingVIPTypesName() {
+	  List<String> vips = new ArrayList<String>();
+	  for (VIPType vipType : startingVIPTypes) {
+		  vips.add(vipType.getName());
+	}
+	  return vips;
   }
   
   public void addStartingVIPType(VIPType aStartingVIPType) {
@@ -362,6 +425,8 @@ public class Faction implements Serializable {
 		return retHTML.toString();
 	}
 	*/
+  
+  	@JsonIgnore
 	public String getTotalDescription(){
 		String totalDescription = "";
     	
@@ -518,8 +583,17 @@ public class Faction implements Serializable {
 		vipTypes.add(aVIPType);
 	}
 	
+	@JsonIgnore
 	public List<VIPType> getVIPTypes(){
 		return vipTypes;
+	}
+	
+	public List<String> getVIPTypesName(){
+		List<String> vips = new ArrayList<String>();
+		  for (VIPType vipType : vipTypes) {
+			  vips.add(vipType.getName());
+		}
+		  return vips;
 	}
 
 	public String getHowToPlay() {
@@ -538,6 +612,7 @@ public class Faction implements Serializable {
 		return shortName;
 	}
 
+	@JsonIgnore
 	public List<String> getAbilitiesStringsDroid(){
 		List<String> allStrings = new LinkedList<String>();
 		if (alien){
@@ -558,6 +633,7 @@ public class Faction implements Serializable {
 		return allStrings;
 	}
 
+	@JsonIgnore
 	public boolean getHasAbilityDroid(int abilityNr){
 		boolean hasAbility = false;
 		if ((abilityNr == 1) & alien){
@@ -578,6 +654,7 @@ public class Faction implements Serializable {
 		return hasAbility;
 	}
 
+	@JsonIgnore
 	public String getFactionLinkDroid(){
 		StringBuffer sb = new StringBuffer();
 		sb.append("<b>");
@@ -589,6 +666,7 @@ public class Faction implements Serializable {
 		return sb.toString();
 	}
 
+	@JsonIgnore
 	public String getFactionInfoDroid(){
 		StringBuffer sb = new StringBuffer();
 		sb.append("<h4>Faction: ");
@@ -635,6 +713,7 @@ public class Faction implements Serializable {
 		return sb.toString();
 	}
 
+	@JsonIgnore
 	public static String getHTMLHeaderRow(){
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<tr>");
@@ -658,6 +737,7 @@ public class Faction implements Serializable {
 		  return sb.toString();
 	  }
 	  
+	@JsonIgnore
 	  public String getHTMLTableRow(String gameWorldName){
 		  Logger.finer( "getHTMLTableRow: " + gameWorldName);
 		  StringBuffer sb = new StringBuffer();
@@ -675,6 +755,7 @@ public class Faction implements Serializable {
 		  return sb.toString();
 	  }
 
+	@JsonIgnore
 	  public static String getHTMLHeaderRowNO(){
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<tr class='ListheaderRow'>");
@@ -699,6 +780,7 @@ public class Faction implements Serializable {
 		  return sb.toString();
 	  }
 	  
+	@JsonIgnore
 	  public String getHTMLTableRowNO(String gameWorldName, String RowName, int i){
 		  Logger.finer("getHTMLTableRow: " + gameWorldName);
 		  StringBuffer sb = new StringBuffer();
@@ -723,7 +805,7 @@ public class Faction implements Serializable {
 		  return sb.toString();
 	  }
 
-	  
+	  @JsonIgnore
 	  public String getHTMLCheckbox(){
 		  return "<input type=\"checkbox\" checked name=\"faction_" + name + "\" value=\"yes\">" + name + "<br>";
 	  }

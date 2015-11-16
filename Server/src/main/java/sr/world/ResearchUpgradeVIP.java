@@ -2,6 +2,8 @@ package sr.world;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.Functions;
 
 public class ResearchUpgradeVIP implements Serializable {
@@ -156,6 +158,7 @@ public class ResearchUpgradeVIP implements Serializable {
 	    	return text;
 	    }
 	  
+	  @JsonIgnore
 	  public String getResearchText(){
 	    	String text;
 	    	

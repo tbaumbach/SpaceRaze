@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.logging.Logger;
 
 public class Research implements Serializable {
@@ -83,6 +85,7 @@ public class Research implements Serializable {
 		return advantages;
 	}
 	
+	@JsonIgnore
 	public List<ResearchAdvantage> getAllAdvantagesThatIsReadyToBeResearchOn() {
 		
 		List<ResearchAdvantage> tempAdvantages = new ArrayList<ResearchAdvantage>();
@@ -95,6 +98,23 @@ public class Research implements Serializable {
 			ResearchAdvantage tempResearchAdvantage = it.next();
 			if(tempResearchAdvantage.isReadyToBeResearchedOn()){
 				tempAdvantages.add(tempResearchAdvantage);
+			}
+		}
+		return tempAdvantages;
+	}
+	
+	public List<String> getAllAdvantagesNameThatIsReadyToBeResearchOn() {
+		
+		List<String> tempAdvantages = new ArrayList<String>();
+		
+		Collection<ResearchAdvantage> tempAllAdvantage = allAdvantage.values();
+		Iterator<ResearchAdvantage> it = tempAllAdvantage.iterator();
+		Logger.finer("tempAllAdvantage.size(): " + allAdvantage.size());
+		
+		while(it.hasNext()){
+			ResearchAdvantage tempResearchAdvantage = it.next();
+			if(tempResearchAdvantage.isReadyToBeResearchedOn()){
+				tempAdvantages.add(tempResearchAdvantage.getName());
 			}
 		}
 		return tempAdvantages;

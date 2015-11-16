@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.enums.TypeOfTroop;
 import sr.general.Functions;
 import sr.general.logging.Logger;
@@ -76,6 +78,7 @@ public class BuildingType implements Serializable, Cloneable{
 	private int buildingBuildBonus; // decreases build cost of buildings
 	*/
 	
+	@JsonIgnore
 	  public String getHTMLTableContentNO(){
 		  StringBuffer sb = new StringBuffer();
 		  String RowName= shortName;
@@ -354,6 +357,8 @@ public class BuildingType implements Serializable, Cloneable{
 		this.replaceParentBuilding = replaceParentBuilding;
 	}
 	*/
+	
+	@JsonIgnore
 	public UniqueIdCounter getUniqueIdCounter(){
 	      return uic;
 	    }
@@ -452,8 +457,17 @@ public class BuildingType implements Serializable, Cloneable{
 		this.autoDestructWhenConquered = autoDestructWhenConquered;
 	}
 
+	@JsonIgnore
 	public List<VIPType> getBuildVIPTypes() {
 		return buildVIPTypes;
+	}
+	
+	public List<String> getBuildVIPTypesName() {
+		List<String> vipTypesName = new ArrayList<String>();
+		for (VIPType vip : buildVIPTypes) {
+			vipTypesName.add(vip.getName());
+		}
+		return vipTypesName;
 	}
 
 	public void setBuildVIPTypes(List<VIPType> buildVIPTypes) {
@@ -568,7 +582,7 @@ public class BuildingType implements Serializable, Cloneable{
 	public List<TypeOfTroop> getTypeOfTroop() {
 		return typeOfTroop;
 	}
-
+	
 	public void addTypeOfTroop(TypeOfTroop typeOfTroop) {
 		this.typeOfTroop.add(typeOfTroop);
 	}
@@ -654,7 +668,7 @@ public class BuildingType implements Serializable, Cloneable{
 		return childAlreadyBuild;
 	}
 		
-	
+	@JsonIgnore
 	public List<String> getAbilitiesStrings(){
 	    List<String> allStrings = new LinkedList<String>();
 	    
@@ -816,6 +830,7 @@ public class BuildingType implements Serializable, Cloneable{
 		this.selfDestructable = selfDestructable;
 	}
 	
+	@JsonIgnore
 	public boolean getHasAbilityDroid(int abilityNr){
 		boolean hasAbility = false;
 	    if ((abilityNr == 1) & spaceport){
@@ -863,6 +878,7 @@ public class BuildingType implements Serializable, Cloneable{
 		return hasAbility;
 	}
 
+	@JsonIgnore
 	public String getBuildingInfoDroid(Buildings buildingsGW) {
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<h4>Building: ");
@@ -900,6 +916,7 @@ public class BuildingType implements Serializable, Cloneable{
 		  return sb.toString();
 	}
 
+	@JsonIgnore
 	public static String getAllAbilitiesDroid(){
 	    List<String> allStrings = new LinkedList<String>();	    
     	allStrings.add("Spaceport");
@@ -923,6 +940,7 @@ public class BuildingType implements Serializable, Cloneable{
 	    return sb.toString();
 	}
 
+	@JsonIgnore
 	public List<String> getAbilitiesStringsDroid(){
 	    List<String> allStrings = new LinkedList<String>();	    
 	    if (spaceport){

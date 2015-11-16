@@ -231,6 +231,7 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		
 	}
 	
+	@JsonIgnore
 	public String getResearchText(){
     	String text;
     	
@@ -396,8 +397,17 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		this.ships.add(ship);
 	}
 	
+	@JsonIgnore
 	public List<SpaceshipType> getShips(){
 		return ships;
+	}
+	
+	public List<String> getShipsName(){
+		List<String> shipNames = new ArrayList<String>();
+		for (SpaceshipType Spaceship : ships) {
+			shipNames.add(Spaceship.getName());
+		}
+		return shipNames;
 	}
 	
 	public void setShips(List<SpaceshipType> ships){
@@ -420,8 +430,17 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		troops.add(aTroopType);
 	}
 	
+	@JsonIgnore
 	public List<TroopType> getTroopTypes(){
 		return troops;
+	}
+	
+	public List<String> getTroopTypesName(){
+		List<String> troopNames = new ArrayList<String>();
+		for (TroopType troop : troops) {
+			troopNames.add(troop.getUniqueName());
+		}
+		return troopNames;
 	}
 	
 	public void setTroopTypes(List<TroopType> newTroops){
@@ -444,8 +463,17 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		vips.add(aVIPType);
 	}
 	
+	@JsonIgnore
 	public List<VIPType> getVIPTypes(){
 		return vips;
+	}
+	
+	public List<String> getVIPTypesName(){
+		List<String> vipNames = new ArrayList<String>();
+		for (VIPType vip : vips) {
+			vipNames.add(vip.getName());
+		}
+		return vipNames;
 	}
 	
 	public void setVIPTypes(List<VIPType> newVIPs){
@@ -468,8 +496,17 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		buildings.add(aBuildingType);
 	}
 	
+	@JsonIgnore
 	public List<BuildingType> getBuildingTypes(){
 		return buildings;
+	}
+	
+	public List<String> getBuildingTypesName(){
+		List<String> buildingNames = new ArrayList<String>();
+		for (BuildingType building : buildings) {
+			buildingNames.add(building.getName());
+		}
+		return buildingNames;
 	}
 	
 	public void setBuildingTypes(List<BuildingType> newBuildings){
@@ -491,9 +528,19 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		this.replaceShips.add(ship);
 	}
 
+	@JsonIgnore
 	public List<SpaceshipType> getReplaceShips() {
 		return replaceShips;
 	}
+	
+	public List<String> getReplaceShipsName(){
+		List<String> shipNames = new ArrayList<String>();
+		for (SpaceshipType Spaceship : replaceShips) {
+			shipNames.add(Spaceship.getName());
+		}
+		return shipNames;
+	}
+	
 	
 	public void setReplaceShips(List<SpaceshipType> replaceShips) {
 		this.replaceShips = replaceShips;
@@ -515,8 +562,17 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		this.replaceTroops.add(aTroopType);
 	}
 
+	@JsonIgnore
 	public List<TroopType> getReplaceTroopTypes() {
 		return replaceTroops;
+	}
+	
+	public List<String> getReplaceTroopTypesName(){
+		List<String> troopNames = new ArrayList<String>();
+		for (TroopType troop : replaceTroops) {
+			troopNames.add(troop.getUniqueName());
+		}
+		return troopNames;
 	}
 	
 	public void setReplaceTroopTypes(List<TroopType> replaceTroopTypes) {
@@ -539,9 +595,20 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		replaceVIPs.add(aVIPType);
 	}
 	
+	@JsonIgnore
 	public List<VIPType> getReplaceVIPTypes(){
 		return replaceVIPs;
 	}
+	
+	public List<String> getReplaceVIPTypesName(){
+		List<String> vipNames = new ArrayList<String>();
+		for (VIPType vip : replaceVIPs) {
+			vipNames.add(vip.getName());
+		}
+		return vipNames;
+	}
+	
+	
 	
 	public void setReplaceVIPTypes(List<VIPType> replaceVIPTypes){
 		replaceVIPs = replaceVIPTypes;
@@ -563,9 +630,19 @@ public class ResearchAdvantage implements Serializable, Cloneable  {
 		replaceBuildings.add(aBuildingType);
 	}
 	
+	@JsonIgnore
 	public List<BuildingType> getReplaceBuildingTypes(){
 		return replaceBuildings;
 	}
+	
+	public List<String> getReplaceBuildingTypesName(){
+		List<String> buildingNames = new ArrayList<String>();
+		for (BuildingType building : replaceBuildings) {
+			buildingNames.add(building.getName());
+		}
+		return buildingNames;
+	}
+	
 	
 	public void setReplaceBuildingTypes(List<BuildingType> newBuildings){
 		replaceBuildings = newBuildings;

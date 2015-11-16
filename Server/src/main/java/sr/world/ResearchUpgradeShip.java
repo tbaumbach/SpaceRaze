@@ -2,6 +2,8 @@ package sr.world;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.enums.SpaceshipRange;
 
 public class ResearchUpgradeShip implements Serializable{
@@ -180,6 +182,7 @@ public class ResearchUpgradeShip implements Serializable{
     	return text;
     }
     
+    @JsonIgnore
     public String getResearchText(){
     	String text;
     	

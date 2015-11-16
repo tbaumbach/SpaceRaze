@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.enums.BlackMarketFrequency;
 
 /* 
@@ -93,6 +95,7 @@ public class VIPType implements Serializable {
     this.uic = uic;
   }
   
+  @JsonIgnore
   public String getHTMLTableContent(){
 	  StringBuffer sb = new StringBuffer();
 	  sb.append("<table border=\"0\" cellspacing=\"4\" cellpadding=\"0\" class=\"sr\">\n");
@@ -131,6 +134,7 @@ public class VIPType implements Serializable {
 	  return sb.toString();
   }
   
+  @JsonIgnore
   public String getHTMLTableContentNO(){
 	  StringBuffer sb = new StringBuffer();
 	  String RowName= shortName;
@@ -181,6 +185,7 @@ public class VIPType implements Serializable {
 	  return sb.toString();
   }
 
+  @JsonIgnore
   public List<String> getAbilitiesStrings(){  // add info about how easily/hard the VIP dies?   And info about where this VIP may travel?
     List<String> allStrings = new LinkedList<String>();
     if (assassination > 0){
@@ -830,6 +835,7 @@ public class VIPType implements Serializable {
 		this.howToPlay = howToPlay;
 	}
 
+	@JsonIgnore
 	public static String getAllAbilitiesDroid(){
 		List<String> allStrings = new LinkedList<String>();
 		allStrings.add("Governor");
@@ -870,6 +876,7 @@ public class VIPType implements Serializable {
 	    return sb.toString();
 	}
 
+	@JsonIgnore
 	public List<String> getAbilitiesStringsDroid(){
 		List<String> allStrings = new LinkedList<String>();
 		if (governor){
@@ -965,6 +972,7 @@ public class VIPType implements Serializable {
 		return allStrings;
 	}
 
+	@JsonIgnore
 	public boolean getHasAbilityDroid(int abilityNr){
 		boolean hasAbility = false;
 		if ((abilityNr == 1) & governor){
@@ -1060,6 +1068,7 @@ public class VIPType implements Serializable {
 		return hasAbility;
 	}
 
+	@JsonIgnore
 	public String getVipInfoDroid() {
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<h4>VIP type: ");

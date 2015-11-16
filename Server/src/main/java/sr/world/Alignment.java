@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.Functions;
 
 /**
@@ -18,6 +20,7 @@ public class Alignment implements Serializable {
 	private boolean duelOwnAlignment = true; // duellists with false will never fight another duellist with the same alignment
 	private List<String> hateDuellistsList = new LinkedList<String>(); // will fight duellists from these alignments even on same side
 	
+	@JsonIgnore
 	  public String getHTMLTableContent(){
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<table border=\"0\" cellspacing=\"4\" cellpadding=\"0\" class=\"sr\">\n");
@@ -156,6 +159,7 @@ public class Alignment implements Serializable {
 		return name;
 	}
 
+	@JsonIgnore
 	public String getAlignmentInfoDroid() {
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<h4>Alignment: ");

@@ -183,9 +183,6 @@ public class GameWorld implements Serializable{
     	return foundtt;
     }
 
-    public SpaceshipType getSpaceshipTypeCopyByName(String sstname){
-    	return getSpaceshipTypeByName(sstname).copy();
-    }
     
 	public String getChangedDate() {
 		return changedDate;
@@ -219,7 +216,7 @@ public class GameWorld implements Serializable{
 		this.cumulativeBombardment = cumulativeBombardment;
 	}
 */	
-	
+	@JsonIgnore
 	public String getTotalDescription(){
 		String totalDescription = "";
     	
@@ -302,19 +299,17 @@ public class GameWorld implements Serializable{
 	public InitiativeMethod getInitMethod() {
 		return initMethod;
 	}
-/* cannot be changed any more...
-	public void setInitMethod(InitiativeMethod initMethod) {
-		this.initMethod = initMethod;
-	}
-*/
+	
+	@JsonIgnore
 	public SpaceshipType getNeutralSize1() {
 		return neutralSize1;
 	}
-
+	
 	public void setNeutralSize1(SpaceshipType neutralSize1) {
 		this.neutralSize1 = neutralSize1;
 	}
 
+	@JsonIgnore
 	public SpaceshipType getNeutralSize2() {
 		return neutralSize2;
 	}
@@ -323,6 +318,7 @@ public class GameWorld implements Serializable{
 		this.neutralSize2 = neutralSize2;
 	}
 
+	@JsonIgnore
 	public SpaceshipType getNeutralSize3() {
 		return neutralSize3;
 	}
@@ -330,7 +326,20 @@ public class GameWorld implements Serializable{
 	public void setNeutralSize3(SpaceshipType neutralSize3) {
 		this.neutralSize3 = neutralSize3;
 	}
-
+	
+	public String getNeutralSmallShip() {
+		return neutralSize1.getName();
+	}
+	
+	public String getNeutralMediumShip() {
+		return neutralSize2.getName();
+	}
+	
+	public String getNeutralLargeShip() {
+		return neutralSize3.getName();
+	}
+	
+	@JsonIgnore
 	public String getBattleSimDefaultShips1() {
 		return battleSimDefaultShips1;
 	}
@@ -339,6 +348,7 @@ public class GameWorld implements Serializable{
 		this.battleSimDefaultShips1 = battleSimDefaultShips1;
 	}
 
+	@JsonIgnore
 	public String getBattleSimDefaultShips2() {
 		return battleSimDefaultShips2;
 	}
@@ -347,6 +357,7 @@ public class GameWorld implements Serializable{
 		this.battleSimDefaultShips2 = battleSimDefaultShips2;
 	}
 
+	// TODO Remove
 	/*
 	 * Only used by the battlesim page? Civilian ships are filtered out!
 	 */
@@ -375,6 +386,7 @@ public class GameWorld implements Serializable{
 		return newList;
 	}
 
+	@JsonIgnore
 	public List<VIPType> getBattleVIPtypes(){
 		Logger.finer("getBattleVIPtypes()");
 		List<VIPType> battleVips = new ArrayList<VIPType>();
@@ -389,6 +401,7 @@ public class GameWorld implements Serializable{
 		return battleVips;
 	}
 
+	@JsonIgnore
 	public List<VIPType> getLandBattleVIPtypes(){
 		Logger.finer("getLandBattleVIPtypes()");
 		List<VIPType> battleVips = new ArrayList<VIPType>();
@@ -401,6 +414,8 @@ public class GameWorld implements Serializable{
 		return battleVips;
 	}
 
+	// TODO Remove
+	@JsonIgnore
 	public boolean hasSquadrons(){
 		boolean hasSquadrons = false;
 		int i = 0;
@@ -449,7 +464,8 @@ public class GameWorld implements Serializable{
 		}
 		return retHTML.toString();
 	}
-
+	
+	@JsonIgnore
 	public List<String> getFactionsNames(){
 		List<String> factionNames = new LinkedList<String>();
 		for (Faction aFaction : factions) {
@@ -628,6 +644,7 @@ public class GameWorld implements Serializable{
 	}
 
 	*/
+	@JsonIgnore
 	public boolean isSquadronsSurviveOutsideCarriers() {
 		return squadronsSurviveOutsideCarriers;
 	}
@@ -636,6 +653,7 @@ public class GameWorld implements Serializable{
 		this.squadronsSurviveOutsideCarriers = squadronsSurviveOutsideCarriers;
 	}
 */
+	@JsonIgnore
 	public int getClosedNeutralPlanetChance() {
 		return closedNeutralPlanetChance;
 	}
@@ -644,6 +662,7 @@ public class GameWorld implements Serializable{
 		this.closedNeutralPlanetChance = closedNeutralPlanetChance;
 	}
 
+	@JsonIgnore
 	public int getRazedPlanetChance() {
 		return razedPlanetChance;
 	}
@@ -672,9 +691,13 @@ public class GameWorld implements Serializable{
 		this.versionId = versionId;
 	}
 
-
+	@JsonIgnore
 	public TroopType getNeutralTroopType() {
 		return neutralTroopType;
+	}
+	
+	public String getNeutralTroopTypename() {
+		return neutralTroopType.getUniqueName();
 	}
 
 	public void setNeutralTroopType(TroopType neutralTroopType) {
@@ -693,10 +716,13 @@ public class GameWorld implements Serializable{
 		this.baseBombardmentDamage = baseBombardmentDamage;
 	}
 	
+	//TODO Don't think this i in use. Buildings are in factions
+	@JsonIgnore
 	public Buildings getBuildings() {
 		return buildings;
 	}
 
+	//TODO Don't think this i in use. Buildings are in factions
 	public void setBuildings(Buildings buildings) {
 		this.buildings = buildings;
 	}
@@ -718,377 +744,13 @@ public class GameWorld implements Serializable{
 		return false;
 	}
 	
-	  public boolean isAdjustScreenedStatus() {
+	@JsonIgnore
+	public boolean isAdjustScreenedStatus() {
 		return adjustScreenedStatus;
 	}
 
 	public void setAdjustScreenedStatus(boolean adjustScreenedStatus) {
 		this.adjustScreenedStatus = adjustScreenedStatus;
 	}
-/*
-	public String getAllFactionsDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  for (Faction aFaction : factions) {
-			  sb.append(aFaction.getFactionLinkDroid());
-			  sb.append("&nbsp;<br>");
-		  }
-		  return sb.toString();
-	  }
 
-	  public String getReconstructCostsDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  for (Faction aFaction : factions) {
-			  if (!aFaction.isAlien()){
-				  sb.append(aFaction.getName());
-				  sb.append(": ");
-				  sb.append(aFaction.getReconstructCostBase());
-				  sb.append("&nbsp;<br>");
-			  }
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getAllShiptypesDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  for (SpaceshipType aSpaceshipType : shipTypes) {
-			  sb.append(aSpaceshipType.getName());
-			  sb.append("&nbsp;<br>");
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getAllVIPTypesDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  List<VIPType> aVIPTypeList = new ArrayList<VIPType>(vipTypes);
-		  Collections.sort(aVIPTypeList, new VIPTypeComparator());
-		  for (VIPType aVIPType : aVIPTypeList) {
-			  sb.append(aVIPType.getName());
-			  sb.append("&nbsp;<br>");
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getVIPTypesDroid(String alignmentName){
-		  StringBuffer sb = new StringBuffer();
-		  for (VIPType aVIPType : vipTypes) {
-			  if (aVIPType.getAlignment().getName().equalsIgnoreCase(alignmentName)){
-				  sb.append(aVIPType.getName());
-				  sb.append("&nbsp;<br>");
-			  }
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getFactionsDroid(String alignmentName){
-		  StringBuffer sb = new StringBuffer();
-		  for (Faction aFaction : factions) {
-			  if (aFaction.getAlignment().getName().equalsIgnoreCase(alignmentName)){
-				  sb.append(aFaction.getName());
-				  sb.append("&nbsp;<br>");
-			  }
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getAllBuildingTypesDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  List<BuildingType> buildingsListCopy = new ArrayList<BuildingType>(buildings.getBuildings());
-		  Collections.sort(buildingsListCopy,new BuildingTypeNameComparator());
-		  for (BuildingType aBuildingType : buildingsListCopy) {
-			  sb.append(aBuildingType.getName());
-			  sb.append("&nbsp;<br>");
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getAllAlignmentsDroid(){
-		  StringBuffer sb = new StringBuffer();
-		  for (Alignment aAlignment : alignments.getAllAlignments()) {
-			  sb.append(aAlignment.getName());
-			  sb.append(" alignment&nbsp;<br>");
-		  }
-		  return sb.toString();
-	  }
-
-	  public String getFactionInfoDroid(String factionName){
-		  Faction foundFaction = findFaction(factionName);
-		  return foundFaction.getFactionInfoDroid();
-	  }
-
-	  public String getShiptypeInfoDroid(String shiptypeName){
-		  SpaceshipType foundShiptype = getSpaceshipTypeByName(shiptypeName);
-		  return foundShiptype.getShiptypeInfoDroid();
-	  }
-
-	  public String getAlignmentInfoDroid(String alignmentName){
-		  Alignment foundAlignment = getAlignments().findAlignment(alignmentName);
-		  return foundAlignment.getAlignmentInfoDroid();
-	  }
-
-	  public String getBuildingInfoDroid(String buildingName){
-		  BuildingType foundBuilding = getBuildingTypeByName(buildingName);
-		  return foundBuilding.getBuildingInfoDroid(buildings);
-	  }
-
-	  public String getVipInfoDroid(String vipName){
-		  VIPType foundVip = getVIPTypeByName(vipName);
-		  return foundVip.getVipInfoDroid();
-	  }
-
-	  public String getVipsWithAbilityDroid(int abilityNr){
-		  List<String> vipList = new ArrayList<String>();
-		  StringBuffer sbTitle = new StringBuffer();
-		  sbTitle.append("All VIPs with this ability");
-		  switch (abilityNr){
-		  	case 6: case 7: case 8:
-		  	case 9: case 10: case 11:
-		  	case 12: case 13: case 14:
-		  	case 24: case 26:
-		  		sbTitle.append(" (bonus)");
-			  break;
-		  	case 2: case 3: case 4: case 17:
-		  		sbTitle.append(" (level)");
-		  }
-		  sbTitle.append(":<br>");
-		  for (VIPType aVIPType : vipTypes) {
-			  StringBuffer sb = new StringBuffer();
-			  if (aVIPType.getHasAbilityDroid(abilityNr)){
-				  sb.append(aVIPType.getName());
-				  if (abilityNr == 2){
-					  sb.append(" (");
-					  sb.append(aVIPType.getAssassination());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 3){
-					  sb.append(" (");
-					  sb.append(aVIPType.getCounterEspionage());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 4){
-					  sb.append(" (");
-					  sb.append(aVIPType.getExterminator());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 6){
-					  sb.append(" (");
-					  sb.append(aVIPType.getInitBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 7){
-					  sb.append(" (");
-					  sb.append(aVIPType.getInitFighterSquadronBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 8){
-					  sb.append(" (");
-					  sb.append(aVIPType.getInitDefence());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 9){
-					  sb.append(" (");
-					  sb.append(aVIPType.getPsychWarfareBonus());
-					  sb.append(")");
-				  }else	    
-				  if (abilityNr == 10){
-					  sb.append(" (");
-					  sb.append(aVIPType.getShipBuildBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 11){
-					  sb.append(" (");
-					  sb.append(aVIPType.getBuildingBuildBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 12){
-					  sb.append(" (");
-					  sb.append(aVIPType.getTechBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 13){
-					  sb.append(" (");
-					  sb.append(aVIPType.getOpenIncBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 14){
-					  sb.append(" (");
-					  sb.append(aVIPType.getClosedIncBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 17){
-					  sb.append(" (");
-					  sb.append(aVIPType.getDuellistSkillString());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 24){
-					  sb.append(" (");
-					  sb.append(aVIPType.getResistanceBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 26){
-					  sb.append(" (");
-					  sb.append(aVIPType.getBombardmentBonus());
-					  sb.append(")");
-				  }
-				  sb.append("&nbsp;<br>");
-				  vipList.add(sb.toString());
-			  }
-		  }
-		  Collections.sort(vipList);
-		  StringBuffer sbAll = new StringBuffer();
-		  sbAll.append(sbTitle.toString());
-		  for(String aShipString : vipList){
-			  sbAll.append(aShipString);
-		  }
-		  return sbAll.toString();
-	  }
-
-	  public String getShipsWithAbilityDroid(int abilityNr){
-		  List<String> shipList = new ArrayList<String>();
-		  for (SpaceshipType aShipType : shipTypes) {
-			  if (aShipType.getHasAbilityDroid(abilityNr)){
-				  StringBuffer sb = new StringBuffer();
-				  sb.append(aShipType.getName());
-				  if (abilityNr == 6){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getSquadronCapacity()));
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 10){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getBombardment()));
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 11){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getInitSupportBonus()));
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 12){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getInitiativeBonus()));
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 13){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getInitDefence()));
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 14){
-					  sb.append(" (");
-					  sb.append(Integer.toString(aShipType.getPsychWarfare()));
-					  sb.append(")");
-				  }
-				  sb.append("&nbsp;<br>");
-				  shipList.add(sb.toString());
-			  }
-		  }
-		  Collections.sort(shipList);
-		  StringBuffer sbAll = new StringBuffer();
-		  for(String aShipString : shipList){
-			  sbAll.append(aShipString);
-		  }
-		  return sbAll.toString();
-	  }
-
-	  public String getBuildingsWithAbilityDroid(int abilityNr){
-		  List<String> buildingList = new ArrayList<String>();
-		  for (BuildingType aBuildingType : buildings.getBuildings()) {
-			  if (aBuildingType.getHasAbilityDroid(abilityNr)){
-				  StringBuffer sb = new StringBuffer();
-				  sb.append(aBuildingType.getName());
-				  if (abilityNr == 2){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getOpenPlanetBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 3){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getClosedPlanetBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 4){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getTechBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 5){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getResistanceBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 6){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getShieldCapacity());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 8){
-					  sb.append(" (");
-					  sb.append(aBuildingType.getWharfSize());
-					  sb.append(")");
-				  }
-				  sb.append("&nbsp;<br>");
-				  buildingList.add(sb.toString());
-			  }
-		  }
-		  Collections.sort(buildingList);
-		  StringBuffer sbAll = new StringBuffer();
-		  for(String aShipString : buildingList){
-			  sbAll.append(aShipString);
-		  }
-		  return sbAll.toString();
-	  }
-
-	  public String getFactionsWithAbilityDroid(int abilityNr){
-		  List<String> factionList = new ArrayList<String>();
-//		  sb.append("All factions with this ability:<br>");
-		  for (Faction aFaction : factions) {
-			  if (aFaction.getHasAbilityDroid(abilityNr)){
-				  StringBuffer sb = new StringBuffer();
-				  sb.append(aFaction.getName());
-				  if (abilityNr == 2){
-					  sb.append(" (");
-					  sb.append(aFaction.getResistanceBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 3){
-					  sb.append(" (");
-					  sb.append(aFaction.getOpenPlanetBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 4){
-					  sb.append(" (");
-					  sb.append(aFaction.getClosedPlanetBonus());
-					  sb.append(")");
-				  }else
-				  if (abilityNr == 5){
-					  sb.append(" (");
-					  sb.append(aFaction.getTechBonus());
-					  sb.append("%");
-					  sb.append(")");
-				  }
-				  sb.append("&nbsp;<br>");
-				  factionList.add(sb.toString());
-			  }
-		  }
-		  Collections.sort(factionList);
-		  StringBuffer sbAll = new StringBuffer();
-		  for(String aShipString : factionList){
-			  sbAll.append(aShipString);
-		  }
-		  return sbAll.toString();
-	  }
-*/
 }

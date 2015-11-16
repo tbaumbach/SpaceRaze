@@ -2,6 +2,8 @@ package sr.world;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.Functions;
 
 @SuppressWarnings("unused")
@@ -113,6 +115,7 @@ public class ResearchUpgradeBuilding implements Serializable{
 	    	return text;
 	    }
 	
+	@JsonIgnore
 	public String getResearchText(){
     	String text;
     	
