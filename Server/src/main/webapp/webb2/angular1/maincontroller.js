@@ -112,8 +112,8 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 		  
 	
 	  $scope.callCreateUser = function(){$http({
-		  method: 'POST',
-		  url: 'http://localhost:8080/Server/api/user/create/',
+		  method: 'PUT',
+		  url: 'http://localhost:8080/Server/api/user/',
 		  headers: {
 			   'Content-Type': 'application/json'
 			 },
@@ -162,6 +162,22 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 		  }, function errorCallback(response) {
 			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
 		  })};
+		  
+	  $scope.callJoinGame = function(){$http({
+		  method: 'PUT',
+		  url: 'http://localhost:8080/Server/api/games/2/users/USA/tobbe/kungen/',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			 data : ''
+			 //data: $scope.gameUserParameters
+			 
+		}).then(function successCallback(response) {
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};  
+		  
 	  /*
 	   * Gets a contract for creating a new game
 	   * 
@@ -172,7 +188,7 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 	   */
 	  $scope.getContract = function(){$http({
 		  method: 'GET',
-		  url: 'http://localhost:8080/Server/api/creategame/create/contract'
+		  url: 'http://localhost:8080/Server/api/games/game/new/contract'
 		}).then(function successCallback(response) {
 			$scope.gameParameters = response.data;
 		  }, function errorCallback(response) {
@@ -182,7 +198,7 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 
 		  $scope.getGameWorlds = function(){$http({
 			  method: 'GET',
-			  url: 'http://localhost:8080/Server/api/gameworld/list'
+			  url: 'http://localhost:8080/Server/api/gameworlds'
 			}).then(function successCallback(response) {
 				$scope.gameWorlds = response.data;
 				$scope.message = response.data;
@@ -192,7 +208,7 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 			  
 		  $scope.getMaps = function(){$http({
 			  method: 'GET',
-			  url: 'http://localhost:8080/Server/api/map/list'
+			  url: 'http://localhost:8080/Server/api/maps/'
 			}).then(function successCallback(response) {
 				$scope.maps = response.data;
 				$scope.message = response.data;
@@ -233,8 +249,8 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 	   * 
 	   */
 	  $scope.callCreateNewgame = function(){$http({
-		  method: 'POST',
-		  url: 'http://localhost:8080/Server/api/creategame/create/',
+		  method: 'PUT',
+		  url: 'http://localhost:8080/Server/api/games/',
 		  headers: {
 			   'Content-Type': 'application/json'
 			 },

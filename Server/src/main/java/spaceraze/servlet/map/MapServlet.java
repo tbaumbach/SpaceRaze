@@ -31,16 +31,15 @@ import sr.world.Map;
 import sr.world.Planet;
 import sr.world.StatisticGameType;
 
-@Path("/map")
+@Path("/maps")
 public class MapServlet{
 	
 	@GET
-	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<MapLight> gameworldList() throws JsonProcessingException {
 		
 		
-		System.out.println("Call aginst map/list");
+		System.out.println("Call aginst maps/list");
 		
 		
 		List<MapLight> mapLights = new ArrayList<MapLight>();

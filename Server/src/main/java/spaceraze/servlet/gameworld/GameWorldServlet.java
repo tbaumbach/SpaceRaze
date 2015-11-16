@@ -29,18 +29,17 @@ import sr.world.GameWorld;
 import sr.world.Planet;
 import sr.world.StatisticGameType;
 
-@Path("/gameworld")
+@Path("/gameworlds")
 public class GameWorldServlet{
 	
 	//@Context ServletContext context;
 	
 	@GET
-	@Path("/list")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<GameWorldLight> gameworldList() throws JsonProcessingException {
 		
 		
-		System.out.println("Call aginst gameworld/list");
+		System.out.println("Call aginst gameworlds @GET");
 		
 		List<GameWorldLight> gameWorldsLights = new ArrayList<GameWorldLight>();
 		List<GameWorld> gameWorldTypes = GameWorldHandler.getGameWorldTypes();

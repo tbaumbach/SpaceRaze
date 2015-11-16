@@ -23,6 +23,8 @@ public class PlayerServlet{
 	
 	@Context ServletContext context;
 	
+	
+	// Do not use this. Use @Path("/{gameName}/users/{faction}/{player}/{govenor}") in GamesServlet
 	@GET
 	@Path("/join/{game}/{faction}/{player}/{govenor}")
 	@Produces(MediaType.APPLICATION_JSON)

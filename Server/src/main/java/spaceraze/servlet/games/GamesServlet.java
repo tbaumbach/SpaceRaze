@@ -2,11 +2,15 @@ package spaceraze.servlet.games;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -15,10 +19,12 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import spaceraze.servlet.create.GameParameters;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
 import sr.world.Player;
+import sr.world.StatisticGameType;
 
 @Path("/games")
 public class GamesServlet{
@@ -26,7 +32,7 @@ public class GamesServlet{
 	@Context ServletContext context;
 	
 	@GET
-	@Path("/list/{selector}")
+	@Path("/{selector}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<GameListObject> gameList(@PathParam("selector") String selector, @Context HttpServletRequest req) throws JsonProcessingException {
 		
@@ -133,13 +139,89 @@ public class GamesServlet{
 	}
 	
 	
+	// Join a game
+	@PUT
+	@Path("/{gameName}/users/{faction}/{player}/{govenor}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String join(@PathParam("gameName") int gameId, @PathParam("faction") String factionName, @PathParam("player") String playerName, 
+			@PathParam("govenor") String govenorName, @Context HttpServletRequest req) throws JsonProcessingException {
+		
+		String message ="Somthing went wrong in joining the game";
+		
+		System.out.println(new StringJoiner(" ").add("Call aginst game/user/join/{game}/{faction}/{player}/{govenor}:").
+				add(Integer.toString(gameId)).add(factionName).add(playerName).add(govenorName));
+		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		// TODO We are not using players name from the URL. Going FB, Google logins = most likely no session.
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		
+		
+		if(user.isPlayerOrAdmin()){
+			SR_Server aServer = sh.findGame(gameId);
+			if(aServer != null){
+				message = aServer.join(user.getName(), govenorName, factionName);
+			}else{
+				message = "Can't find a game with id: " + gameId;
+			}
+	    	
+		}else{
+			message = "Player are not logd in.";
+		}
+    	
+	    return message;
+		
+	}
 	
 	
 	
+	// Create a new game
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String create(GameParameters parameters, @Context HttpServletRequest req) throws JsonProcessingException {
+		
+		
+		System.out.println("Call aginst games @PUT: " + parameters.toString());
+		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		System.out.println("Call aginst games @PUT User.getName: " + user.getName());
+		
+		
+		
+		
+		parameters.setUser(user.getName());
+		
+		String report = sh.StartNewGame(parameters);
+		
+		
+		
+		return report;
+		
+	}
 	
+	//Contract for creating new games.
+	@GET
+	@Path("/game/new/contract")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GameParameters contract() throws JsonProcessingException {
+		
+		System.out.println("Call aginst games/game/new/contract: ");
+				
+		
+		List<String> factions = new ArrayList<String>();
+		factions.add("China");
+		factions.add("USA");
+		
+		return new GameParameters("thelastgreatwar", "", "wigge9", "10", "yes", "0", "no", "9", 
+				"", "", "yes", factions, "no", "faction", false, 
+				"no", 60, 60, 0, 1, StatisticGameType.ALL);
 	
-	
-	
+	}
 	
 	
 	

@@ -20,6 +20,9 @@ import sr.server.ServerHandler;
 import sr.webb.users.User;
 import sr.world.StatisticGameType;
 
+/*
+ * TODO remove this. Moved to GamesServlet.
+ */
 @Path("/creategame")
 public class GameCreater{
 	
