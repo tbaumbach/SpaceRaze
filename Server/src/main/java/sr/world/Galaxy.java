@@ -1945,13 +1945,13 @@ private void createAllVIPs(Player p, Planet homeplanet){
       List<SpaceshipType> factionSpaceshipTypes = p.getFaction().getSpaceshipTypes();
       //Logger.finer("addSpaceshipTypes: " + p.getName());
       for (int i = 0; i < factionSpaceshipTypes.size(); i++){
-    	  Logger.finer("i: " + i + " " + (SpaceshipType)factionSpaceshipTypes.get(i));
-    	  p.addSpaceshipType(new SpaceshipType((SpaceshipType)factionSpaceshipTypes.get(i)));
+    	  Logger.finer("i: " + i + " " + factionSpaceshipTypes.get(i));
+    	  p.addSpaceshipType(new SpaceshipType(factionSpaceshipTypes.get(i)));
       }
     }
     
     private void addBuildingType(Player p){
-    	p.setBuildings((Buildings)Functions.deepClone(p.getFaction().getBuildings()));
+    	p.setBuildings(Functions.deepClone(p.getFaction().getBuildings()));
     }
     
 

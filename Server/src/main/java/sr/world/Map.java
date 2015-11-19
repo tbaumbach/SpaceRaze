@@ -12,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import sr.general.logging.Logger;
 import sr.server.properties.PropertiesHandler;
 
@@ -105,6 +107,7 @@ public class Map implements Serializable, Comparable<Map>{
 	 * Creates a new Map object from file of a published map
 	 * @return
 	 */
+	@JsonIgnore
 	public Map getCopyFromFile(){
 		return new Map(fileName);
 	}
@@ -221,8 +224,17 @@ public class Map implements Serializable, Comparable<Map>{
 		fileName = newFileName;
 	}
 
+	@JsonIgnore
 	public List<Planet> getPlanets() {
 		return planets;
+	}
+	
+	public List<String> getPlanetNames() {
+		List<String> planetsName = new ArrayList<String>();
+		for (Planet planet : planets) {
+			planetsName.add(planet.getName());
+		}
+		return planetsName;
 	}
 
 	public int getNrPlanets() {
@@ -307,6 +319,7 @@ public class Map implements Serializable, Comparable<Map>{
 	 * Max is always planets.size()
 	 * @return html for select options
 	 */
+	@JsonIgnore
 	public String getNrPlayersHTML(){
 		String retStr = "";
 		List<Planet> starPlanets = getStarPlanets();
@@ -322,6 +335,7 @@ public class Map implements Serializable, Comparable<Map>{
 		return retStr;
 	}
 	
+	@JsonIgnore
 	public String getNrStartingPlanetsHTML(){
 		
 		int numbersOfStartPlanets = planets.size() / maxNrStartPlanets;
@@ -332,6 +346,7 @@ public class Map implements Serializable, Comparable<Map>{
 		return retStr;
 	}
 	
+	@JsonIgnore
 	private List<Planet> getStarPlanets() {
 		List<Planet>  tempList = new ArrayList<Planet>();
 		for (Planet aPlanet : planets) {
@@ -343,7 +358,8 @@ public class Map implements Serializable, Comparable<Map>{
 		return tempList;
 	}
 	
-				  
+	
+	@JsonIgnore			  
 	public String getPlanetsHTML(){
 		String retStr = "";
 		int j = 0;
@@ -380,6 +396,7 @@ public class Map implements Serializable, Comparable<Map>{
 		return newPlanet;
 	}
 	
+	@JsonIgnore
 	public String getFreeName(String namePrefix){
 		int index = 1;
 		boolean freeFound = false;
@@ -484,6 +501,7 @@ public class Map implements Serializable, Comparable<Map>{
     }
 
 	// returns a String object that can be written to a file to create a Map file
+    @JsonIgnore
 	public String getMapData(){
 		String s = "";
 		List<Planet> allPlanets = getPlanets();
@@ -672,6 +690,7 @@ public class Map implements Serializable, Comparable<Map>{
 		return allComnected;
 	}
 	
+	@JsonIgnore
     public List<Planet> getAllDestinations(Planet location, boolean longRange){
         List<Planet> alldest = new LinkedList<Planet>();
         Planet tempPlanet = null;
@@ -696,6 +715,7 @@ public class Map implements Serializable, Comparable<Map>{
 		versionId++;
 	}
 
+	@JsonIgnore
 	public String getMapInfoDroid() {
 		  StringBuffer sb = new StringBuffer();
 		  sb.append("<h4>Map: ");

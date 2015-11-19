@@ -1,9 +1,10 @@
-package spaceraze.servlet.create;
+package spaceraze.servlet.game;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import sr.server.SR_Server;
 import sr.world.StatisticGameType;
 
 public class GameParameters {
@@ -14,6 +15,7 @@ public class GameParameters {
 	private String gameWorldName;
 	private String gameName;
 	private String mapName;
+	private int gameId;
 	private String steps;
 	private String autoBalance;
 	private String time;
@@ -35,7 +37,7 @@ public class GameParameters {
 	
 	public GameParameters(){};
 
-	public GameParameters(String gameWorldName, String gameName, String mapName, String steps, String autoBalance, 
+	public GameParameters(String gameWorldName, String gameName, int gameId, String mapName, String steps, String autoBalance, 
 			String time, String emailPlayers, String maxNrPlayers, String user, String gamePassword, 
 			String groupFaction, List<String> selectableFactionNames, String randomFaction, String diplomacy, 
 			boolean singelPlayer, String ranked, int singleVictory, int factionVictory, int endTurn, 
@@ -43,6 +45,7 @@ public class GameParameters {
 		
 		this.gameWorldName = gameWorldName;
 		this.gameName = gameName;
+		this.gameId = gameId;
 		this.mapName = mapName;
 		this.steps = steps;
 		this.autoBalance = autoBalance;
@@ -70,12 +73,26 @@ public class GameParameters {
 		this.gameWorldName = gameWorldName;
 	}
 
+	//TODO här borde det nog lägga till lite ytterligare parametrar. t.ex. faction.
+	public GameParameters(SR_Server aServer) {
+		this.gameId = aServer.getId();
+		this.gameName = aServer.getGameName();
+		this.endTurn = aServer.getEndTurn();
+		this.mapName = aServer.getMapFileName();
+		this.statisticGameType = aServer.getGalaxy().getStatisticsHandler().getStatisticGameType();
+		
+	}
+
 	public String getGameWorldName() {
 		return gameWorldName;
 	}
 
 	public String getGameName() {
 		return gameName;
+	}
+	
+	public int getGameId() {
+		return gameId;
 	}
 
 	public String getMapName() {
@@ -163,6 +180,10 @@ public class GameParameters {
 	public void setGameName(String gameName) {
 		this.gameName = gameName;
 	}
+	
+	public void setGameId(int gameId) {
+		this.gameId = gameId;
+	}
 
 	public void setMapName(String mapName) {
 		this.mapName = mapName;
@@ -242,7 +263,7 @@ public class GameParameters {
 
 	@Override
 	public String toString() {
-		return "GameParameters [gameWorldName=" + gameWorldName + ", gameName=" + gameName + ", mapName=" + mapName
+		return "GameParameters [gameWorldName=" + gameWorldName + ", gameName=" + gameName + ", gameId=" + gameId+ ", mapName=" + mapName
 				+ ", steps=" + steps + ", autoBalance=" + autoBalance + ", time=" + time + ", emailPlayers="
 				+ emailPlayers + ", maxNrPlayers=" + maxNrPlayers + ", user=" + user + ", gamePassword=" + gamePassword
 				+ ", groupFaction=" + groupFaction + ", selectableFactionNames=" + selectableFactionNames

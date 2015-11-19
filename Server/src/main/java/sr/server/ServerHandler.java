@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import spaceraze.servlet.create.GameParameters;
+import spaceraze.servlet.game.GameParameters;
 import sr.enums.DiplomacyGameType;
 import sr.general.logging.Logger;
 import sr.server.persistence.PHash;

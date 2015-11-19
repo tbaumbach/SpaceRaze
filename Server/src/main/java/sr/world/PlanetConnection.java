@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class PlanetConnection implements Serializable{
   static final long serialVersionUID = 1L;
   Planet p1,p2;
@@ -48,18 +50,29 @@ public class PlanetConnection implements Serializable{
     this.longRange = longRange;
   }
 
+  @JsonIgnore
   public Planet getPlanet1(){
     return p1;
   }
 
+  @JsonIgnore
   public Planet getPlanet2(){
     return p2;
+  }
+  
+  public String getPlanetName1(){
+    return p1.getName();
+  }
+
+  public String getPlanetName2(){
+    return p2.getName();
   }
 
   public boolean isLongRange(){
     return longRange;
   }
 
+  @JsonIgnore
   public Planet getOtherEnd(Planet aPlanet, boolean isLongRange){
     Planet returnPlanet = null;
     if ((longRange == false) | (isLongRange == longRange)){
@@ -73,6 +86,7 @@ public class PlanetConnection implements Serializable{
     return returnPlanet;
   }
 
+  @JsonIgnore
   public String getSaveString(int index){
 	String retStr = "connection" + index + " = ";
 	retStr = retStr + p1.getName();
@@ -81,6 +95,7 @@ public class PlanetConnection implements Serializable{
 	return retStr;
   }
   
+  @JsonIgnore
   public boolean isConnection(Planet aPlanet1, Planet aPlanet2){
   	  boolean found = false;
   	  if ((p1 == aPlanet1) & (p2 == aPlanet2)){
