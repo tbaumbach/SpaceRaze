@@ -222,22 +222,27 @@ public class Planet implements Serializable{
     	return sameFaction;
     }
 
-    // TODO skriv om denna eller ta  bort den. Fungerar nog inte längre.
-    public boolean isEnemyOrNeutralPlanet(Faction aFaction){
-    	boolean enemyOrNeutralPlanet = false;
-    	if (playerInControl != null){
-    		if (playerInControl.getFaction() != aFaction){
-    			enemyOrNeutralPlanet = true;
-    		}
-    	}else{
+    
+    public boolean isEnemyOrNeutralPlanet(Player player){
+    	
+    	boolean enemyOrNeutralPlanet = true;
+    	
+    	if(playerInControl == null){
     		enemyOrNeutralPlanet = true;
+    	}else if(player == playerInControl){
+    		enemyOrNeutralPlanet = false;
+    	}else if(player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, playerInControl)){
+    		enemyOrNeutralPlanet = false;
     	}
+    	
+		
+		
     	return enemyOrNeutralPlanet;
     }
 
     
     /*
-    public String getPlayerName(){    // används denna?
+    public String getPlayerName(){    // anvï¿½nds denna?
         return playerInControl.getName();
     }
 	*/
@@ -255,7 +260,7 @@ public class Planet implements Serializable{
         return (res + g.getVIPResBonus(this,playerInControl)) < 1;
     }
 
-    // blockad är som en belägring men utan att planeten tar skada eller kan ge sig. Den bara blockeras.
+    // blockad ï¿½r som en belï¿½gring men utan att planeten tar skada eller kan ge sig. Den bara blockeras.
     public void underBlockade(List<TaskForce> alltf){
       setBesieged(true);
       open = false;
@@ -264,13 +269,13 @@ public class Planet implements Serializable{
     		  playerInControl.addToGeneral("The planet " + name + " are being blockad by hostile forces.");
     		  for (int i = 0; i < alltf.size(); i++){
     			  TaskForce temptf = alltf.get(i);
-    			  // kolla vilka som vill belägra?
+    			  // kolla vilka som vill belï¿½gra?
     			  temptf.getPlayer().addToGeneral("The planet " + name + ", are being blocked by you and ships from other factions.");
     		  }
     	  }else{
     		  for (int i = 0; i < alltf.size(); i++){
     			  TaskForce temptf = alltf.get(i);
-    			  // kolla vilka som vill belägra?
+    			  // kolla vilka som vill belï¿½gra?
     			  temptf.getPlayer().addToGeneral("The neutral planet " + name + " are being blocked by you and ships from other factions.");
     		  }
     	  }
@@ -293,7 +298,7 @@ public class Planet implements Serializable{
 
     public void conqueredByTroops(Player conqueringPlayer){
 		Logger.finer("conqueredByTroops called");
-		res = 1 + conqueringPlayer.getFaction().getResistanceBonus(); // olika typer av spelare får olika res på nyerövrade planeter
+		res = 1 + conqueringPlayer.getFaction().getResistanceBonus(); // olika typer av spelare fï¿½r olika res pï¿½ nyerï¿½vrade planeter
         if (playerInControl != null){
         	playerInControl.getPlanetInfos().setLastKnownOwner(name,conqueringPlayer.getName(),playerInControl.getGalaxy().turn + 1);
         	playerInControl.getPlanetInfos().setLastKnownProdRes(name,pop,res);
@@ -314,7 +319,7 @@ public class Planet implements Serializable{
         	conqueringPlayer.addToHighlights(name,HighlightType.TYPE_PLANET_CONQUERED);
         	if (hasNeverSurrendered){
         		hasNeverSurrendered = false;
-        		// lägg till en slumpvis VIP till denna spelare
+        		// lï¿½gg till en slumpvis VIP till denna spelare
         		VIP aVIP = conqueringPlayer.getGalaxy().maybeAddVIP(conqueringPlayer);
         		if (aVIP != null){
         			aVIP.setLocation(this);
@@ -385,7 +390,7 @@ public class Planet implements Serializable{
         		playerInControl.addToGeneral("While besieging your planet " + name + " Governor " + bombardingTaskForce.getPlayer().getGovenorName() + "'s bombardment have lowered " + name + "'s resistance and population by " + bombardment + ".");
         		bombardingTaskForce.getPlayer().addToGeneral("While besieging the planet " + name + " belonging to Governor " + playerInControl.getGovenorName() + " (" + playerInControl.getFaction().getName() + ") your bombardment have lowered its resistance and population by " + bombardment + ".");
         	
-        		// 10% chans att bomba sönder en byggnad/bombvärde.
+        		// 10% chans att bomba sï¿½nder en byggnad/bombvï¿½rde.
         		for(int bombardmentIndex = 0; bombardmentIndex < bombardment; bombardmentIndex++){
 	            	if(Functions.getD100(10)){// 10% to hit a ground building.
 	    				
@@ -449,7 +454,7 @@ public class Planet implements Serializable{
 //        boolean infectedByAlien = getInfectedByAlien();
         int psychWarfare = g.getMaxPsychWarfare(this,tf.getPlayer());
         if (psychWarfare > 0){
-        	// Detta var nog en bugg:  res -= psychWarfare; stog två gånger.
+        	// Detta var nog en bugg:  res -= psychWarfare; stog tvï¿½ gï¿½nger.
         //  res -= psychWarfare;
           // TaskForce psychWarfare
           Logger.finer("psychWarfare: " + psychWarfare);
@@ -564,7 +569,7 @@ public class Planet implements Serializable{
     	  razed(tf);
       }else{
         if ((res + tf.getPlayer().getGalaxy().getVIPResBonus(this,playerInControl)) < 1){ // planet surrenders, can never happen to an alien planet
-          res = 1 + tf.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare får olika res på nyerövrade planeter
+          res = 1 + tf.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare fï¿½r olika res pï¿½ nyerï¿½vrade planeter
           hasFallen = true;
           if (playerInControl != null){
             playerInControl.getPlanetInfos().setLastKnownOwner(name,tf.getPlayer().getName(),playerInControl.getGalaxy().turn + 1);
@@ -590,7 +595,7 @@ public class Planet implements Serializable{
             }
             if (hasNeverSurrendered){
               hasNeverSurrendered = false;
-              // lägg till en slumpvis VIP till denna spelare
+              // lï¿½gg till en slumpvis VIP till denna spelare
               VIP aVIP = tf.getPlayer().getGalaxy().maybeAddVIP(tf.getPlayer());
               if (aVIP != null){
                 aVIP.setLocation(this);
@@ -603,17 +608,17 @@ public class Planet implements Serializable{
           playerInControl = tf.getPlayer();
         if (checkSurrender(tf.getPlayer().getGalaxy())){ // planet surrenders, can never happen to an alien planet
         	planetSurrenders(tf);
-        }else{ // planeten belägrad men har ej gett upp än
+        }else{ // planeten belï¿½grad men har ej gett upp ï¿½n
           holding(tf);
         }
       }
 */
       /*
-      if (hasFallen | isRazedAndUninfected()){ // planeten har bytt ägare eller är razad
+      if (hasFallen | isRazedAndUninfected()){ // planeten har bytt ï¿½gare eller ï¿½r razad
         if (oldPlayerInControl != null){ // det fanns en spelare som kontrollerade planeten (dvs ej neutral)
           oldPlayerInControl.addToGeneral("");
         }
-      }else{ // planeten har ej bytt ägare
+      }else{ // planeten har ej bytt ï¿½gare
         if (playerInControl != null){
           playerInControl.addToGeneral("");
         }
@@ -651,7 +656,7 @@ public class Planet implements Serializable{
     }
 
     public void planetSurrenders(TaskForce attackingTaskForce){          
-    	res = 1 + attackingTaskForce.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare får olika res på nyerövrade planeter
+    	res = 1 + attackingTaskForce.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare fï¿½r olika res pï¿½ nyerï¿½vrade planeter
     	if (playerInControl != null){
     		playerInControl.getPlanetInfos().setLastKnownOwner(name,attackingTaskForce.getPlayer().getName(),playerInControl.getGalaxy().turn + 1);
     		playerInControl.getPlanetInfos().setLastKnownProdRes(name,pop,res);
@@ -677,7 +682,7 @@ public class Planet implements Serializable{
         	
         	if (hasNeverSurrendered){
         		hasNeverSurrendered = false;
-        		// lägg till en slumpvis VIP till denna spelare
+        		// lï¿½gg till en slumpvis VIP till denna spelare
         		VIP aVIP = attackingTaskForce.getPlayer().getGalaxy().maybeAddVIP(attackingTaskForce.getPlayer());
         		if (aVIP != null){
         			aVIP.setLocation(this);
@@ -813,7 +818,7 @@ public class Planet implements Serializable{
           playerInControl = null;
         }else{
           if ((res + tf.getPlayer().getGalaxy().getVIPResBonus(this,playerInControl)) < 1){ // planet surrenders, can never happen to an alien planet
-            res = 1 + tf.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare får olika res på nyerövrade planeter
+            res = 1 + tf.getPlayer().getFaction().getResistanceBonus(); // olika typer av spelare fï¿½r olika res pï¿½ nyerï¿½vrade planeter
             hasFallen = true;
             if (playerInControl != null){
               playerInControl.getPlanetInfos().setLastKnownOwner(name,tf.getPlayer().getName(),playerInControl.getGalaxy().turn + 1);
@@ -838,7 +843,7 @@ public class Planet implements Serializable{
               }
               if (hasNeverSurrendered){
                 hasNeverSurrendered = false;
-                // lägg till en slumpvis VIP till denna spelare
+                // lï¿½gg till en slumpvis VIP till denna spelare
                 VIP aVIP = tf.getPlayer().getGalaxy().maybeAddVIP(tf.getPlayer());
                 if (aVIP != null){
                   aVIP.setLocation(this);
@@ -849,7 +854,7 @@ public class Planet implements Serializable{
             }
             oldPlayerInControl = playerInControl;
             playerInControl = tf.getPlayer();
-          }else{ // planeten belägrad men har ej gett upp än
+          }else{ // planeten belï¿½grad men har ej gett upp ï¿½n
             besieged = true;
             if (playerInControl != null){
               tf.getPlayer().addToGeneral(name + " have not surrendered yet.");
@@ -859,11 +864,11 @@ public class Planet implements Serializable{
             }
           }
         }
-        if (hasFallen | isRazedAndUninfected()){ // planeten har bytt ägare eller är razad
+        if (hasFallen | isRazedAndUninfected()){ // planeten har bytt ï¿½gare eller ï¿½r razad
           if (oldPlayerInControl != null){ // det fanns en spelare som kontrollerade planeten (dvs ej neutral)
             oldPlayerInControl.addToGeneral("");
           }
-        }else{ // planeten har ej bytt ägare
+        }else{ // planeten har ej bytt ï¿½gare
           if (playerInControl != null){
             playerInControl.addToGeneral("");
           }
@@ -952,11 +957,11 @@ public class Planet implements Serializable{
             }
           //}
         }
-        if (hasFallen | isRazed()){ // planeten har bytt ägare eller är razad
+        if (hasFallen | isRazed()){ // planeten har bytt ï¿½gare eller ï¿½r razad
           if (oldPlayerInControl != null){ // det fanns en spelare som kontrollerade planeten (dvs ej neutral)
             oldPlayerInControl.addToGeneral("");
           }
-        }else{ // planeten har ej bytt ägare
+        }else{ // planeten har ej bytt ï¿½gare
           if (playerInControl != null){
             playerInControl.addToGeneral("");
           }
@@ -973,7 +978,7 @@ public class Planet implements Serializable{
     	setPlayerInControl(attacker);
     	if (isHasNeverSurrendered()){
     		setHasNeverSurrendered(false);
-    		// lägg till en slumpvis VIP till infestator spelaren
+    		// lï¿½gg till en slumpvis VIP till infestator spelaren
     		VIP aVIP = attacker.getGalaxy().maybeAddVIP(attacker);
     		if (aVIP != null){
     			aVIP.setLocation(this);
@@ -984,14 +989,14 @@ public class Planet implements Serializable{
     }
     
     public void joinsVisitingDiplomat(VIP tempVIP, boolean addInfoToPlayer){
-      res = res + tempVIP.getBoss().getFaction().getResistanceBonus();  // olika typer av spelare får olika res på nyerövrade planeter?
+      res = res + tempVIP.getBoss().getFaction().getResistanceBonus();  // olika typer av spelare fï¿½r olika res pï¿½ nyerï¿½vrade planeter?
       if(addInfoToPlayer){
     	  tempVIP.getBoss().addToGeneral("The neutral planet " + name + " has been convinced by your " + tempVIP.getName() + " to join your forces!");
       	tempVIP.getBoss().addToHighlights(name,HighlightType.TYPE_PLANET_JOINS);
       }
       if (hasNeverSurrendered){
         hasNeverSurrendered = false;
-        // lägg till en slumpvis VIP till denna spelare
+        // lï¿½gg till en slumpvis VIP till denna spelare
         VIP aVIP = tempVIP.getBoss().getGalaxy().maybeAddVIP(tempVIP.getBoss());
         if (aVIP != null){
           aVIP.setLocation(this);
@@ -1014,7 +1019,7 @@ public class Planet implements Serializable{
         tempInf.getBoss().addToHighlights(name,HighlightType.TYPE_PLANET_JOINS);
         if (hasNeverSurrendered){
         	hasNeverSurrendered = false;
-        	// lägg till en slumpvis VIP till denna spelare
+        	// lï¿½gg till en slumpvis VIP till denna spelare
         	VIP aVIP = tempInf.getBoss().getGalaxy().maybeAddVIP(tempInf.getBoss());
         	if (aVIP != null){
         		aVIP.setLocation(this);

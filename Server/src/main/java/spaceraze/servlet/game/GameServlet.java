@@ -20,7 +20,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
+import sr.world.EconomyReport;
+import sr.world.Player;
+import sr.world.Report;
 import sr.world.StatisticGameType;
+import sr.world.TurnInfo;
 
 @Path("/games/game")
 public class GameServlet {
@@ -40,17 +44,49 @@ public class GameServlet {
 		HttpSession session = req.getSession();
 		User user = (User)session.getAttribute("user");
 		
-		SR_Server[] servers = sh.getServers();
+		SR_Server server = sh.findGame(gameId);
 		
-		for (SR_Server aServer : servers) {
-	 		if (aServer.getTurn() == 0 && !aServer.getGalaxy().getsinglePlayer()){
-	 			if (aServer.isPlayerParticipating(user) && aServer.getId() == gameId){
-	 				return new GameParameters(aServer);
-	 			}
-	 		}
-	 	}
+		if(server != null){
+			if(server.isPlayerParticipating(user)){
+				return new GameParameters(server);
+			}
+		}
+		
 				
 		return new GameParameters();
+		
+	}
+	
+	@GET
+	@Path("/{gameId}/{user}/{turn}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public EconomyReport getTurn(@PathParam("gameId") int gameId, @PathParam("user") String userName, 
+			@PathParam("turn") int turn, @Context HttpServletRequest req) throws JsonProcessingException {
+		
+		
+		System.out.println("Call aginst game/{gameId}/{user}/{turn} @GET");
+		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		
+		SR_Server server = sh.findGame(gameId);
+		
+		if(server != null){
+			if(server.isPlayerParticipating(user)){
+				//TODO ändra här så att inte spelarns password sparas i spelet och krävs för att hämta spelarn.
+				Player player = server.getPlayer(user.getName(), user.getPassword());
+				TurnInfo turnInfo = player.getTurnInfo();
+				
+				EconomyReport latestEconomyReport = turnInfo.getLatestEconomyReport();
+				
+				return latestEconomyReport;
+			}
+		}
+		
+				
+		return null;
 		
 	}
 	
