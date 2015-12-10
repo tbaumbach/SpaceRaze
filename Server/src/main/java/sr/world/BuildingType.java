@@ -31,7 +31,7 @@ public class BuildingType implements Serializable, Cloneable{
 	private boolean spaceport;
 	UniqueIdCounter uic;
 	int nrProduced;
-	//  kan nog vara en ide...  om byggnaden ligger i orbit så fungerar det som för skepp men om byggnaden är på planeten så syns den inte fören en fi har trupper på planeten.
+	//  kan nog vara en ide...  om byggnaden ligger i orbit sï¿½ fungerar det som fï¿½r skepp men om byggnaden ï¿½r pï¿½ planeten sï¿½ syns den inte fï¿½ren en fi har trupper pï¿½ planeten.
 	private boolean visibleOnMap = true;
 	
 	// war buildings. shieldCapacity= ???, CannonDamage =  damge against enemy ships(one shot), cononRateOfFire(number of shot/turn) 
@@ -42,7 +42,7 @@ public class BuildingType implements Serializable, Cloneable{
 	//private List<BuildingType> nextBuildingSteps;
 	private BuildingType parentBuildingType;
 
-	// Vänta med dessa tills grunden är klar
+	// Vï¿½nta med dessa tills grunden ï¿½r klar
 	// -------------------------------------
 //	private int shipTechBonus = 0; // %  on ships bild on planet
 	private int siegeBonus = 0;
@@ -53,8 +53,8 @@ public class BuildingType implements Serializable, Cloneable{
 	
 	// Paul  Kan du fixa dessa
 	
-	// GÖR OM skapa en klass o lägg dessa i den. 
-	// så att troops får en egen klass + så att build troops klassen kan hämta troops bonus från denna klass
+	// Gï¿½R OM skapa en klass o lï¿½gg dessa i den. 
+	// sï¿½ att troops fï¿½r en egen klass + sï¿½ att build troops klassen kan hï¿½mta troops bonus frï¿½n denna klass
 	// adding bonus to troops build on the planet
 	private int troopHitBonus = 0; // % on troops bild on planet
 	private int troopAttackBonus = 0; // % % on troops bild on planet
@@ -71,7 +71,7 @@ public class BuildingType implements Serializable, Cloneable{
 	//private int shipTechBonus = 0; // %  on ships bild on planet
 	
 	/*
-	// (Tobbe) Dessa användes inte. Samma egenskaper som VIPar har och skall kanske användas i framtiden. Skall vara i % form.
+	// (Tobbe) Dessa anvï¿½ndes inte. Samma egenskaper som VIPar har och skall kanske anvï¿½ndas i framtiden. Skall vara i % form.
 	private int shipBuildBonus; // decreases build cost of ships
 	private int troopBuildBonus; // decreases build cost of troops
 	private int vipBuildBonus; // decreases build cost of VIPs
@@ -140,6 +140,7 @@ public class BuildingType implements Serializable, Cloneable{
 		buildVIPTypes = new ArrayList<VIPType>();
 	}
 	
+	//TODO vad Ã¤r detta?  Ser ut som om den ska tas bort.
 	// returns buildingsType info (description)
 	public String getBuildingText(){
     	String text;
@@ -628,7 +629,7 @@ public class BuildingType implements Serializable, Cloneable{
 			constructible = false;
 		}else if(isPlanetUnique() && aPlanet.hasBuilding(this.getName())){
 			constructible = false;
-		}else if(isWorldUnique()|| isFactionUnique()|| isPlayerUnique() || isPlanetUnique()){ // kollar om en unik byggnad redan har en child byggnad byggd. Om så är fallet så är den också unik och då skall det inte gå att bygga denna byggnad.
+		}else if(isWorldUnique()|| isFactionUnique()|| isPlayerUnique() || isPlanetUnique()){ // kollar om en unik byggnad redan har en child byggnad byggd. Om sï¿½ ï¿½r fallet sï¿½ ï¿½r den ocksï¿½ unik och dï¿½ skall det inte gï¿½ att bygga denna byggnad.
 			if(isWorldUnique() || isFactionUnique() || isPlayerUnique()){
 				// check if a build order already exist
 				if(aPlayer.getOrders().haveBuildingTypeBuildOrder(this, buildingId)){
@@ -655,7 +656,7 @@ public class BuildingType implements Serializable, Cloneable{
 		if (aBuildingType.getParentBuilding() != null){
 			Logger.finer("aBuildingType.getParentBuilding().getName(): " + aBuildingType.getParentBuilding().getName());
 			if(aBuildingType.getParentBuilding().getName().equalsIgnoreCase(buildingName)){
-				childAlreadyBuild = true;// det finns en child byggnad som är byggd och eftersom denna byggnad är unik så måste den också vara det och då stoppa bygge av denna byggnad.
+				childAlreadyBuild = true;// det finns en child byggnad som ï¿½r byggd och eftersom denna byggnad ï¿½r unik sï¿½ mï¿½ste den ocksï¿½ vara det och dï¿½ stoppa bygge av denna byggnad.
 			}else{
 				BuildingType tempBuildingType = aPlayer.getBuildings().getBuildingType(aBuildingType.getParentBuilding().getName());
 				if(tempBuildingType != null){
