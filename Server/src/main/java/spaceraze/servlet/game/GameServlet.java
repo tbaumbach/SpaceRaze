@@ -16,6 +16,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
@@ -60,11 +62,13 @@ public class GameServlet {
 	@GET
 	@Path("/{gameId}/{user}/{turn}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public EconomyReport getTurn(@PathParam("gameId") int gameId, @PathParam("user") String userName, 
+	@JacksonFeatures(serializationEnable =  { SerializationFeature.INDENT_OUTPUT })
+	public GameTurn getTurn(@PathParam("gameId") int gameId, @PathParam("user") String userName, 
 			@PathParam("turn") int turn, @Context HttpServletRequest req) throws JsonProcessingException {
 		
 		
 		System.out.println("Call aginst game/{gameId}/{user}/{turn} @GET");
+		System.out.println("Call aginst game/"+ gameId +"/"+ userName +"/"+ turn +" @GET");
 		
 		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
 		
@@ -75,13 +79,10 @@ public class GameServlet {
 		
 		if(server != null){
 			if(server.isPlayerParticipating(user)){
-				//TODO ändra här så att inte spelarns password sparas i spelet och krävs för att hämta spelarn.
-				Player player = server.getPlayer(user.getName(), user.getPassword());
-				TurnInfo turnInfo = player.getTurnInfo();
 				
-				EconomyReport latestEconomyReport = turnInfo.getLatestEconomyReport();
+				GameTurn turnInfo = new GameTurn(server, user.getLogin(), turn);
 				
-				return latestEconomyReport;
+				return turnInfo;
 			}
 		}
 		

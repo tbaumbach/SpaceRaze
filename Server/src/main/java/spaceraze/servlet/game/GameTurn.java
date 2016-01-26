@@ -17,6 +17,8 @@ public class GameTurn {
 	//Möjligt att det bara måste göras om spelvärlden har forskning.
 	//TODO måste även lösa de unika typernas hantering. Ska alla andra spelare se när faction/world unika typer redan är byggda?
 	
+	GameTurn(){};
+	
 	GameTurn(SR_Server server, String playerName, int turn){
 		
 		addPlayers(server, playerName);
@@ -44,25 +46,15 @@ public class GameTurn {
 		}
 	}
 	
-	
-	
-	class PlayerInfo{
-		
-		private String name, faction;
-		
-		PlayerInfo(Player player){
-			name = player.getGovenorName();
-			faction = player.getFactionName();
-		}
 
-		public String getName() {
-			return name;
-		}
 
-		public String getFaction() {
-			return faction;
-		}
-		
+
+	public List<PlayerInfo> getPlayers() {
+		return players;
+	}
+
+	public List<PlanetInfo> getPlanets() {
+		return planets;
 	}
 
 }

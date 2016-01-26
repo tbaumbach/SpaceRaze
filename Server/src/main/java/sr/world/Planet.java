@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-
+import sr.enums.DiplomacyLevel;
 import sr.enums.HighlightType;
 import sr.general.Functions;
 import sr.general.logging.Logger;
+import sr.world.diplomacy.DiplomacyState;
 import sr.world.incomeExpensesReports.IncomeType;
 
 //TODO remove @JsonTypeName("Planet") 
@@ -231,12 +232,12 @@ public class Planet implements Serializable{
     		enemyOrNeutralPlanet = true;
     	}else if(player == playerInControl){
     		enemyOrNeutralPlanet = false;
-    	}else if(player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, playerInControl)){
-    		enemyOrNeutralPlanet = false;
+    	}else{
+    		DiplomacyState diplomacyState = player.getGalaxy().getDiplomacyState(player, playerInControl);
+			if(diplomacyState.getCurrentLevel().isHigher(DiplomacyLevel.PEACE)){
+				enemyOrNeutralPlanet = false;
+			}
     	}
-    	
-		
-		
     	return enemyOrNeutralPlanet;
     }
 

@@ -418,6 +418,21 @@ public class Galaxy implements Serializable{
         }
         return initDefence;
       }
+    
+    
+    
+    public boolean isItAlliesSurveyShipsOnPlanet(Player player, Planet planet){
+    	List<Player> allies = getAllies(player, players);
+    	boolean foundShip = false;
+    	int i = 0;
+    	while (!foundShip && allies.size() < i) {
+    			if(findSurveyShip(planet, allies.get(i)) != null){
+    				foundShip = true;
+    			}
+    		i++;
+		}
+    	return foundShip;
+    }
 
     public Spaceship findSurveyShip(Planet aPlanet, Player aPlayer){
     	Spaceship foundShip = null;
@@ -431,6 +446,19 @@ public class Galaxy implements Serializable{
     		}
     	}
     	return foundShip;
+    }
+    
+    public boolean isItAlliesSurveyVipOnPlanet(Player player, Planet planet){
+    	List<Player> allies = getAllies(player, players);
+    	boolean foundSpy = false;
+    	int i = 0;
+    	while (!foundSpy && allies.size() < i) {
+    			if(findSurveyVIPonShip(planet, allies.get(i)) != null){
+    				foundSpy = true;
+    			}
+    		i++;
+		}
+    	return foundSpy;
     }
 
     public VIP findSurveyVIPonShip(Planet aPlanet, Player aPlayer){
@@ -486,6 +514,19 @@ public class Galaxy implements Serializable{
     	}
     	return found;
     }
+    
+    public boolean isItAlliedSpyOnPlanet(Player player, Planet planet){
+    	List<Player> allies = getAllies(player, players);
+    	boolean foundSpy = false;
+    	int i = 0;
+    	while (!foundSpy && allies.size() < i) {
+    			if(findVIPSpy(planet, allies.get(i)) != null){
+    				foundSpy = true;
+    			}
+    		i++;
+		}
+    	return foundSpy;
+    }
 
     public VIP findVIPSpy(Planet aPlanet, Player aPlayer){
       VIP foundVIP = null;
@@ -522,7 +563,7 @@ public class Galaxy implements Serializable{
         boolean atPlanet = tempVIP.getPlanetLocation() == aPlanet; // finns vipen vid planeten?
         boolean inShipAtPlanet = false;
         boolean inTroopAtPlanet = false;
-        if (!atPlanet & (tempVIP.getPlanetLocation() == null)){ //  om inte på planeten...
+        if (!atPlanet & (tempVIP.getPlanetLocation() == null)){ //  om inte pï¿½ planeten...
           Spaceship tempss = tempVIP.getShipLocation();
           if (tempss != null){
         	  if (tempss.getLocation() == aPlanet){  // finns vipen i ett skepp vid planeten?
@@ -781,19 +822,19 @@ public class Galaxy implements Serializable{
             aPlayer.addToHighlights(tempVIP.getName(),HighlightType.TYPE_OWN_VIP_KILLED);
         }else
         if (aShip.getLocation().getPlayerInControl() == aPlayer){
-            // om skeppet är vid en egen planet så flyttar VIPen dit
+            // om skeppet ï¿½r vid en egen planet sï¿½ flyttar VIPen dit
         	tempVIP.setLocation(aShip.getLocation());
         	aPlayer.addToVIPReport("Your " + tempVIP.getName() + " travelling in " + aShip.getName() + " have moved to the planet " + aShip.getLocation().getName() + " when the ship was selfdestructed.");
         }else{
-          // annars om VIPen kan vara på fientliga planeter så flyttar den dit
+          // annars om VIPen kan vara pï¿½ fientliga planeter sï¿½ flyttar den dit
           if (tempVIP.canVisitEnemyPlanets()){
             tempVIP.setLocation(aShip.getLocation());
             aPlayer.addToVIPReport("Your " + tempVIP.getName() + " travelling in " + aShip.getName() + " have moved to the planet " + aShip.getLocation().getName() + " when the ship was selfdestructed.");
-          }else // annars om det är en neutral planet och VIP en är en guvenör flyttar han dit
+          }else // annars om det ï¿½r en neutral planet och VIP en ï¿½r en guvenï¿½r flyttar han dit
           if ((tempVIP.canVisitNeutralPlanets()) & (aShip.getLocation().getPlayerInControl() == null)){
             tempVIP.setLocation(aShip.getLocation());
             aPlayer.addToVIPReport("Your " + tempVIP.getName() + " travelling in " + aShip.getName() + " have moved to the planet " + aShip.getLocation().getName() + " when the ship was selfdestructed.");
-          }else{  // annars dör VIPen
+          }else{  // annars dï¿½r VIPen
             allVIPs.remove(tempVIP);
             aPlayer.addToVIPReport("Your " + tempVIP.getName() + " has been killed when your ship " + aShip.getName() + " was selfdestructed at " + aShip.getLocation().getName() + ".");
             aPlayer.addToHighlights(tempVIP.getName(),HighlightType.TYPE_OWN_VIP_KILLED);
@@ -904,7 +945,7 @@ public class Galaxy implements Serializable{
         if (tempVIP.isHardToKill()){
           tempVIP.setLocation(aShip.getLocation());
           aPlayer.addToVIPReport("Your " + tempVIP.getName() + " travelling in " + aShip.getName() + " have moved to the planet " + aShip.getLocation().getName() + " when the ship was destroyed.");
-        }else{  // annars dör VIPen
+        }else{  // annars dï¿½r VIPen
           allVIPs.remove(tempVIP);
           aPlayer.addToVIPReport("Your " + tempVIP.getName() + " has been killed when your ship " + aShip.getName() + " was destroyed at " + aShip.getLocation().getName() + ".");
           aPlayer.addToHighlights(tempVIP.getName(),HighlightType.TYPE_OWN_VIP_KILLED);
@@ -935,7 +976,7 @@ public class Galaxy implements Serializable{
     				vip.setLocation(aTroop.getShipLocation().getLocation());
         			aPlayer.addToVIPReport("Your " + vip.getName() + " travelling in " + aTroop.getUniqueName() + " have moved to the planet " + aTroop.getShipLocation().getLocation().getName() + " when the ship carrying the troop was destroyed.");
     			}
-    		}else{  // annars dör VIPen
+    		}else{  // annars dï¿½r VIPen
     			allVIPs.remove(vip);
     			if (aTroop.getPlanetLocation() != null){
     				aPlayer.addToVIPReport("Your " + vip.getName() + " has been killed when your troop " + aTroop.getUniqueName() + " was destroyed at " + aTroop.getPlanetLocation().getName() + ".");
@@ -1228,7 +1269,7 @@ public class Galaxy implements Serializable{
     private void checkLightJediLightJediSpies(Planet aPlanet,int lowVIP, int highVIP){
       // check if the current VIP will fight
       if (isLightJediSpiesConflict(aPlanet,(VIP)allVIPs.elementAt(lowVIP),(VIP)allVIPs.elementAt(highVIP))){ // Conflict!
-        // kolla vilken av Jedina som är på en egen planet
+        // kolla vilken av Jedina som ï¿½r pï¿½ en egen planet
         boolean highIsHome = false;
         VIP aHighVIP = (VIP)allVIPs.elementAt(highVIP);
         Planet highPlanetLocation = aHighVIP.getPlanetLocation();
@@ -1237,7 +1278,7 @@ public class Galaxy implements Serializable{
             highIsHome = true;
           }
         }
-        // slumpa om den andra blir upptäckt
+        // slumpa om den andra blir upptï¿½ckt
         int discovered = Functions.getRandomInt(1,2);
         int loserIndex = -1, winnerIndex = -1;
         if (discovered == 1){ // the other Light Jedi spy is discovered
@@ -1382,7 +1423,7 @@ public class Galaxy implements Serializable{
     private void checkCounterEspionageAtPlanet(Planet aPlanet, List<VIP> vipsAtPlanet, int lowVIP, int highVIP){
       // check if the current VIP will fight
       if (isSpiesConflict(aPlanet,vipsAtPlanet.get(lowVIP),vipsAtPlanet.get(highVIP))){ // Conflict!
-        // kolla vilken av Spionerna som är på en egen planet
+        // kolla vilken av Spionerna som ï¿½r pï¿½ en egen planet
         VIP aHighVIP = vipsAtPlanet.get(highVIP);
         VIP aLowVIP = vipsAtPlanet.get(lowVIP);
         boolean highIsHome = false;
@@ -1396,7 +1437,7 @@ public class Galaxy implements Serializable{
             }
           }
         }
-        // slumpa om den andra blir upptäckt
+        // slumpa om den andra blir upptï¿½ckt
         int counterEspionageSkill = 0;
         if (highIsHome){
         	counterEspionageSkill = aHighVIP.getCounterEspionage();
@@ -1507,7 +1548,7 @@ public class Galaxy implements Serializable{
         if ((aHighVIP.isAssassin()) & (aHighVIP.getLocation() == aPlanet) & (aLowVIP.getLocation() == aPlanet) & (!aLowVIP.isWellGuarded())){
         	highIsAssassin = true;
         }
-        // slumpa om den andra blir mördad
+        // slumpa om den andra blir mï¿½rdad
         int assassinationSkill = 0;
         if (highIsAssassin){
         	assassinationSkill = aHighVIP.getAssassinationSkill();
@@ -1674,7 +1715,7 @@ public class Galaxy implements Serializable{
       return planets;
     }
 
-    // enklare variant av getPlayer som ej används vid inloggning
+    // enklare variant av getPlayer som ej anvï¿½nds vid inloggning
     public Faction getFaction(String name){
       int i = 0;
       Faction found = null;
@@ -1708,7 +1749,7 @@ public class Galaxy implements Serializable{
         return p;
     }
 
-    // enklare variant av getPlayer som ej används vid inloggning
+    // enklare variant av getPlayer som ej anvï¿½nds vid inloggning
     public Player getPlayer(String name){
     	Logger.finer("name: " + name);
     	int i = 0;
@@ -1727,7 +1768,7 @@ public class Galaxy implements Serializable{
     	return found;
     }
 
-    // enklare variant av getPlayer som ej används vid inloggning
+    // enklare variant av getPlayer som ej anvï¿½nds vid inloggning
     public Player getPlayerByGovenorName(String govenorName){
       int i = 0;
       Player found = null;
@@ -1812,7 +1853,7 @@ public class Galaxy implements Serializable{
         allVIPs.add(tempVIP);
     	return tempVIP;
     }
-//  gissar att TurnInfo texten inte visas någon stan?  den är tok fel i alla fall.
+//  gissar att TurnInfo texten inte visas nï¿½gon stan?  den ï¿½r tok fel i alla fall.
     private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName){
         Player p = new Player(name,password,this, govenorName, factionName, homeplanet);
         p.getTurnInfo().addToLatestGeneralReport("Welcome to this SpaceRaze Game.");
@@ -1933,7 +1974,7 @@ public class Galaxy implements Serializable{
 	}
 
 	/*
-// används under testning
+// anvï¿½nds under testning
 private void createAllVIPs(Player p, Planet homeplanet){
   for (int i = 1; i < vipTypes.size(); i++){
     VIP tempVip = ((VIPType)vipTypes.get(i)).createNewVIP(p,homeplanet);
@@ -1983,7 +2024,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
 //    Random r = Functions.getRandom();
     // klona planetlistan
 //    List<Planet> tempplanets = (List<Planet>)((LinkedList<Planet>)planets).clone();
-   // List<Planet> tempplanets = new LinkedList<Planet>(planets); // byter ut raden ovanför mot att bara skapa en ny lista, tror inte vi behöver klona listan
+   // List<Planet> tempplanets = new LinkedList<Planet>(planets); // byter ut raden ovanfï¿½r mot att bara skapa en ny lista, tror inte vi behï¿½ver klona listan
     List<Planet> tempplanets = getStarPlanets();
     // slumpa om den
     Collections.shuffle(tempplanets);
@@ -1993,17 +2034,17 @@ private void createAllVIPs(Player p, Planet homeplanet){
     if (groupSameFaction){
     	setPlanetRangeToClosestFriendly(tempplanets,playerFaction);
     }
-    // loopa igenom planeterna tills listan är slut eller en lämplig hemplanet hittats
+    // loopa igenom planeterna tills listan ï¿½r slut eller en lï¿½mplig hemplanet hittats
     int i = 0;
     while ((i < tempplanets.size()) & (foundPlanet == null)){
       Planet tempPlanet = tempplanets.get(i);
-      // kolla om planeten inte redan är en hemplanet
+      // kolla om planeten inte redan ï¿½r en hemplanet
       if (tempPlanet.getPlayerInControl() == null){
         // kolla om en planet har andra hemplaneter inom steps steg
         if (!checkStartplanetsWithinRange(steps,tempPlanet,false) & !checkStartplanetsWithinRange(steps,tempPlanet,true)){
           // om nej -> returnera denna planet
           foundPlanet = tempPlanet;
-        }else{ // om ja, gå vidare till nästa
+        }else{ // om ja, gï¿½ vidare till nï¿½sta
           i++;
         }
       }else{
@@ -2059,14 +2100,14 @@ private void createAllVIPs(Player p, Planet homeplanet){
 				  planet.setRangeToClosestFriendly(Integer.MAX_VALUE);
 				  Logger.finer("planet max value: " + planet.getName());
 			  }else{
-				  // sök i grafen tills man hittar en planet som är samma faction, spara hur många 
-				  //   steg dit det är i rangeToClosestFriendly
+				  // sï¿½k i grafen tills man hittar en planet som ï¿½r samma faction, spara hur mï¿½nga 
+				  //   steg dit det ï¿½r i rangeToClosestFriendly
 				  int steps = getStepsToClosestFriendly(allPlanets,planet,playersFaction);
 				  planet.setRangeToClosestFriendly(steps);
 				  Logger.finest("planet: " + planet.getName() + " value: " + planet.getRangeToClosestFriendly());
 			  }
 		  }
-		  // sortera om listan m.ha. rangeToClosestFriendly, lägst först
+		  // sortera om listan m.ha. rangeToClosestFriendly, lï¿½gst fï¿½rst
 		  Collections.sort(allPlanets,new PlanetRangeComparator());
 		  // trace...
 		  Logger.finest("planets sorted");
@@ -2078,64 +2119,64 @@ private void createAllVIPs(Player p, Planet homeplanet){
 
   private int getStepsToClosestFriendly(List<Planet> planets, Planet aPlanet, Faction playerFaction){
 	    boolean planetFound = false;
-	    // skapa tom vektor över hittade planeter
-	    List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
+	    // skapa tom vektor ï¿½ver hittade planeter
+	    List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
 	    edgePlanets.add(aPlanet);
-	    List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
-	    List<Planet> searchedPlanets = new ArrayList<Planet>();  // lägg in alla som genomsökts + startplaneten
+	    List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
+	    List<Planet> searchedPlanets = new ArrayList<Planet>();  // lï¿½gg in alla som genomsï¿½kts + startplaneten
 	    searchedPlanets.add(aPlanet);
 	    List<Planet> allNeighbours;
 	    int tempSteps = 0;
 	    // loopa tills alla planeter har letats igenom, eller tempSteps = steps eller minst 1 startplanet har hittats
 	    while ((searchedPlanets.size() < planets.size()) & (!planetFound)){
 	      tempSteps++;
-	      // Gå igenom alla edgePlanets
+	      // Gï¿½ igenom alla edgePlanets
 	      for (int i = 0; i < edgePlanets.size(); i++){
 	        Planet tempPlanet = edgePlanets.get(i);
-	        // Hämta alla grannar till tempPlanet, både short & long range
+	        // Hï¿½mta alla grannar till tempPlanet, bï¿½de short & long range
 	        allNeighbours = getAllDestinations(tempPlanet,false);
-	        // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+	        // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
 	        for (int j = 0; j < allNeighbours.size(); j++){
 	          Planet tempNeighbourPlanet = allNeighbours.get(j);
 	          // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
 	          if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-	            // lägg i newEdgePlanets
+	            // lï¿½gg i newEdgePlanets
 	            newEdgePlanets.add(tempNeighbourPlanet);
 	          }
 	        }
 	        allNeighbours = getAllDestinations(tempPlanet,true);
-	        // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+	        // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
 	        for (int j = 0; j < allNeighbours.size(); j++){
 	          Planet tempNeighbourPlanet = allNeighbours.get(j);
 	          // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
 	          if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-	            // lägg i newEdgePlanets
+	            // lï¿½gg i newEdgePlanets
 	            newEdgePlanets.add(tempNeighbourPlanet);
 	          }
 	        }
 	      }
-	      // Gå igenom newEdgePlanets och kolla om någon av dem är en hemplanet till en spelare från samma faction
+	      // Gï¿½ igenom newEdgePlanets och kolla om nï¿½gon av dem ï¿½r en hemplanet till en spelare frï¿½n samma faction
 	      for (int k = 0; k < newEdgePlanets.size(); k++){
 	        Planet tempPlanet = newEdgePlanets.get(k);
-	        // kolla om planeten är en startplanet
+	        // kolla om planeten ï¿½r en startplanet
 	        if (tempPlanet.getPlayerInControl() != null){
 	        	if (tempPlanet.getPlayerInControl().getFaction() == playerFaction){
-	        		// planet hittad! Sätt till true!
+	        		// planet hittad! Sï¿½tt till true!
 	        		planetFound = true;
 	        	}
 	        }
 	      }
-	      // töm edgePlanets
+	      // tï¿½m edgePlanets
 	      edgePlanets.clear();
-	      // kopiera över newEdgePlanets till edgePlanets
+	      // kopiera ï¿½ver newEdgePlanets till edgePlanets
 	      for (int l = 0; l < newEdgePlanets.size(); l++){
 	        edgePlanets.add((Planet)newEdgePlanets.get(l));
 	      }
-	      // kopiera över newEdgePlanets till searchedPlanets
+	      // kopiera ï¿½ver newEdgePlanets till searchedPlanets
 	      for (int m = 0; m < newEdgePlanets.size(); m++){
 	        searchedPlanets.add((Planet)newEdgePlanets.get(m));
 	      }
-	      // töm newEdgePlanets
+	      // tï¿½m newEdgePlanets
 	      newEdgePlanets.clear();
 	    }
 	    return tempSteps;
@@ -2143,52 +2184,52 @@ private void createAllVIPs(Player p, Planet homeplanet){
 
   private boolean checkStartplanetsWithinRange(int steps, Planet aLocation, boolean longRange){
     boolean planetFound = false;
-    // skapa tom vektor över hittade planeter
-    List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
+    // skapa tom vektor ï¿½ver hittade planeter
+    List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
     edgePlanets.add(aLocation);
-    List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
-    List<Planet> searchedPlanets = new ArrayList<Planet>();  // lägg in alla som genomsökts + startplaneten
+    List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
+    List<Planet> searchedPlanets = new ArrayList<Planet>();  // lï¿½gg in alla som genomsï¿½kts + startplaneten
     searchedPlanets.add(aLocation);
     List<Planet> allNeighbours;
     int tempSteps = 0;
     // loopa tills alla planeter har letats igenom, eller tempSteps = steps eller minst 1 startplanet har hittats
     while ((searchedPlanets.size() < planets.size()) & (tempSteps < steps) & (!planetFound)){
       tempSteps++;
-      // Gå igenom alla edgePlanets
+      // Gï¿½ igenom alla edgePlanets
       for (int i = 0; i < edgePlanets.size(); i++){
         Planet tempPlanet = edgePlanets.get(i);
-        // Hämta alla grannar till tempPlanet
+        // Hï¿½mta alla grannar till tempPlanet
         allNeighbours = getAllDestinations(tempPlanet,longRange);
-        // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+        // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
         for (int j = 0; j < allNeighbours.size(); j++){
           Planet tempNeighbourPlanet = allNeighbours.get(j);
           // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
           if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-            // lägg i newEdgePlanets
+            // lï¿½gg i newEdgePlanets
             newEdgePlanets.add(tempNeighbourPlanet);
           }
         }
       }
-      // Gå igenom newEdgePlanets och (och ej belägrade??? kan bara gälla egna planeter)
+      // Gï¿½ igenom newEdgePlanets och (och ej belï¿½grade??? kan bara gï¿½lla egna planeter)
       for (int k = 0; k < newEdgePlanets.size(); k++){
         Planet tempPlanet = newEdgePlanets.get(k);
-        // kolla om planeten är en startplanet
+        // kolla om planeten ï¿½r en startplanet
         if (tempPlanet.getPlayerInControl() != null){
           // planet hittad! Returnera true!
           planetFound = true;
         }
       }
-      // töm edgePlanets
+      // tï¿½m edgePlanets
       edgePlanets.clear();
-      // kopiera över newEdgePlanets till edgePlanets
+      // kopiera ï¿½ver newEdgePlanets till edgePlanets
       for (int l = 0; l < newEdgePlanets.size(); l++){
         edgePlanets.add((Planet)newEdgePlanets.get(l));
       }
-      // kopiera över newEdgePlanets till searchedPlanets
+      // kopiera ï¿½ver newEdgePlanets till searchedPlanets
       for (int m = 0; m < newEdgePlanets.size(); m++){
         searchedPlanets.add((Planet)newEdgePlanets.get(m));
       }
-      // töm newEdgePlanets
+      // tï¿½m newEdgePlanets
       newEdgePlanets.clear();
     }
     return planetFound;
@@ -2233,7 +2274,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
     // extract Order from Player and insert it into the original Player instance
     // and do the same for PlanetInfos
     public String replacePlayer(Player p){
-      Logger.finer("replaceplayer(galaxy): " + p.getName());  // spårutskrift till consolen
+      Logger.finer("replaceplayer(galaxy): " + p.getName());  // spï¿½rutskrift till consolen
       if (p.getErrorMessage() != null){
         return "Insert failed: " + p.getErrorMessage();
       }else{
@@ -2414,7 +2455,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
         }
       }
       if (tempnr == 1){
-        // om det bara finns en spelare kvar måste han ha minst 1 planet för att vinna
+        // om det bara finns en spelare kvar mï¿½ste han ha minst 1 planet fï¿½r att vinna
         boolean atLeastOnePlanet = false;
         for (int j = 0; j < planets.size();j++){
           Planet tempPlanet = (Planet)planets.get(j);
@@ -2518,8 +2559,8 @@ private void createAllVIPs(Player p, Planet homeplanet){
     	if (allConfederacies.size() > 0){
     		// array for total prod for all conf
     		int[] confProdTotal = new int[allConfederacies.size()]; 
-    		int otherProd = 0;  // räkna popen på alla neutrala planeter
-    		// räkna popen på alla factioner
+    		int otherProd = 0;  // rï¿½kna popen pï¿½ alla neutrala planeter
+    		// rï¿½kna popen pï¿½ alla factioner
     		for (Planet aPlanet : planets){
     			if (aPlanet.getPlayerInControl() != null){
     				int confIndex = findPlayerConfederacy(aPlanet.getPlayerInControl(), allConfederacies);
@@ -2561,8 +2602,8 @@ private void createAllVIPs(Player p, Planet homeplanet){
     	if (allLordships.size() > 0){
     		// array for total prod for all conf
     		int[] lordProdTotal = new int[allLordships.size()]; 
-    		int otherProd = 0;  // räkna popen på alla neutrala planeter
-    		// räkna popen på alla factioner
+    		int otherProd = 0;  // rï¿½kna popen pï¿½ alla neutrala planeter
+    		// rï¿½kna popen pï¿½ alla factioner
     		for (Planet aPlanet : planets){
     			if (aPlanet.getPlayerInControl() != null){
     				int lordIndex = findPlayerLordship(aPlanet.getPlayerInControl(), allLordships);
@@ -2604,12 +2645,12 @@ private void createAllVIPs(Player p, Planet homeplanet){
     // check if 1 faction has at least factionVictory(65) % of the total pop of all planets in the game
     public Faction checkWinningFaction(int factionVictoryLimit){
       Faction winner = null;
-      // nollsätt totalpop för alla factioner
+      // nollsï¿½tt totalpop fï¿½r alla factioner
       for (int i = 0; i < factions.size(); i++){
         ((Faction)factions.get(i)).setTotalPop(0);
       }
-      int neutralPop = 0;  // räkna popen på alla neutrala planeter
-      // räkna popen på alla factioner
+      int neutralPop = 0;  // rï¿½kna popen pï¿½ alla neutrala planeter
+      // rï¿½kna popen pï¿½ alla factioner
       for (int j = 0; j < planets.size();j++){
         Planet tempPlanet = (Planet)planets.get(j);
         if (tempPlanet.getPlayerInControl() != null){
@@ -2641,12 +2682,12 @@ private void createAllVIPs(Player p, Planet homeplanet){
     // check if 1 faction has at least total production >= factionVictoryLimit
     public Faction checkWinningFactionLimit(int factionVictoryLimit){
     	Faction winner = null;
-    	// nollsätt totalpop för alla factioner
+    	// nollsï¿½tt totalpop fï¿½r alla factioner
     	for (Faction aFaction : factions){
     		aFaction.setTotalPop(0);
     	}
-    	int neutralPop = 0;  // räkna popen på alla neutrala planeter
-    	// räkna popen på alla factioner
+    	int neutralPop = 0;  // rï¿½kna popen pï¿½ alla neutrala planeter
+    	// rï¿½kna popen pï¿½ alla factioner
     	for (Planet aPlanet : planets){
     		if (aPlanet.getPlayerInControl() != null){
     			Faction tempFaction = aPlanet.getPlayerInControl().getFaction();
@@ -2683,12 +2724,12 @@ private void createAllVIPs(Player p, Planet homeplanet){
     // check if 1 player has at least singleVictory (60) % of all pop in the game
     public Player checkWinningPlayer(int singleVictoryLimit){
       Player winner = null;
-      // nollsätt totalpop för alla factioner
+      // nollsï¿½tt totalpop fï¿½r alla factioner
       for (int i = 0; i < players.size(); i++){
         ((Player)players.get(i)).setTotalPop(0);
       }
-      int neutralPop = 0;   // räkna popen på alla neutrala planeter
-      // räkna popen för alla spelare
+      int neutralPop = 0;   // rï¿½kna popen pï¿½ alla neutrala planeter
+      // rï¿½kna popen fï¿½r alla spelare
       for (int j = 0; j < planets.size();j++){
         Planet tempPlanet = (Planet)planets.get(j);
         if (tempPlanet.getPlayerInControl() != null){
@@ -2742,15 +2783,15 @@ private void createAllVIPs(Player p, Planet homeplanet){
       	for (Iterator<CanBeLostInSpace> iter = allLostInSpace.iterator(); iter.hasNext();) {
     		CanBeLostInSpace aLis = iter.next();
     		if (aLis instanceof Spaceship){
-				if (!lostShips){ // ta alla skepp som ej är från aFaction
+				if (!lostShips){ // ta alla skepp som ej ï¿½r frï¿½n aFaction
 					if (aLis.getOwner() != null){
 						if (!aLis.getOwner().getFaction().getName().equalsIgnoreCase(aFactionName)){
 							lisList.add(aLis);
 						}
-					}else{ // neutralt = lägg till
+					}else{ // neutralt = lï¿½gg till
 						lisList.add(aLis);
 					}
-				}else{ // ta endast skepp från aFaction
+				}else{ // ta endast skepp frï¿½n aFaction
 					if (aLis.getOwner() != null){
 						if (aLis.getOwner().getFaction().getName().equalsIgnoreCase(aFactionName)){
 							lisList.add(aLis);
@@ -2767,7 +2808,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
 			Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
 			String factionName = aPlayer.getFaction().getName();
 	  		List<CanBeLostInSpace> allLostInSpace = lastReport.getLostInSpace();
-	  		List<CanBeLostInSpace> lisOwn = getShipsLostInSpace(allLostInSpace,factionName,true); // egna förlorade skepp
+	  		List<CanBeLostInSpace> lisOwn = getShipsLostInSpace(allLostInSpace,factionName,true); // egna fï¿½rlorade skepp
 	        addStatistics(StatisticType.SHIPS_LOST, aPlayer, lisOwn.size(), true);
 	  		List<CanBeLostInSpace> lisOther = getShipsLostInSpace(allLostInSpace,factionName,false);
 	        addStatistics(StatisticType.SHIPS_KILLED, aPlayer, lisOther.size(), true);
@@ -2831,22 +2872,22 @@ private void createAllVIPs(Player p, Planet homeplanet){
     }
 
     private void setStaticsicsProduction(){
-      // skapa en map för factionernas totala pop
+      // skapa en map fï¿½r factionernas totala pop
   	  java.util.Map<String,Integer> factionProductions = new HashMap<String,Integer>(); // String = faction name
-      // nollsätt totalpop för alla factioner
+      // nollsï¿½tt totalpop fï¿½r alla factioner
       for (Player aPlayer : players) {
     	  aPlayer.setTotalPop(0);
     	  if (factionProductions.get(aPlayer.getFaction().getName()) == null){
     		  factionProductions.put(aPlayer.getFaction().getName(),0);
     	  }
       }
-      int neutralPop = 0;   // räkna popen på alla neutrala planeter
-      // lägg till factionerna
+      int neutralPop = 0;   // rï¿½kna popen pï¿½ alla neutrala planeter
+      // lï¿½gg till factionerna
 //      for (Faction aFaction : gw.getFactions()) {
 //    	  Logger.fine(aFaction.getName());
 //    	  factionProductions.put(aFaction.getName(), 0);
 //      }
-      // räkna popen för alla spelare
+      // rï¿½kna popen fï¿½r alla spelare
       for (int j = 0; j < planets.size();j++){
     	  Planet tempPlanet = (Planet)planets.get(j);
     	  if (tempPlanet.getPlayerInControl() != null){
@@ -3103,7 +3144,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
         	totIncome = totIncome + tmpInc;
         	Logger.finest("totIncome1 " + totIncome);
         	// add income bonus for Buildings
-        	Logger.finest("getPlanetBuildingsBonus(tempPlanet) före");
+        	Logger.finest("getPlanetBuildingsBonus(tempPlanet) fï¿½re");
         	totIncome = totIncome + getPlanetBuildingsBonus(tempPlanet,playerTurnInfo);
         	Logger.finest("totIncome2 " + totIncome);
         	Logger.finest("getPlanetBuildingsBonus(tempPlanet) efter");
@@ -3340,7 +3381,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
     	  removeSquadronsFromCarrier(ss);
       }
       ok = spaceships.remove(ss);
-      if (!ok){Logger.severe("Couldn't find spaceship to delete!!!");} // spårutskrift
+      if (!ok){Logger.severe("Couldn't find spaceship to delete!!!");} // spï¿½rutskrift
     }
 
     public void removeTroop(Troop aTroop){
@@ -3350,7 +3391,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
         if (aTroop.getOwner() != null){ // only players can have vips on troops
         	checkVIPsInDestroyedTroop(aTroop);
         }
-        if (!ok){Logger.finer("Couldn't find troop to delete!!!");} // spårutskrift
+        if (!ok){Logger.finer("Couldn't find troop to delete!!!");} // spï¿½rutskrift
     }
 
     private void removeSquadronsFromCarrier(Spaceship aCarrier){
@@ -3712,6 +3753,23 @@ private void createAllVIPs(Player p, Planet homeplanet){
       }
       return hasShipsInSystem;
     }
+    
+    /**
+     * Checks if allies to the player have any ships on the planet. If so the player should get information about the planet. 
+     * @return
+     */
+    public boolean isItAlliedShipsInSystem(Player player, Planet planet){
+    	List<Player> allies = getAllies(player, players);
+    	boolean haveAllied = false;
+    	int i = 0;
+    	while (!haveAllied && allies.size() < i) {
+    			if(playerHasShipsInSystem(allies.get(i), planet)){
+    				haveAllied = true;
+    			}
+    		i++;
+		}
+    	return haveAllied;
+    }
 
     public List<Spaceship> getPlayersSpaceshipsOnPlanet(Player aPlayer, Planet aPlanet){
       List<Spaceship> playersss = new ArrayList<Spaceship>();
@@ -3829,11 +3887,17 @@ private void createAllVIPs(Player p, Planet homeplanet){
     }
 
     public List<Troop> getTroopsOnPlanet(Planet aPlanet, Player aPlayer){
+    	return getTroopsOnPlanet(aPlanet, aPlayer, true);
+    }
+    
+    public List<Troop> getTroopsOnPlanet(Planet aPlanet, Player aPlayer, boolean showUnVisible){
     	List<Troop> troopsAtPlanet = new LinkedList<Troop>();
     	for (Troop aTroop : troops) {
             if (aTroop.getPlanetLocation() == aPlanet){
             	if (aTroop.getOwner() == aPlayer){
-            		troopsAtPlanet.add(aTroop);
+            		if(showUnVisible || aTroop.getTroopType().isVisible()){
+            			troopsAtPlanet.add(aTroop);
+            		}
             	}
             }
     	}
@@ -4020,7 +4084,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
       Planet firstDestination = null;
       // kolla efter egna planeter
       foundPlanet = findClosestOwnPlanetFromShip(aSpaceship.getLocation(),aSpaceship.getOwner(),aSpaceship);  
-      // om en destinationsplanet har hittats skall den 1:a planeten på väg dit hämtas
+      // om en destinationsplanet har hittats skall den 1:a planeten pï¿½ vï¿½g dit hï¿½mtas
       if (foundPlanet != null){
         Logger.finer("foundPlanet: " + foundPlanet.getName());
         firstDestination = findFirstJumpTowardsPlanet(aSpaceship.getLocation(),foundPlanet,aSpaceship);
@@ -4038,16 +4102,16 @@ private void createAllVIPs(Player p, Planet homeplanet){
     }
 
     
-    // aPlayer kan vara null för att leta efter neutrala planeter
+    // aPlayer kan vara null fï¿½r att leta efter neutrala planeter
     private Planet findClosestPlanet(Planet aLocation, Player aPlayer, SpaceshipRange aSpaceshipRange, FindPlanetCriterium aCriterium, List<String> visitedPlanets){
       Logger.finer("findClosestOwnPlanetFromShip: " + aLocation.getName());
       Planet foundPlanet = null;
-      // skapa tom vektor över hittade planeter
+      // skapa tom vektor ï¿½ver hittade planeter
       List<Planet> foundPlanets = new ArrayList<Planet>();
-      List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som var på gränsen till det genomsökta området
+      List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som var pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
       edgePlanets.add(aLocation);
-      List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
-      List<Planet> searchedPlanets = new ArrayList<Planet>();  // lägg in alla som genomsökts + startplaneten
+      List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
+      List<Planet> searchedPlanets = new ArrayList<Planet>();  // lï¿½gg in alla som genomsï¿½kts + startplaneten
       searchedPlanets.add(aLocation);
 /*
       // a spaceship cannot retreat back to the planet it retreated from
@@ -4057,31 +4121,31 @@ private void createAllVIPs(Player p, Planet homeplanet){
       }
 */
       List<Planet> allNeighbours;
-      // loopa tills alla planeter har letats igenom eller minst 1 lämplig planet har hittats
+      // loopa tills alla planeter har letats igenom eller minst 1 lï¿½mplig planet har hittats
       while ((searchedPlanets.size() < planets.size()) & (foundPlanets.size() == 0) & (edgePlanets.size() > 0)){
       	Logger.finer("in while");
-      	// Gå igenom alla edgePlanets
+      	// Gï¿½ igenom alla edgePlanets
         for (int i = 0; i < edgePlanets.size(); i++){
        	  Logger.finest("loop edgeplanets");
           Planet tempPlanet = edgePlanets.get(i);
           Logger.finest("temp edgeplanet: " + tempPlanet.getName());
-          // Hämta alla grannar till tempPlanet
+          // Hï¿½mta alla grannar till tempPlanet
           allNeighbours = getAllDestinations(tempPlanet,aSpaceshipRange == SpaceshipRange.LONG);
-          // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+          // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
           for (int j = 0; j < allNeighbours.size(); j++){
           	Logger.finest("loop neighbours");
             Planet tempNeighbourPlanet = allNeighbours.get(j);
             Logger.finest("temp neighbours: " + tempNeighbourPlanet.getName());
             // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
             if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-              // lägg i newEdgePlanets
+              // lï¿½gg i newEdgePlanets
               newEdgePlanets.add(tempNeighbourPlanet);
               Logger.finest("adding to searched");
             }
           }
         }
         Logger.finer("loop edge finished");
-        // Gå igenom newEdgePlanets och (och ej belägrade??? kan bara gälla egna planeter)
+        // Gï¿½ igenom newEdgePlanets och (och ej belï¿½grade??? kan bara gï¿½lla egna planeter)
         for (int k = 0; k < newEdgePlanets.size(); k++){
           Logger.finest("loop new edge");
           Planet tempPlanet = newEdgePlanets.get(k);
@@ -4092,9 +4156,9 @@ private void createAllVIPs(Player p, Planet homeplanet){
     	  }
           if (!alreadyVisited){
 	          if (aCriterium == FindPlanetCriterium.OWN_PLANET_NOT_BESIEGED){
-		          // kolla om planeten tillhör eftersökt spelare
-		          if (tempPlanet.getPlayerInControl() == aPlayer){// om planeter tillhör eftersökt spelare
-		            // om den dessutom ej är belägrad, sätt in den i foundPlanets
+		          // kolla om planeten tillhï¿½r eftersï¿½kt spelare
+		          if (tempPlanet.getPlayerInControl() == aPlayer){// om planeter tillhï¿½r eftersï¿½kt spelare
+		            // om den dessutom ej ï¿½r belï¿½grad, sï¿½tt in den i foundPlanets
 		          	if (!tempPlanet.isBesieged()){
 		          		foundPlanets.add(tempPlanet);
 		          		Logger.finest("adding to found: " + tempPlanet.getName());
@@ -4146,17 +4210,17 @@ private void createAllVIPs(Player p, Planet homeplanet){
           }
         }
         Logger.finest("loop new edge finished");
-        // töm edgePlanets
+        // tï¿½m edgePlanets
         edgePlanets.clear();
-        // kopiera över newEdgePlanets till edgePlanets
+        // kopiera ï¿½ver newEdgePlanets till edgePlanets
         for (int l = 0; l < newEdgePlanets.size(); l++){
           edgePlanets.add(newEdgePlanets.get(l));
         }
-        // kopiera över newEdgePlanets till searchedPlanets
+        // kopiera ï¿½ver newEdgePlanets till searchedPlanets
         for (int m = 0; m < newEdgePlanets.size(); m++){
           searchedPlanets.add(newEdgePlanets.get(m));
         }
-        // töm newEdgePlanets
+        // tï¿½m newEdgePlanets
         newEdgePlanets.clear();
         // log if no more planets can be searched
         if (edgePlanets.size() == 0){
@@ -4164,15 +4228,15 @@ private void createAllVIPs(Player p, Planet homeplanet){
         }
       }
       Logger.finest("while finished");
-      // om vektorn.size() > 0, dvs minst 1st lämplig planet har hittats
+      // om vektorn.size() > 0, dvs minst 1st lï¿½mplig planet har hittats
       if (foundPlanets.size() > 0){
         Logger.finest("foundPlanets.size() > 0");
-        // välj slumpartat en av de planeterna
+        // vï¿½lj slumpartat en av de planeterna
         if (foundPlanets.size() > 1){
 //          Functions.randomize(foundPlanets);
           Collections.shuffle(foundPlanets);
         }
-        // sätt foundPlanet till den utslumpade planeten
+        // sï¿½tt foundPlanet till den utslumpade planeten
         foundPlanet = foundPlanets.get(0);
       }else{
         Logger.finest("foundPlanets.size() == 0");
@@ -4214,24 +4278,24 @@ private void createAllVIPs(Player p, Planet homeplanet){
       Logger.finer("findFirstJumpTowardsPlanet aDestination: " + aDestination.getName());
       Planet firstStopPlanet = null;
       boolean found = false;
-      // sätt reachFrom på startplaneten så den blir rotnod
+      // sï¿½tt reachFrom pï¿½ startplaneten sï¿½ den blir rotnod
       aLocation.setReachFrom(null);
-      List<Planet> edgePlanets = new LinkedList<Planet>(); // de planeter som är på gränsen till det genomsökta området
+      List<Planet> edgePlanets = new LinkedList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
       edgePlanets.add(aLocation);
-      List<Planet> newEdgePlanets = new LinkedList<Planet>(); // de planeter som är på gränsen till det genomsökta området
-      List<Planet> searchedPlanets = new LinkedList<Planet>();  // lägg in alla som genomsökts + startplaneten
+      List<Planet> newEdgePlanets = new LinkedList<Planet>(); // de planeter som ï¿½r pï¿½ grï¿½nsen till det genomsï¿½kta omrï¿½det
+      List<Planet> searchedPlanets = new LinkedList<Planet>();  // lï¿½gg in alla som genomsï¿½kts + startplaneten
       searchedPlanets.add(aLocation);
       List<Planet> allNeighbours;
-      // loopa tills alla planeter har letats igenom eller minst 1 lämplig planet har hittats
+      // loopa tills alla planeter har letats igenom eller minst 1 lï¿½mplig planet har hittats
       while (!found){
       	Logger.finest("while (!found) found: " + found);
-        // Gå igenom alla edgePlanets
+        // Gï¿½ igenom alla edgePlanets
         for (int i = 0; i < edgePlanets.size(); i++){
           Planet tempPlanet = (Planet)edgePlanets.get(i);
           Logger.finest("tempPlanet: " + tempPlanet.getName());
-          // Hämta alla grannar till tempPlanet
+          // Hï¿½mta alla grannar till tempPlanet
           allNeighbours = getAllDestinations(tempPlanet,aSpaceshipRange == SpaceshipRange.LONG);
-          // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+          // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
           for (int j = 0; j < allNeighbours.size(); j++){
             Planet tempNeighbourPlanet = allNeighbours.get(j);
             Logger.finest("tempNeighbourPlanet: " + tempNeighbourPlanet.getName());
@@ -4240,11 +4304,11 @@ private void createAllVIPs(Player p, Planet homeplanet){
               Logger.finest("containsPlanet: " + !Functions.containsPlanet(searchedPlanets,tempNeighbourPlanet));
               Logger.finest("containsPlanet: " + !Functions.containsPlanet(newEdgePlanets,tempNeighbourPlanet));
               Logger.finest("inside if: ");
-              // sätt reachFrom så det går att hitta pathen senare
+              // sï¿½tt reachFrom sï¿½ det gï¿½r att hitta pathen senare
               tempNeighbourPlanet.setReachFrom(tempPlanet);
-              // lägg i newEdgePlanets
+              // lï¿½gg i newEdgePlanets
               newEdgePlanets.add(tempNeighbourPlanet);
-              // kolla om det är den eftersökta planeten
+              // kolla om det ï¿½r den eftersï¿½kta planeten
               if(tempNeighbourPlanet == aDestination){
               	Logger.finest("found = true ");
                 found = true;
@@ -4252,19 +4316,19 @@ private void createAllVIPs(Player p, Planet homeplanet){
             }
           }
         }
-        // töm edgePlanets
+        // tï¿½m edgePlanets
         edgePlanets.clear();
         for (int l = 0; l < newEdgePlanets.size(); l++){
-          // kopiera över newEdgePlanets till edgePlanets
+          // kopiera ï¿½ver newEdgePlanets till edgePlanets
           edgePlanets.add((Planet)newEdgePlanets.get(l));
-          // kopiera över newEdgePlanets till searchedPlanets
+          // kopiera ï¿½ver newEdgePlanets till searchedPlanets
           searchedPlanets.add((Planet)newEdgePlanets.get(l));
         }
-        // töm newEdgePlanets
+        // tï¿½m newEdgePlanets
         newEdgePlanets.clear();
       }
       Planet lastStop = aDestination;
-      // loopa tills reachFrom är null
+      // loopa tills reachFrom ï¿½r null
       Logger.finest("before while, lastStop: " + lastStop.getName());
       while (lastStop.getReachFrom().getReachFrom() != null){
       	Logger.finest("");
@@ -4751,8 +4815,8 @@ private void createAllVIPs(Player p, Planet homeplanet){
 	        VIP tempVIP = (VIP)allVIPs.get(i);
 	        if (tempVIP.isDiplomat() & !tempVIP.getBoss().isAlien()){ // aliens can not use diplomacy
 	        	Planet tempLocation = tempVIP.getPlanetLocation();
-	        	if (tempLocation != null){ // tempVIP är vid en planet
-	        		if ((tempLocation.getPlayerInControl() == null) & !tempLocation.isRazed()){  // planeten är neutral
+	        	if (tempLocation != null){ // tempVIP ï¿½r vid en planet
+	        		if ((tempLocation.getPlayerInControl() == null) & !tempLocation.isRazed()){  // planeten ï¿½r neutral
 	        			allDiplomats.add(tempVIP);
 	        		}
 	        	}
@@ -4807,7 +4871,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
 			Logger.finest("tempVIP.getBoss().getFaction().getAlignment(): " + tempVIP.getBoss().getFaction().getAlignment());
 	        if (tempVIP.isInfestator() & tempVIP.getBoss().isAlien() & tempVIP.getAlignment().equals(tempVIP.getBoss().getFaction().getAlignment())){ // only infestators with the same alignment as a player can use infestation
 	          Planet tempLocation = tempVIP.getPlanetLocation();
-	          if (tempLocation != null){ // tempVIP är vid en planet
+	          if (tempLocation != null){ // tempVIP ï¿½r vid en planet
 		          Logger.finest("tempLocation != null ");
 		          Logger.finest("tempLocation: " + tempLocation.getName());
 	        	  Player owner = tempLocation.getPlayerInControl();
@@ -4829,8 +4893,8 @@ private void createAllVIPs(Player p, Planet homeplanet){
 	    for (VIP tempVIP : allVIPs){
 	        if (tempVIP.isGovernor()){
 	          Planet tempLocation = tempVIP.getPlanetLocation();
-	          if (tempLocation != null){ // Gov är vid en planet
-	            if (tempLocation.getPlayerInControl() == null){  // planeten är neutral
+	          if (tempLocation != null){ // Gov ï¿½r vid en planet
+	            if (tempLocation.getPlayerInControl() == null){  // planeten ï¿½r neutral
 	            	allGovs.add(tempVIP);
 	            }
 	          }
@@ -4845,8 +4909,8 @@ private void createAllVIPs(Player p, Planet homeplanet){
 	        VIP tempVIP = (VIP)allVIPs.get(i);
 	        if (tempVIP.isDiplomat()){
 	          Planet tempLocation = tempVIP.getPlanetLocation();
-	          if (tempLocation != null){ // Gov är vid en planet
-	            if (tempLocation.getPlayerInControl() != null){  // planeten är inte neutral
+	          if (tempLocation != null){ // Gov ï¿½r vid en planet
+	            if (tempLocation.getPlayerInControl() != null){  // planeten ï¿½r inte neutral
 	            	allDips.add(tempVIP);
 	            }
 	          }else{
@@ -5347,6 +5411,21 @@ private void createAllVIPs(Player p, Planet homeplanet){
 		return diplomacy.getDiplomacyState(player1, player2);
 	}
 	
+	public List<Player> getAllies(Player player, List<Player> players){
+		
+		List<Player> allies = new ArrayList<Player>();
+		
+		for (Player aPlayer : players) {
+			if(player != aPlayer){
+				DiplomacyState diplomacyState = player.getGalaxy().getDiplomacyState(player, aPlayer);
+				if(diplomacyState.getCurrentLevel().isHigher(DiplomacyLevel.PEACE)){
+					allies.add(aPlayer);
+				}
+			}
+		}
+		return allies;
+	}
+	
 	public Planet getPlanet(String planetName){
 		Logger.finer("getPlanet(String planetName) planetName : " + planetName);
 		Planet aPlanet=null;
@@ -5613,7 +5692,7 @@ private void createAllVIPs(Player p, Planet homeplanet){
 	    		}
 			}
 			
-			// slumpa planetern (så att det blir helt slumpade). Sortera planeterna efter prod.
+			// slumpa planetern (sï¿½ att det blir helt slumpade). Sortera planeterna efter prod.
 			// slumpa spelarna. lopa sedan igenom planetlistan o dela ut planeterna.
 			
 		}

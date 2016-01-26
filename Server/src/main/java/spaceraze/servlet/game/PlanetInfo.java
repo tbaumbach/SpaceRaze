@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.hamcrest.core.IsInstanceOf;
+
 import sr.general.logging.Logger;
 import sr.world.Building;
 import sr.world.Galaxy;
 import sr.world.Planet;
 import sr.world.Player;
 import sr.world.Spaceship;
+import sr.world.Troop;
 import sr.world.VIP;
 import sr.world.mapinfo.FleetData;
 
@@ -33,17 +36,19 @@ public class PlanetInfo {
 	private int population, resistance;
 	private int lastInfoTurn = 0; // Används för att tala om för spelarn vilken turn informationen kommer ifrån.
 	private String notes;
-	private List<BuildingInfo> buildings; // Här visas byggnader som tillhör ägaren. Alltså inte bara spelarens byggnader.
-	private List<VIPInfo> vips; // Innehåller alla spelarens, allierade och synliga fientliga VIPar.
+	private List<BuildingInfo> buildings; // Här visas byggnader som tillhör ägaren. Alltså inte bara spelarens byggnader. Kan bara finnas en ägare av byggnader på en planet.t
+	private List<VIPInfo> vips; // Innehåller alla spelarens, allierade och synliga fientliga VIPar. OBS bara VIPar på planeten, ej på skepp eller troops.
 	//TODO Vore snyggt om vi även visar fientliga VIPar som har dödat egna VIPar. Tyvärr vet vi ju inte typen utan bara egenskapen(assasin). Detta är överkurs.
 	
 	// The owners ships
 	private List<ShipInfo> ships;
+	private List<TroopInfo> troops;
 	// Other plyers/neutral fleets(size and civilians)
 	private List<FleetInfo> fleets;
+	// Other plyers/neutral armys(troops numbers)
+	private List<ArmyInfo> armys;
 	
-	//TODO ######### fixa för trupper. ##########
-	//private List<TroopInfo> troops;
+	
 	
 	//TODO borde vi även lägga till battlereports för skepp o trupper? eller ska det ligga i turnInfo. 
 	
@@ -56,13 +61,17 @@ public class PlanetInfo {
 	//private List<String> lastKnownBuildingsInOrbit,lastKnownBuildingsOnSurface;
 	//private boolean lastKnownRazed;
 	
+	//PlanetInfo(){};
 	
 	
 	PlanetInfo(Planet planet, Player player){
 		buildings = new ArrayList<BuildingInfo>();
 		vips = new ArrayList<VIPInfo>();
 		ships = new ArrayList<ShipInfo>();
+		troops = new ArrayList<TroopInfo>();
 		fleets = new ArrayList<FleetInfo>();
+		armys = new ArrayList<ArmyInfo>();
+		
 		name = planet.getName();
 		razed = planet.isRazed();
 		//TODO klasserna PlanerInfos och sr.world.PlanetInfo ska ersättas av denna klass enligt samma model som MapPLanetInfo.
@@ -71,33 +80,46 @@ public class PlanetInfo {
 		// Vill inte förstöra möjligheten att använda spel körde i appleten.
 		notes = player.getPlanetInfos().getNotes(planet.getName());
 		
-		Galaxy  galaxy = player.getGalaxy();
-		// TODO här ska även allierdas VIPar/skepp/survey kollas = spelarn ser allt som dina allierade.
+		Galaxy galaxy = player.getGalaxy();
 		boolean haveSpy = (galaxy.findVIPSpy(planet,player) != null);
+		boolean alliedSpy = galaxy.isItAlliedSpyOnPlanet(player, planet);
+		boolean spy = haveSpy | alliedSpy;
 		boolean surveyShip = (galaxy.findSurveyShip(planet,player) != null);
+		boolean alliedSurveyShip = galaxy.isItAlliesSurveyShipsOnPlanet(player, planet);
 		boolean surveyVIP = (galaxy.findSurveyVIPonShip(planet,player) != null);
-		boolean survey = surveyShip | surveyVIP;
+		boolean alliedSurveyVIP = galaxy.isItAlliesSurveyVipOnPlanet(player, planet);
+		boolean survey = surveyShip | alliedSurveyShip | surveyVIP | alliedSurveyVIP;
 		boolean shipInSystem = (galaxy.playerHasShipsInSystem(player,planet));
+		boolean alliedShipsInSystem = galaxy.isItAlliedShipsInSystem(player, planet);
 		
 		
-		//TODO när shipInSystem även betyder allierade skepp så ska deta bytas ut mot galaxy.playerHasShipsInSystem(player,planet)
 		if(shipInSystem){
 			addShips(player, planet, galaxy);
 		}
 		
+		addTroops(player, planet, galaxy);
+		
+		boolean haveTroopsOnTheGround = (troops.size() > 0);
+		
 		
 	//	if(!razed){ // a razed planet is a dead planet = nothing on it.
 			open = planet.isOpen();
-			
-			besieged = planet.isBesieged();
-			
+						
 			boolean isOwner = planet.isPlanetOwner(player);
 			
 			
 			//Checks if the planets owner is a allied = show all.
-			boolean isAllied = planet.isEnemyOrNeutralPlanet(player);
-			if(open || shipInSystem || isOwner || isAllied || haveSpy || survey){
-				owner = planet.getPlayerInControl().getGovenorName();
+			boolean isAllied = !planet.isEnemyOrNeutralPlanet(player);
+			
+			//TODO borde lägga till att man ser om man har troops på planeten. Har för mig att trupper idag överlever även utan support skepp(troopShip)
+			if(open || shipInSystem || alliedShipsInSystem || isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
+				
+				if(planet.isPlayerPlanet()){
+					owner = planet.getPlayerInControl().getGovenorName();
+				}else{
+					owner = "neutral";
+				}
+				
 				basePopulation = planet.getBasePop();
 				besieged = planet.isBesieged();
 				population = planet.getPopulation();
@@ -109,12 +131,16 @@ public class PlanetInfo {
 				//lastKnownMaxShipSize = null;
 				//lastKnownRazed = false;
 				
-				addVIPs(player, planet, galaxy, isOwner, isAllied, haveSpy, survey);
+				getOthersFleets(planet, player, galaxy);
+								
+				addVIPs(player, planet, galaxy, isAllied, spy, survey, haveTroopsOnTheGround);
 				
-				if(isOwner || isAllied || haveSpy || survey){
-					
+				// Information from the ground.
+				if(isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
+					getOthersArmys(planet, player, galaxy, true);
 					addBuildings(planet.getBuildings());
-				} else if(open || shipInSystem){
+				} else if(open || shipInSystem || alliedShipsInSystem){// Information from orbit, can't see cloaked units.
+					getOthersArmys(planet, player, galaxy, false);
 					addBuildings(planet.getBuildingsByVisibility(true)); // bara buildings som syns på kartan.
 				}
 				
@@ -127,9 +153,6 @@ public class PlanetInfo {
 				// lastKnownProd,lastKnownRes hanteras genom att använda vanliga prod/res med kombination av lastInfoTurn. Gällar alla värden.
 			}
 			
-			if (haveSpy | shipInSystem | open | isOwner | isAllied){
-				getOtherFleets(planet, player, galaxy);
-			}
 			
 			
 	//	}else{ // TODO Planet is razed = allways closed, no one that can report from it. Only if the player or Allied have ships, spys.
@@ -139,7 +162,7 @@ public class PlanetInfo {
 		
 	}
 	
-	private void getOtherFleets(Planet planet, Player player, Galaxy g){
+	private void getOthersFleets(Planet planet, Player player, Galaxy g){
         // loopa igenom alla spelare och kolla efter flottor
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
@@ -160,21 +183,88 @@ public class PlanetInfo {
         
     }
 	
-	//VIPS on the planet, not VIPs on troops or ships.
-	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isOwner, boolean isAllied, boolean haveSpy, boolean survey){
+	private void getOthersArmys(Planet planet, Player player, Galaxy g, boolean showUnVisible){
+        // loopa igenom alla spelare och kolla efter troops
+        for (Player tempPlayer : g.getPlayers()) {
+        	if (tempPlayer != player){
+        		List<Troop> troopsOnPlanet = g.getTroopsOnPlanet(planet, tempPlayer, showUnVisible);
+        		if(troopsOnPlanet.size()> 0){
+        			armys.add(new ArmyInfo(tempPlayer.getGovenorName(),troopsOnPlanet.size()));
+        		}
+        	}
+        }
+        List<Troop> troopsOnPlanet = g.getTroopsOnPlanet(planet, null, showUnVisible);
+        if(troopsOnPlanet.size()> 0){
+			armys.add(new ArmyInfo("Neutral",troopsOnPlanet.size()));
+		}
+    }
+	
+	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isAllied, boolean haveSpy, boolean survey, boolean haveTroopsOnTheGround){
 		
 		for (VIP aVIP : galaxy.getAllVIPs()) {
 			if (aVIP.getPlanetLocation() == planet){
 				if(aVIP.getBoss() == player || player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, aVIP.getBoss())){
 					vips.add(new VIPInfo(aVIP, player));
-				}else if(open || haveSpy || survey){ // VIPar som  tillhör fiender. Alltså VIPar som inte finns på spelarens eller dess allierades planeter. 
+				}else if(open || isAllied ||haveSpy || survey || haveTroopsOnTheGround){ // VIPar som  tillhör fiender. Alltså VIPar som inte finns på spelarens eller dess allierades planeter. 
 					if (aVIP.getShowOnOpenPlanet()){
 						vips.add(new VIPInfo(aVIP, player));
 					}
 				}
+			}//Check if VIP are on a ship 
+			else if(aVIP.getShipLocation() != null && aVIP.getBoss() == player){
+				ShipInfo aShip = findShip(aVIP.getShipLocation().getUniqueName());
+				if(aShip != null){
+					aShip.addVIP(new VIPInfo(aVIP, player));
+				}
+			}//Check if VIP are on a troop
+			else if(aVIP.getTroopLocation() != null && aVIP.getBoss() == player){
+				TroopInfo troop = findTroop(aVIP.getTroopLocation().getUniqueName());
+				if(troop != null){
+					troop.addVIP(new VIPInfo(aVIP, player));
+				}
 			}
 		}
     }
+	
+	private ShipInfo findShip(String name){
+		for (ShipInfo ship: ships) {
+			if(ship.getName().equals(name)){
+				return ship;
+			}else{
+				for (ShipInfo squdron : ship.getSqudrons()) {
+					if(squdron.getName().equals(name)){
+						return squdron;
+					}	
+				}
+			}
+		}
+		return null;
+	}
+	
+	private TroopInfo findTroop(String name){
+		for (TroopInfo troop: troops) {
+			if(troop.getName().equals(name)){
+				return troop;
+			}
+		}
+		
+		for (ShipInfo ship: ships) {
+			for (TroopInfo troop : ship.getTroops()) {
+				if(troop.getName().equals(name)){
+					return troop;
+				}
+			}
+			
+			for (ShipInfo squdron : ship.getSqudrons()) {
+				for (TroopInfo troop : ship.getTroops()) {
+					if(troop.getName().equals(name)){
+						return troop;
+					}
+				}	
+			}
+		}
+		return null;
+	}
 
 	private void addBuildings(List<Building> planetBuildings) {
 		for (Building building : planetBuildings) {
@@ -184,11 +274,43 @@ public class PlanetInfo {
 	
 	//The owners ships.
 	private void addShips(Player player, Planet planet, Galaxy galaxy){
+		//TODO kolla upp att även squadroner som befinner sig i en carrier följer med i listan.
 		List<Spaceship> spaceShips = galaxy.getPlayersSpaceshipsOnPlanet(player, planet);
+		List<Spaceship> squdronsOnShip = new ArrayList<Spaceship>();
+		
+		//Add all ships to the planets
 		for (Spaceship spaceship : spaceShips) {
-			ships.add(new ShipInfo(spaceship));
+			if(spaceship.isSquadron() && spaceship.getCarrierLocation() != null){
+				squdronsOnShip.add(spaceship);
+			}else{
+				ships.add(new ShipInfo(spaceship));
+			}
 		}
 		
+		//Add ships(squdrons) to carriers on the planet.
+		for (Spaceship aSqudron : squdronsOnShip) {
+			for (ShipInfo aShip : ships) {
+				if(aShip.getName().equals(aSqudron.getCarrierLocation().getUniqueName())){
+					aShip.addSqudron(aShip);
+				}
+			}
+		}
+		
+	}
+	
+	
+	//The owners Troops.
+	private void addTroops(Player player, Planet planet, Galaxy galaxy){
+		List<Troop> troopsOnPlanet = galaxy.getPlayersTroopsOnPlanet(player, planet);
+		
+		for (Troop troop : troopsOnPlanet) {
+			if(troop.getShipLocation() != null){
+				ShipInfo ship = findShip(troop.getShipLocation().getUniqueName());
+				ship.addTroop(new TroopInfo(troop));
+			}else{
+				troops.add(new TroopInfo(troop));
+			}
+		}
 	}
 
 	public String getName() {
@@ -199,223 +321,70 @@ public class PlanetInfo {
 		return open;
 	}
 
-	public String isOwner() {
+	public String getOwner() {
 		return owner;
 	}
 
 	public int getBasePopulation() {
 		return basePopulation;
 	}
-	
-	class BuildingInfo{
-		
-		private String name, type;
-		private int id;
-		
-		BuildingInfo(Building building){
-			name = building.getBuildingType().getName();
-			id = building.getUniqueId();
-			name = building.getUniqueName();
-		}
 
-		public String getName() {
-			return name;
-		}
 
-		public String getType() {
-			return type;
-		}
-
-		public int getId() {
-			return id;
-		}
+	public boolean isRazed() {
+		return razed;
 	}
-	
-	class VIPInfo{
-		
-		private String type, owner;
-		private int id = -1, kills = -1;
-		
-		VIPInfo(VIP aVip, Player player){
-			type = aVip.getTypeName();
-						
-			if(aVip.getBoss() != null){
-				
-				if(player.getName().equals(aVip.getBoss().getName())){
-					owner = aVip.getBoss().getGovenorName();
-					id = aVip.getId();
-					kills = aVip.getKills();
-				}else if(player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, aVip.getBoss())){
-					// Ägaren till VIPen är en allierad vilket betyder att spelarn får veta vem som äger VIPen.
-					owner = aVip.getBoss().getGovenorName();
-				}
-			}
-			
-			
-		}
 
-		public String getType() {
-			return type;
-		}
 
-		public String getOwner() {
-			return owner;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public int getKills() {
-			return kills;
-		}
+	public boolean isBesieged() {
+		return besieged;
 	}
-	
-	class ShipInfo{
-		
-		//TODO har inte tagit med värden som handlar om flykt. Vet inte om det behövs eller inte, framtiden får visa vägen.
-		
-		private String type, name;
-		private int kills, currentHP, currentShield, techWhenBuilt, shields;
-		private int weaponsSmall, weaponsMedium, weaponsLarge, weaponsHuge, weaponsSquadron;
-		private int weaponsSalvoesMedium, weaponsSalvoesLarge, weaponsSalvoesHuge;
-		private double armorSmall, armorMedium, armorLarge, armorHuge;
-		private boolean retreating, screeened;
-		
-		ShipInfo(Spaceship aShip){
-			
-			type = aShip.getTypeName();
-			name = aShip.getUniqueName();
-			kills = aShip.getKills();
-			currentHP = aShip.getCurrentDc();
-			retreating = aShip.isRetreating();
-			screeened = aShip.getScreened();
-			currentShield = aShip.getCurrentShields();
-			shields = aShip.getShields();
-			techWhenBuilt = aShip.getTechWhenBuilt();
-			weaponsSmall = aShip.getWeaponsStrengthSmall();
-			weaponsMedium = aShip.getWeaponsStrengthMedium();
-			weaponsLarge = aShip.getWeaponsStrengthLarge();
-			weaponsHuge = aShip.getWeaponsStrengthHuge();
-			weaponsSquadron = aShip.getWeaponsStrengthSquadron();
-			weaponsSalvoesMedium = aShip.getWeaponsSalvoesMedium();
-			weaponsSalvoesLarge = aShip.getWeaponsSalvoesLarge();
-			weaponsSalvoesHuge = aShip.getWeaponsSalvoesHuge();
-			armorSmall = aShip.getArmorSmall();
-			armorMedium = aShip.getArmorMedium();
-			armorLarge = aShip.getArmorLarge();
-			armorHuge = aShip.getArmorHuge();
-			
-		}
 
-		public String getType() {
-			return type;
-		}
 
-		public String getName() {
-			return name;
-		}
-
-		public int getKills() {
-			return kills;
-		}
-
-		public int getCurrentHP() {
-			return currentHP;
-		}
-
-		public int getCurrentShield() {
-			return currentShield;
-		}
-
-		public int getTechWhenBuilt() {
-			return techWhenBuilt;
-		}
-
-		public int getShields() {
-			return shields;
-		}
-
-		public int getWeaponsSmall() {
-			return weaponsSmall;
-		}
-
-		public int getWeaponsMedium() {
-			return weaponsMedium;
-		}
-
-		public int getWeaponsLarge() {
-			return weaponsLarge;
-		}
-
-		public int getWeaponsHuge() {
-			return weaponsHuge;
-		}
-
-		public int getWeaponsSquadron() {
-			return weaponsSquadron;
-		}
-
-		public int getWeaponsSalvoesMedium() {
-			return weaponsSalvoesMedium;
-		}
-
-		public int getWeaponsSalvoesLarge() {
-			return weaponsSalvoesLarge;
-		}
-
-		public int getWeaponsSalvoesHuge() {
-			return weaponsSalvoesHuge;
-		}
-
-		public double getArmorSmall() {
-			return armorSmall;
-		}
-
-		public double getArmorMedium() {
-			return armorMedium;
-		}
-
-		public double getArmorLarge() {
-			return armorLarge;
-		}
-
-		public double getArmorHuge() {
-			return armorHuge;
-		}
-
-		public boolean isRetreating() {
-			return retreating;
-		}
-
-		public boolean isScreeened() {
-			return screeened;
-		}
+	public int getPopulation() {
+		return population;
 	}
-	
-	class FleetInfo {
-		
-		private String owner;
-		private int shipSize;
-		private boolean civ;
-		
-		FleetInfo(String owner, int size, boolean isCivilan){
-			this.owner = owner;
-			this.shipSize = size;
-			this.civ = isCivilan;
-		}
 
-		public String getOwner() {
-			return owner;
-		}
 
-		public int getShipSize() {
-			return shipSize;
-		}
+	public int getResistance() {
+		return resistance;
+	}
 
-		public boolean isCiv() {
-			return civ;
-		}
+
+	public int getLastInfoTurn() {
+		return lastInfoTurn;
+	}
+
+
+	public String getNotes() {
+		return notes;
+	}
+
+
+	public List<BuildingInfo> getBuildings() {
+		return buildings;
+	}
+
+
+	public List<VIPInfo> getVips() {
+		return vips;
+	}
+
+
+	public List<ShipInfo> getShips() {
+		return ships;
+	}
+
+
+	public List<FleetInfo> getFleets() {
+		return fleets;
+	}
+
+	public List<TroopInfo> getTroops() {
+		return troops;
+	}
+
+	public List<ArmyInfo> getArmys() {
+		return armys;
 	}
 
 }
