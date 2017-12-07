@@ -1,7 +1,7 @@
 //Title:        SpaceRaze
 //Author:       Paul Bodin
 //Description:  Javabaserad version av Spaceraze.
-//Bygger på Spaceraze Galaxy fast skall fungera mera som Wigges webbaserade variant.
+//Bygger pï¿½ Spaceraze Galaxy fast skall fungera mera som Wigges webbaserade variant.
 //Detta Javaprojekt omfattar serversidan av spelet.
 
 package sr.world.orders;
@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import sr.enums.DiplomacyLevel;
 import sr.enums.HighlightType;
@@ -64,19 +66,19 @@ public class Orders implements Serializable {
     expenses = new ArrayList<Expense>();
     shipMoves = new ArrayList<ShipMovement>();
     shipToCarrierMoves = new ArrayList<ShipToCarrierMovement>();
-    // innehåller de planeters namn vars synlighet skall togglas, i.e. closed->open och vice versa
+    // innehï¿½ller de planeters namn vars synlighet skall togglas, i.e. closed->open och vice versa
     planetVisibilities = new ArrayList<String>();
-    // innehåller de planeters namn som skall överges
+    // innehï¿½ller de planeters namn som skall ï¿½verges
     abandonPlanets = new ArrayList<String>();
-    // innehåller de skepps namn som skall förstöras
+    // innehï¿½ller de skepps namn som skall fï¿½rstï¿½ras
     shipSelfDestructs = new ArrayList<Integer>();
-    // innehåller de buildings som skall förstöras
+    // innehï¿½ller de buildings som skall fï¿½rstï¿½ras
     buildingSelfDestructs = new ArrayList<Integer>();
-//  innehåller de VIPar som skall förstöras
+//  innehï¿½ller de VIPar som skall fï¿½rstï¿½ras
     VIPSelfDestructs = new ArrayList<Integer>();
-    // vektor över alla skepp som skall ändra/togglas screened-status
+    // vektor ï¿½ver alla skepp som skall ï¿½ndra/togglas screened-status
     screenedShips = new ArrayList<Integer>();
-    // vektor över alla meddelanden som spelaren vill skicka
+    // vektor ï¿½ver alla meddelanden som spelaren vill skicka
    // messages = new Vector<Message>();
     VIPMoves = new ArrayList<VIPMovement>();
     researchOrder = new ArrayList<ResearchOrder>();
@@ -124,8 +126,8 @@ public class Orders implements Serializable {
     VIPSelfDestructs.addAll(oldOrders.getVIPSelfDestructs());
     
     
-    // TODO (Tobbe) här måste vi kanske titta på building id  men vi testar med Name först och får se om vi måste markera just den building som skall tas bort
-    // provade o kollade om objekten var samma.  troligtvis går det nog inte då det är cloner av varandra o inte samma obj.
+    // TODO (Tobbe) hï¿½r mï¿½ste vi kanske titta pï¿½ building id  men vi testar med Name fï¿½rst och fï¿½r se om vi mï¿½ste markera just den building som skall tas bort
+    // provade o kollade om objekten var samma.  troligtvis gï¿½r det nog inte dï¿½ det ï¿½r cloner av varandra o inte samma obj.
     // fixa selfdestruct Building
     buildingSelfDestructs = new ArrayList<Integer>();
     buildingSelfDestructs.addAll(oldOrders.getBuildingSelfDestructs());
@@ -346,7 +348,7 @@ public class Orders implements Serializable {
 				aState.setCurrentLevel(DiplomacyLevel.LORD);
 				Player aPlayer = aChange.getOtherPlayer(g);
 				Logger.fine("aChange.getOtherPlayerName(): " + aChange.getOtherPlayerName() + " aPlayer: " + aPlayer);
-				aState.setLord(aPlayer); // newLevel gäller alltid den andra spelaren
+				aState.setLord(aPlayer); // newLevel gï¿½ller alltid den andra spelaren
 				aChange.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have accepted Governor " + aChange.getOtherPlayer(g).getGovenorName() + " offer for vassalship and he is now your lord");
 				aChange.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + aChange.getThePlayer(g).getGovenorName() + " have accepted your offer for vassalship and is now your vassal");
 				aChange.getThePlayer(g).getTurnInfo().addToLatestHighlights(aChange.getOtherPlayer(g).getGovenorName() + ";" + DiplomacyLevel.LORD, HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
@@ -356,7 +358,7 @@ public class Orders implements Serializable {
 				aState.setCurrentLevel(DiplomacyLevel.LORD);
 				Player aPlayer = aChange.getThePlayer(g);
 				Logger.fine("aChange.getThePlayerName(): " + aChange.getThePlayerName() + " aPlayer: " + aPlayer);
-				aState.setLord(aPlayer);  // newLevel gäller alltid den andra spelaren, och i detta fall skall thePlayer vara lord om den andra är vasall
+				aState.setLord(aPlayer);  // newLevel gï¿½ller alltid den andra spelaren, och i detta fall skall thePlayer vara lord om den andra ï¿½r vasall
 				aChange.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have accepted Governor " + aChange.getOtherPlayer(g).getGovenorName() + " offer for lordship and he is now your vassal");
 				aChange.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + aChange.getThePlayer(g).getGovenorName() + " have accepted your offer for lordship and is now your lord");
 				aChange.getThePlayer(g).getTurnInfo().addToLatestHighlights(aChange.getOtherPlayer(g).getGovenorName() + ";" + DiplomacyLevel.VASSAL, HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
@@ -920,7 +922,7 @@ public class Orders implements Serializable {
     }
     if (found > -1){ // ta bort den
       planetVisibilities.remove(found);
-    }else{ // annars lägg till den
+    }else{ // annars lï¿½gg till den
       planetVisibilities.add(aPlanet.getName());
     }
   }
@@ -951,7 +953,7 @@ public class Orders implements Serializable {
     }
     if (found > -1){ // ta bort den
       screenedShips.remove(found);
-    }else{ // annars lägg till den
+    }else{ // annars lï¿½gg till den
       screenedShips.add(aShip.getId());
     }
   }
@@ -999,7 +1001,7 @@ public class Orders implements Serializable {
     }
     if (found > -1){ // ta bort den
       abandonPlanets.remove(found);
-    }else{ // annars lägg till den
+    }else{ // annars lï¿½gg till den
       abandonPlanets.add(aPlanet.getName());
     }
   }
@@ -1105,7 +1107,7 @@ public class Orders implements Serializable {
    }
 
   public void addNewShipMove(Spaceship ss, Planet destination){
-    // först kolla om det finns en gammal order för detta skepp som skall tas bort
+    // fï¿½rst kolla om det finns en gammal order fï¿½r detta skepp som skall tas bort
     int found = -1;
     for (int i = 0; i < shipMoves.size(); i++){
       ShipMovement tempShipMove = (ShipMovement)shipMoves.get(i);
@@ -1122,7 +1124,7 @@ public class Orders implements Serializable {
   }
 
   public void addNewTroopToPlanetMove(Troop aTroop, Planet destination, int turn){
-	  // först kolla om det finns en gammal order för detta skepp som skall tas bort
+	  // fï¿½rst kolla om det finns en gammal order fï¿½r detta skepp som skall tas bort
 	  int found = -1;
 	  for (int i = 0; i < troopToPlanetMoves.size(); i++){
 		  TroopToPlanetMovement tempTroopToPlanetMove = troopToPlanetMoves.get(i);
@@ -1139,7 +1141,7 @@ public class Orders implements Serializable {
   }
 
   public void addNewTroopToCarrierMove(Troop aTroop, Spaceship destinationCarrier){
-	  // först kolla om det finns en gammal order för detta skepp som skall tas bort
+	  // fï¿½rst kolla om det finns en gammal order fï¿½r detta skepp som skall tas bort
 	  int found = -1;
 	  for (int i = 0; i < troopToCarrierMoves.size(); i++){
 		  TroopToCarrierMovement tempTroopToCarrierMove = troopToCarrierMoves.get(i);
@@ -1157,7 +1159,7 @@ public class Orders implements Serializable {
 
   public void addNewTaxChange(String playerName, int amount){
 	  TaxChange found = checkTaxChange(playerName);
-	  // först kolla om det finns en gammal order för detta skepp som skall tas bort
+	  // fï¿½rst kolla om det finns en gammal order fï¿½r detta skepp som skall tas bort
 //	  int found = -1;
 //	  int i = 0;
 //	  while ((found == -1) && (i < taxChanges.size())){
@@ -1190,7 +1192,7 @@ public class Orders implements Serializable {
   }
 
   public void addNewShipToCarrierMove(Spaceship ss, Spaceship destinationCarrier){
-	    // först kolla om det finns en gammal order för detta skepp som skall tas bort
+	    // fï¿½rst kolla om det finns en gammal order fï¿½r detta skepp som skall tas bort
 	    int found = -1;
 	    for (int i = 0; i < shipToCarrierMoves.size(); i++){
 	      ShipToCarrierMovement tempShipToCarrierMove = (ShipToCarrierMovement)shipToCarrierMoves.get(i);
@@ -1207,7 +1209,7 @@ public class Orders implements Serializable {
 	  }
 
   public void addNewVIPMove(VIP aVIP,Object destination){
-    // först kolla om det finns en gammal order för denna vip som skall tas bort
+    // fï¿½rst kolla om det finns en gammal order fï¿½r denna vip som skall tas bort
     int found = -1;
     for (int i = 0; i < VIPMoves.size(); i++){
       VIPMovement tempVIPMove = VIPMoves.get(i);
@@ -1230,7 +1232,7 @@ public class Orders implements Serializable {
     }
   }
 
-  // kolla om det finns en gammal order för detta skepp
+  // kolla om det finns en gammal order fï¿½r detta skepp
   public boolean checkShipMove(Spaceship ss){
     boolean found = false;
     int i = 0;
@@ -1245,7 +1247,7 @@ public class Orders implements Serializable {
     return found;
   }
   
-  // kolla om det finns en gammal order för detta VIP
+  // kolla om det finns en gammal order fï¿½r detta VIP
   public boolean checkVIPMove(VIP vip){
 	  boolean found = false;
 	  int i = 0;
@@ -1424,7 +1426,7 @@ public class Orders implements Serializable {
 	  return moveToCarrier;
   }
 
-  // kolla om det finns en gammal order för detta skepp
+  // kolla om det finns en gammal order fï¿½r detta skepp
   public boolean checkShipToCarrierMove(Spaceship ss){
     boolean found = false;
     int i = 0;
@@ -1439,7 +1441,7 @@ public class Orders implements Serializable {
     return found;
   }
 
-  // kolla om det finns en gammal order för detta skepp
+  // kolla om det finns en gammal order fï¿½r detta skepp
   public boolean checkShipToCarrierMove(Spaceship aSqd,Spaceship aCarrier){
     boolean found = false;
     int i = 0;
@@ -1458,7 +1460,7 @@ public class Orders implements Serializable {
     return found;
   }
 
-  // kolla hur många moveToCarrier orders det finns till den anvivna carriern
+  // kolla hur mï¿½nga moveToCarrier orders det finns till den anvivna carriern
   public int countShipToCarrierMoves(Spaceship aCarrier){
     int count = 0;
     for (ShipToCarrierMovement aShipToCarrierMove : shipToCarrierMoves) {
@@ -1507,7 +1509,7 @@ public class Orders implements Serializable {
   }
 
   public void addNewTransaction(int aSum, Player recipient){
-    // först kolla om det finns en gammal transaktion som skall tas bort
+    // fï¿½rst kolla om det finns en gammal transaktion som skall tas bort
 	  int findIndex = -1;
     for (int i = 0; i < expenses.size(); i++){
       Expense tempExpense = (Expense)expenses.get(i);
@@ -1787,7 +1789,7 @@ public class Orders implements Serializable {
    */
 
   public void addUppgradeBuilding(Building currentBuilding, BuildingType newBuilding, Player aPlayer){
-	  // skapa ny order om inte varvet redan är satt att uppgradera
+	  // skapa ny order om inte varvet redan ï¿½r satt att uppgradera
     if (!alreadyUpgrading(currentBuilding)){
     	addExpenses(new Expense("building", newBuilding, aPlayer.getName(),currentBuilding.getLocation(), currentBuilding), aPlayer.getGalaxy());
     }
@@ -1811,7 +1813,7 @@ public class Orders implements Serializable {
   
   /*
   public void addUppgradeWharf(OrbitalWharf currentwharf){
-	  // skapa ny order om inte varvet redan är satt att uppgradera
+	  // skapa ny order om inte varvet redan ï¿½r satt att uppgradera
     if (!alreadyUpgrading(currentwharf)){
       expenses.addElement(new Expense("upgradewharf",currentwharf,currentwharf.getLocation().getPlayerInControl().getGalaxy()));
     }
@@ -1877,8 +1879,8 @@ public class Orders implements Serializable {
     return allsst;
   }
 */	
-  // ska returnera en vektor med alla skeppstyper det finns byggorder på för currentBuilding.
-  // behöver ej testa för upgrading
+  // ska returnera en vektor med alla skeppstyper det finns byggorder pï¿½ fï¿½r currentBuilding.
+  // behï¿½ver ej testa fï¿½r upgrading
   public List<SpaceshipType> getAllShipBuilds(Building currentBuilding){
     Vector<SpaceshipType> allsst = new Vector<SpaceshipType>();
     for (int i = 0; i < expenses.size(); i++){
@@ -2097,7 +2099,7 @@ public class Orders implements Serializable {
     return found;
   }
   
-//TODO (Tobbe) gör om
+//TODO (Tobbe) gï¿½r om
   public boolean getBuildingSelfDestruct(Building aBuilding){
     boolean found = false;
     for (int i = 0; i < buildingSelfDestructs.size(); i++){
@@ -2108,7 +2110,7 @@ public class Orders implements Serializable {
     return found;
   }
 
-  // leta igenom alla VIPMoves och kolla om någon av dem förflyttar iväg denna vip
+  // leta igenom alla VIPMoves och kolla om nï¿½gon av dem fï¿½rflyttar ivï¿½g denna vip
   public boolean VIPWillStay(VIP tempEngineer){
     boolean vipStays = true;
     int i = 0;
@@ -2206,7 +2208,7 @@ public class Orders implements Serializable {
 	    }
 	}
 	
-	  // kolla om det finns en gammal order för denna forskning
+	  // kolla om det finns en gammal order fï¿½r denna forskning
 	public boolean checkResearchOrder(String rOrder){
 	    boolean found = false;
 	    int i = 0;
@@ -2377,6 +2379,7 @@ public class Orders implements Serializable {
 		return ordersTextList;
 	}
 
+	@JsonIgnore
 	public int getOrdersCount(){
 		int nr = 0;
 		nr += expenses.size();

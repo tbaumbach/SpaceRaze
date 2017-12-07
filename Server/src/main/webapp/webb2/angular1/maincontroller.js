@@ -271,6 +271,88 @@ app.controller('MainController', ['$scope', '$http', function($scope, $http){
 			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
 		  })};
 		  
+	
+	  $scope.callNewOrders = function(){$http({
+		  method: 'PUT',
+		  url: 'http://localhost:8080/Server/api/games/game/orders/1/Tobbe',
+		  headers: {
+			   'Content-Type': 'application/json'
+			 },
+			 data: {expenses:[
+			                  {planetName: 'Tyrell', spaceshipTypeName: 'C Bomber', type: 'buildship', currentBuildingId: 1, playerName: 'tobbe'},
+			                  {planetName: 'Tyrell', troopTypeName: 'China Light Infantry', type: 'buildtroop', currentBuildingId: 4, playerName: 'tobbe'},
+			                  {planetName: 'Tyrell', buildingTypeName: 'City', type: 'building', currentBuildingId: 2, playerName: 'tobbe'},
+			                  {playerName: 'a', type: 'transaction', playerName: 'a'}
+			                  ],
+				 shipMoves:[{spaceShipID : 73,destinationName: 'Riven', owner: 'tobbe'} ],
+				 planetVisibilities:['Eroticon'],
+				 abandonPlanets:[ ],
+				 shipSelfDestructs:[ ],
+				 screenedShips : [ ],
+				  shipToCarrierMoves : [ ],
+				  troopToCarrierMoves : [ ],
+				  troopToPlanetMoves : [ ],
+				  troopSelfDestructs : [ ],
+				  abandonGame : false,
+				  buildingSelfDestructs : [ ],
+				  diplomacyOffers : [ ],
+				  diplomacyChanges : [ ],
+				  taxChanges : [ ],
+				  planetNotesChanges : [ ],
+				  vipmoves : [ ],
+				  researchOrders : [ ],
+				  vipselfDestructs : [ ],
+				  blackMarketBids : [ ]}
+			
+		}).then(function successCallback(response) {
+			$scope.message = response.data;
+		  }, function errorCallback(response) {
+			  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+		  })};
+		  
+		  
+		  		  
+		  // Testning mot API för uppgift "boka taxi"
+		  
+		  $scope.callOrderTaxi = function(){$http({
+			  method: 'PUT',
+			  url: 'http://localhost:8080/taxi/api/taxi',
+			  headers: {
+				   'Content-Type': 'application/json'
+				 },
+				 data: {"userName": "Thobias Baumbach", "addressFrom" : "sveavägen 49", "addressTo" : "Schlytersvägen 36", "time" : "19:30"}
+				 
+			}).then(function successCallback(response) {
+				$scope.message = response.data;
+			  }, function errorCallback(response) {
+				  $scope.error = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+			  })};
+			  
+			  $scope.listTaxiOrders = function(){$http({
+				  method: 'GET',
+				  url: 'http://localhost:8080/taxi/api/taxi/orders'
+				}).then(function successCallback(response) {
+					$scope.hej = response.data;
+				  }, function errorCallback(response) {
+					  $scope.hej = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+				  })};
+				  
+			
+				  $scope.cancelTaxi = function(){$http({
+					  method: 'DELETE',
+					  url: 'http://localhost:8080/taxi/api/taxi',
+					  headers: {
+						   'Content-Type': 'application/json'
+						 },
+						 data: "1"
+					}).then(function successCallback(response) {
+						$scope.hej = response.data;
+					  }, function errorCallback(response) {
+						  $scope.hej = "något gick fel " + "data " + response.data + "status " + response.status + "headers " + response.headers + "config " + response.config + "statusText " + response.statusText;
+					  })};
+			  
+			  
+			  
 		  
 	  
 /*	  

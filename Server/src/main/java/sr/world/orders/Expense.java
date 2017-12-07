@@ -18,7 +18,7 @@ import sr.world.TurnInfo;
 import sr.world.VIP;
 import sr.world.VIPType;
 
-// representerar ett utlägg gjort av spelaren under sitt drag
+// representerar ett utlï¿½gg gjort av spelaren under sitt drag
 public class Expense implements Serializable {
   static final long serialVersionUID = 1L;
   String type;
@@ -36,10 +36,12 @@ public class Expense implements Serializable {
   String typeVIPName;
   //Galaxy g;
   //Player player;
-  String playerName=""; // Du eller player som mot tar en gåva.
+  String playerName=""; // Du eller player som mot tar en gï¿½va.
   BlackMarketBid aBid;
   ResearchOrder researchO;
   int sum;
+  
+  public Expense(){}
 
   // Research
   public Expense(String temptype, ResearchOrder ro, Player aPlayer){
@@ -48,23 +50,9 @@ public class Expense implements Serializable {
 	  this.playerName = aPlayer.getName();
 	}
  
-/*
-  // type = "newwharf" & type = "newspacestation"
-  public Expense(String temptype, Planet tempp, Galaxy g, Player aPlayer){
-    planet = tempp;
-    this.type = temptype;
-    this.g = g;
-    this.player = aPlayer;
-  }
 
-  // bygga ut ow, type = "upgradewharf"
-  public Expense(String temptype, OrbitalWharf tempow, Galaxy g){
-    ow = tempow;
-    this.type = temptype;
-    this.g = g;
-  }
-*/
-  // bjuda på ett erbjudande på svarta marknaden, type = "blackmarketbid"
+  // bjuda pï¿½ ett erbjudande pï¿½ svarta marknaden, type = "blackmarketbid"
+  // Fungear inte med Rest API(JSON). DÃ¥ det siter ihop fÃ¶r mycket med serven.
   public Expense(String temptype, BlackMarketBid aBid, Player aPlayer){
     this.playerName = aPlayer.getName();
     this.aBid = aBid;
@@ -127,65 +115,7 @@ public class Expense implements Serializable {
     this.playerName = aPlayer.getName();
     this.planetName = aPlanet.getName();
   }
-  // används inte då alla innre objekt är borttagna och bara namn (id) är sparade i Expanse.
-  // anropas vid uppdatering av en spelares orders. Alltså när applikationen startas igen under samma drag som där order redan är lagda
-  /*public Expense(Expense oldExpense,Galaxy newGalaxy){
-	  playerName = oldExpense.getPlayerName();
-    type = oldExpense.getType();
-    currentBuildingId = oldExpense.currentBuildingId;
-    if (type.equalsIgnoreCase("pop") | type.equalsIgnoreCase("res")){
-    	planetName =oldExpense.getPlanetName();
-    }else
-    if (type.equalsIgnoreCase("building")){
-    	System.out.println("newGalaxy.getPlayer(playerName):" + newGalaxy.getPlayer(playerName));
-    	System.out.println("oldExpense.getBuildingType():" + oldExpense.getBuildingType());
-    	System.out.println("oldExpense.getBuildingType().getName():" + oldExpense.getBuildingType().getName());
-    	
-    	buildingType = newGalaxy.getPlayer(playerName).findBuildingType(oldExpense.getBuildingType().getName());
-    	if(oldExpense.currentBuildingId > 0){
-    		currentBuildingId = oldExpense.currentBuildingId;
-    	}
-    	planetName = oldExpense.getPlanetName();
-    }else
-    if (type.equalsIgnoreCase("buildship")){
-    	planetName = oldExpense.getPlanetName();
-    	sst = newGalaxy.getPlayer(playerName).findSpaceshipType(oldExpense.getSpaceshipTypeName());
-    	//ow = newGalaxy.findOrbitalWharf(oldExpense.getOrbitalWharfId());
-        //sst = ow.getLocation().getPlayerInControl().findSpaceshipType(oldExpense.getSpaceshipTypeName());
-         
-    }else
-    if (type.equalsIgnoreCase("buildtroop")){
-    	planetName =oldExpense.getPlanetName();
-        troopType = newGalaxy.getPlayer(playerName).findTroopType(oldExpense.getTroopType().getUniqueName());
-    }else
-    if (type.equalsIgnoreCase("buildVIP")){
-    	planetName = oldExpense.getPlanetName();
-    	typeVIPName = oldExpense.getVipTypeName();
-     }else
-    if (type.equalsIgnoreCase("transaction")){
-      sum = oldExpense.getSum();
-      playerName = oldExpense.getPlayerName();
-    }else
-    if (type.equalsIgnoreCase("blackmarketbid")){
-      aBid = new BlackMarketBid(oldExpense.getBlackMarketBid(),newGalaxy);
-      playerName = aBid.getPlayerName();
-    }else
-    if (type.equalsIgnoreCase("reconstruct")){
-    	planetName =oldExpense.getPlanetName();
-        playerName = oldExpense.getPlayerName();
-    }else
-    if(type.equalsIgnoreCase("research")){
-    	playerName = oldExpense.getPlayerName();
-    	LoggingHandler.fine("(Expense.java) oldExpense.getPlayerName() " + oldExpense.getPlayerName());
-    	researchO = oldExpense.researchO;
-    	//researchO = newGalaxy.getPlayer(oldExpense.getPlayerName()).getOrders().getResearchOrder(oldExpense.researchO.getAdvantageName());
-    	//LoggingHandler.fine("(Expense.java) researchO.getAdvantageName() " + oldExpense.researchO.getAdvantageName());
-    	LoggingHandler.fine("(Expense.java) researchO.getAdvantageName() " + researchO.getAdvantageName());
-    	
-    	
-    //	sum = oldExpense.getSum(); 
-    }
-   }*/
+  
 
   public void performExpense(TurnInfo ti, Player p, Orders o){
 	  
@@ -311,7 +241,7 @@ public class Expense implements Serializable {
 			sstemp.setLocation(planet);
 			g.addSpaceship(sstemp);
 			ti.addToLatestExpenseReport("You have built a new " + sst.getName() + " (named " + sstemp.getName() + ") at " + planet.getName() + ".");
-			// TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
+			// TODO (Tobbe) lï¿½gg bonusen fï¿½r buildings.  Skall bonus addas eller skall den som ï¿½r stï¿½rst gï¿½lla.
 			planet.getPlayerInControl().removeFromTreasury(sst.getBuildCost(tempVIP));
 			Logger.finest(" -buildship loc name: " + planet.getName());
 			ti.addToLatestExpenseReport("Cost to build new " + sst.getName() + ": " + sst.getBuildCost(tempVIP) + ".");
@@ -370,7 +300,7 @@ public class Expense implements Serializable {
       	  	tempTroop.setPlanetLocation(planet);
       	  	g.addTroop(tempTroop);
       	  	ti.addToLatestExpenseReport("You have built a new " + troopType.getUniqueName() + " (named " + tempTroop.getUniqueName() + ") at " + planet.getName() + ".");
-            // TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
+            // TODO (Tobbe) lï¿½gg bonusen fï¿½r buildings.  Skall bonus addas eller skall den som ï¿½r stï¿½rst gï¿½lla.
             planet.getPlayerInControl().removeFromTreasury(troopType.getCostBuild(tempVIP));
             Logger.finest(" -buildtroop loc name: " + planet.getName());
             ti.addToLatestExpenseReport("Cost to build new " + troopType.getUniqueName() + ": " + troopType.getCostBuild(tempVIP) + ".");
@@ -388,7 +318,7 @@ public class Expense implements Serializable {
     	boolean buildVIP = true;
     	
     	
-    	// TODO (Tobbe) gör om.  går inte att använda VIPar från bara player om den är worldunique.
+    	// TODO (Tobbe) gï¿½r om.  gï¿½r inte att anvï¿½nda VIPar frï¿½n bara player om den ï¿½r worldunique.
     	VIPType vipType = p.getGalaxy().findVIPType(typeVIPName);
     	
     	if(vipType.isWorldUnique()){
@@ -400,7 +330,7 @@ public class Expense implements Serializable {
     		}
     	}
     	
-    	if(vipType.isWorldUnique()){ // används inte så länge alignment finns kvar. eller alla VIPar ligger i GW
+    	if(vipType.isWorldUnique()){ // anvï¿½nds inte sï¿½ lï¿½nge alignment finns kvar. eller alla VIPar ligger i GW
     		if(!vipType.isWorldUniqueBuild(p.getGalaxy())){
     			uniqueVIPString = "Congratulations you have build the world unique " + vipType.getName() + ".";
     		}else{// The VIP can't be build.
@@ -408,7 +338,7 @@ public class Expense implements Serializable {
     			uniqueVIPString = "You can not build the world unique " + vipType.getName() + " VIP. Some other organisation was faster then you.";
     		}
     	}else
-		if(vipType.isFactionUnique()){ // används inte så länge alignment finns kvar. eller alla VIPar ligger i GW
+		if(vipType.isFactionUnique()){ // anvï¿½nds inte sï¿½ lï¿½nge alignment finns kvar. eller alla VIPar ligger i GW
     		if(!vipType.isFactionUniqueBuild(p)){
     			
     			uniqueVIPString = "Congratulations you have build the faction unique " + vipType.getName() + ".";
@@ -417,7 +347,7 @@ public class Expense implements Serializable {
     			uniqueVIPString = "You can not build the faction unique " + vipType.getName() + " VIP. Some other leader was faster then you.";
     		}
     	}else
-    	if(vipType.isPlayerUnique()){ // används inte så länge alignment finns kvar. eller alla VIPar ligger i GW
+    	if(vipType.isPlayerUnique()){ // anvï¿½nds inte sï¿½ lï¿½nge alignment finns kvar. eller alla VIPar ligger i GW
     		if(!vipType.isPlayerUniqueBuild(p)){
     			uniqueVIPString = "You have build the player unique " + vipType.getName() + " and you can not build more of this type.";
     			
@@ -498,7 +428,7 @@ public class Expense implements Serializable {
     	cost =  aBuildingType.getBuildCost(tempVIP);
     }else
     if (type.equalsIgnoreCase("buildship")){
-    	// kollar först om det finns en engineer vid planeten
+    	// kollar fï¿½rst om det finns en engineer vid planeten
     	VIP tempEngineer = aGalaxy.findVIPShipBuildBonus(planet,planet.getPlayerInControl(),o);
     	cost = aGalaxy.getPlayer(playerName).findSpaceshipType(spaceshipTypeName).getBuildCost(tempEngineer);
     }
@@ -761,6 +691,9 @@ public String getVipTypeName() {
 	return typeVIPName;
 }
 
+public int getCurrentBuildingId(){
+	return currentBuildingId;
+}
 
 
 

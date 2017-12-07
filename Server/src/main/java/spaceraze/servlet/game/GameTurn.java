@@ -17,6 +17,8 @@ public class GameTurn {
 	//Möjligt att det bara måste göras om spelvärlden har forskning.
 	//TODO måste även lösa de unika typernas hantering. Ska alla andra spelare se när faction/world unika typer redan är byggda?
 	
+	//TODO lägg till BlackMarket.
+	
 	GameTurn(){};
 	
 	GameTurn(SR_Server server, String playerName, int turn){

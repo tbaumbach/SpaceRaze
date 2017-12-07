@@ -38,7 +38,7 @@ public class PlanetInfo {
 	private String notes;
 	private List<BuildingInfo> buildings; // Här visas byggnader som tillhör ägaren. Alltså inte bara spelarens byggnader. Kan bara finnas en ägare av byggnader på en planet.t
 	private List<VIPInfo> vips; // Innehåller alla spelarens, allierade och synliga fientliga VIPar. OBS bara VIPar på planeten, ej på skepp eller troops.
-	//TODO Vore snyggt om vi även visar fientliga VIPar som har dödat egna VIPar. Tyvärr vet vi ju inte typen utan bara egenskapen(assasin). Detta är överkurs.
+	
 	
 	// The owners ships
 	private List<ShipInfo> ships;
@@ -111,7 +111,6 @@ public class PlanetInfo {
 			//Checks if the planets owner is a allied = show all.
 			boolean isAllied = !planet.isEnemyOrNeutralPlanet(player);
 			
-			//TODO borde lägga till att man ser om man har troops på planeten. Har för mig att trupper idag överlever även utan support skepp(troopShip)
 			if(open || shipInSystem || alliedShipsInSystem || isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
 				
 				if(planet.isPlayerPlanet()){
@@ -256,7 +255,7 @@ public class PlanetInfo {
 			}
 			
 			for (ShipInfo squdron : ship.getSqudrons()) {
-				for (TroopInfo troop : ship.getTroops()) {
+				for (TroopInfo troop : squdron.getTroops()) {
 					if(troop.getName().equals(name)){
 						return troop;
 					}

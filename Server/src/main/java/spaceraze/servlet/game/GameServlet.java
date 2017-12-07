@@ -27,6 +27,8 @@ import sr.world.Player;
 import sr.world.Report;
 import sr.world.StatisticGameType;
 import sr.world.TurnInfo;
+import sr.world.orders.Expense;
+import sr.world.orders.Orders;
 
 @Path("/games/game")
 public class GameServlet {
@@ -67,8 +69,8 @@ public class GameServlet {
 			@PathParam("turn") int turn, @Context HttpServletRequest req) throws JsonProcessingException {
 		
 		
-		System.out.println("Call aginst game/{gameId}/{user}/{turn} @GET");
-		System.out.println("Call aginst game/"+ gameId +"/"+ userName +"/"+ turn +" @GET");
+		System.out.println("Call aginst games/game/{gameId}/{user}/{turn} @GET");
+		System.out.println("Call aginst games/game/"+ gameId +"/"+ userName +"/"+ turn +" @GET");
 		
 		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
 		
@@ -91,6 +93,77 @@ public class GameServlet {
 		
 	}
 	
+	@GET
+	@Path("/orders/{gameId}/{user}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@JacksonFeatures(serializationEnable =  { SerializationFeature.INDENT_OUTPUT })
+	public Orders getOrders(@PathParam("gameId") int gameId, @PathParam("user") String userName, 
+			@Context HttpServletRequest req) throws JsonProcessingException {
+		
+		
+		System.out.println("Call aginst games/game/orders/{gameId}/{user} @GET getOrders");
+		System.out.println("Call aginst games/game/orders/"+ gameId +"/"+ userName +" @GET getOrders");
+		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		
+		SR_Server server = sh.findGame(gameId);
+		
+		if(server != null){
+			if(server.isPlayerParticipating(user)){
+				
+				Orders orders = server.getGalaxy().getPlayer(user.getName()).getOrders();
+				
+				return orders;
+			}
+		}
+		
+				
+		return null;
+		
+	}
+	
+	@PUT
+	@Path("/orders/{gameId}/{user}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@JacksonFeatures(serializationEnable =  { SerializationFeature.INDENT_OUTPUT })
+	public String saveOrders(Orders newOrders, @PathParam("gameId") int gameId, @PathParam("user") String userName, 
+			@Context HttpServletRequest req) throws JsonProcessingException {
+		
+		
+		System.out.println("Call aginst games/game/orders/{gameId}/{user} @PUT saveOrders");
+		System.out.println("Call aginst games/game/orders/"+ gameId +"/"+ userName +" @PUT saveOrders");
+		
+		ServerHandler sh = (ServerHandler)context.getAttribute("serverhandler");
+		
+		HttpSession session = req.getSession();
+		User user = (User)session.getAttribute("user");
+		
+		SR_Server server = sh.findGame(gameId);
+		
+		if(server != null){
+			if(server.isPlayerParticipating(user)){
+				
+				
+				//TODO Blackmarker har problem vid bud på skepp eller blueprints då stora delar av objektmodellen åker med och det är ju inte meningen.
+				// Skriv om Blackmarket bid så att bara namn på skepp/blueprints skickas med, detta medför omskrivning av serven och vi väntar med det så länge vi är beroende av det gamla projektet.
+				// Finns risk att hela Orders måste skrivas om, dock är dagens Orders skriver just för att undervika att skicka med hela galaxy(serven).
+				// Fortsätter och kodar mot dagens Orders då vi klara oss undan t.ex. BlackMarket.
+				server.getGalaxy().getPlayer(user.getName()).setOrders(newOrders);
+				
+				
+				return "Ok";
+			}
+		}
+		
+				
+		return "somthing went wrong";
+		
+	}
+
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
