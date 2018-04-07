@@ -19,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.jersey.spi.container.servlet.PerSession;
 
 import sr.server.GameWorldHandler;
 import sr.server.SR_Server;

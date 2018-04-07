@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import sr.enums.DiplomacyLevel;
 import sr.enums.HighlightType;
 import sr.general.Functions;
@@ -12,7 +14,7 @@ import sr.general.logging.Logger;
 import sr.world.diplomacy.DiplomacyState;
 import sr.world.incomeExpensesReports.IncomeType;
 
-//TODO remove @JsonTypeName("Planet") 
+//@JsonTypeName("Planet") 
 public class Planet implements Serializable{
     static final long serialVersionUID = 1L;
     private double x,y,z;
@@ -24,6 +26,8 @@ public class Planet implements Serializable{
     private boolean hasNeverSurrendered = true;
     private int rangeToClosestFriendly; // used in Galaxy when computing startplanet location
     private List<Building> buildings = new ArrayList<Building>(); 
+    
+    public Planet(){}
 
     /**
      * Used when reading map data from file
