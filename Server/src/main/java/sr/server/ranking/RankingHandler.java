@@ -134,8 +134,8 @@ public class RankingHandler {
 	}
 
 	private static void saveUsers(){
-		String basePath = PropertiesHandler.getProperty("basepath");
-		String completePath = basePath + "WEB-INF\\classes\\ranking.properties";
+		String dataPath = PropertiesHandler.getProperty("datapath");
+		String completePath = dataPath + "users\\ranking.properties";
 		File playersFile = new File(completePath);
 		try{
 			FileWriter fw = new FileWriter(playersFile);
@@ -189,7 +189,7 @@ public class RankingHandler {
 	private static String getProperty(String key){
 		String retVal = "";
 //		properties = RankingHandler.getInstance();
-		properties = PropertiesHandler.getInstance(DEFAULT_PROPERTIES_NAME);
+		properties = PropertiesHandler.getInstance("users." +DEFAULT_PROPERTIES_NAME);
 		String tmpValue = properties.getProperty(key);
 		if (tmpValue != null){
 			retVal = tmpValue;

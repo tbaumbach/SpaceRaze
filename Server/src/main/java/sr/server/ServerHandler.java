@@ -10,6 +10,10 @@ import java.util.List;
 import spaceraze.servlet.game.GameParameters;
 import sr.enums.DiplomacyGameType;
 import sr.general.logging.Logger;
+import sr.notifier.GameData;
+import sr.notifier.GameListData;
+import sr.notifier.ReturnGames;
+import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
 import sr.server.properties.PropertiesHandler;
 import sr.webb.mail.MailHandler;
@@ -17,6 +21,7 @@ import sr.webb.users.User;
 import sr.world.Faction;
 import sr.world.Galaxy;
 import sr.world.GameWorld;
+import sr.world.Map;
 import sr.world.Player;
 import sr.world.StatisticGameType;
 
@@ -32,7 +37,7 @@ public class ServerHandler {
 	public ServerHandler(){
 		allServers = new LinkedList<SR_Server>();
 		// load all current games
-		String path = PropertiesHandler.getProperty("basepath") + "saves";
+		String path = PropertiesHandler.getProperty("datapath") + "saves";
 		File f = new File(path);
 		String[] files = f.list();
 		int curId = startId;
@@ -173,7 +178,7 @@ public class ServerHandler {
 								"<td id='" + RowName + "2' width='48' valign='middle' class='ListText'><div class='SolidText'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\">"+ mail +"</div></td>" +
 								"<td id='" + RowName + "3' class='ListText' valign='middle'><div class='SolidText'>" + aServer.getGameName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gw.getFileName() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aServer.getMapFileName() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + aServer.getStatus() + "</div></td><td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + aServer.getTurn()+"" + sEndTurn + "</div></td><td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + nextUpdate + "</div></td><td id='" + RowName + "10' class='ListText'><div class='SolidText'>" + aServer.getStartedByPlayerName() + "</div></td><td id='" + RowName + "11' class='ListText'><div class='SolidText'></div></td><td id='" + RowName + "12' class='ListText'><div class='SolidText'>&nbsp;";
 						if (showJoin){
-// ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+// ï¿½ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 							retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 						}
 						retStr = retStr + "</div></td></tr>\n";
@@ -283,7 +288,7 @@ public class ServerHandler {
 						GameWorld gw = aServer.getGalaxy().getGameWorld();
 						retStr = retStr + "<tr class='ListTextRow' style='height:21px' valign='middle' onMouseOver=this.style.backgroundColor='#148f14'; onMouseOut=this.style.backgroundColor='';><td width='3'></td><td width='25' valign='middle'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\"></td><td width='25' valign='middle'>" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td>" + nextUpdate + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;";
 						if (showJoin){
-// ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+// ï¿½ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 							retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 						}
 						retStr = retStr + "</td></tr>\n";
@@ -389,7 +394,7 @@ public class ServerHandler {
 										"<td id='" + RowName + "2' width='25' valign='middle' class='ListText'><div class='SolidText'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\"></div></td>" +
 										"<td id='" + RowName + "3' class='ListText' valign='middle'><div class='SolidText'>" + aServer.getGameName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gw.getFileName() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aServer.getMapFileName() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + aServer.getStatus() + "</div></td><td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + aServer.getTurn() + "</div></td><td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + nextUpdate + "</div></td><td id='" + RowName + "10' class='ListText'><div class='SolidText'>" + aServer.getStartedByPlayerName() + "</div></td><td id='" + RowName + "11' class='ListText'><div class='SolidText'>&nbsp;";
 								if (showJoin){
-//		 ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+//		 ï¿½ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 									retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 								}
 								retStr = retStr + "</div></td></tr>\n";
@@ -494,7 +499,7 @@ public class ServerHandler {
 									//"<td id='" + RowName + "6' class='ListText'><div class='SolidText'><a href=''>Details</a></div></td>" +
 									"<td id='" + RowName + "6' class='ListText'><div class='SolidText'>&nbsp;";
 							if (showJoin){
-//	 ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+//	 ï¿½ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 								retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 							}
 							retStr = retStr + "</div></td></tr>\n";
@@ -912,7 +917,69 @@ public class ServerHandler {
 		return hasTurn;
 	}
 
+	public GameListData getGamesData(User aUser, ReturnGames returnGames, boolean isAndroid){
+		GameListData gameListData = new GameListData();
+		SR_Server[] allSerArr = getServers();
+		if (allSerArr.length > 0){
+			for (int i = 0; i < allSerArr.length; i++) {
+				SR_Server aServer = allSerArr[i];
+				if (returnGames == ReturnGames.ALL){
+					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+				}else
+				if (((returnGames == ReturnGames.OWN) | (returnGames == ReturnGames.OWN_AND_OPEN)) & aServer.isPlayerParticipating(aUser)){
+					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+				}else
+				if (((returnGames == ReturnGames.OPEN) | (returnGames == ReturnGames.OWN_AND_OPEN)) & !aServer.isPlayerParticipating(aUser) & (aServer.getTurn() == 0)){
+					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+				}
+			}
+		}
+		return gameListData;
+	}
 
+	private GameData getGameData(SR_Server aServer, User aUser, boolean isAndroid){
+		GameData gameData = new GameData();
+		gameData.setGameId((int)aServer.getId());
+		Logger.finer("aServer.getGameId(): " + aServer.getId());
+		gameData.setGameName(aServer.getGameName());
+		Logger.finer("Notifier returning game: " + aServer.getGameName());
+		gameData.setGameWorldName(aServer.getGalaxy().getGameWorld().getFullName());
+		gameData.setMapName(aServer.getGalaxy().getMapNameFull());
+		gameData.setMaxTurn(aServer.getEndTurn());
+		String nextUpdate = "None";
+		UpdateRunner ur = aServer.getUpdateRunner();
+		if (ur != null){
+			nextUpdate = ur.getNextUpdateShort();
+			gameData.setNextUpdateCalendar(ur.getNextUpdateCalendar());
+		}
+		gameData.setNextUpdate(nextUpdate);
+		gameData.setNrPlayers(aServer.getGalaxy().getNrActivePlayers());
+		Map map = MapHandler.getMap(aServer.getMapFileName());
+		gameData.setMapMaxPlayers(map.getMaxNrStartPlanets());
+		if (aServer.getTurn() > 0){
+			gameData.setNrPlayersMax(aServer.getGalaxy().getNrPlayers());
+		}else{
+			gameData.setNrPlayersMax(aServer.getGalaxy().getNrStartPlanets());
+		}
+		gameData.setStatus(aServer.getStatus());
+		if (aServer.getGalaxy().isGameOver()){
+			Player player = aServer.getPlayer(aUser.getLogin(), aUser.getPassword());
+			if (player.isDefeated()){
+				gameData.setGameOverStatus("defeated");
+			}else{
+				if (player.isWin()){
+					gameData.setGameOverStatus("win");
+				}else{ // assumes survival or equivalent end game status
+					gameData.setGameOverStatus("survival");
+				}
+			}
+		}
+		gameData.setTurn(aServer.getTurn());
+		gameData.setUpdatesWeek(UpdateRunner.getShortDescription(aServer.getGalaxy().getTime()));
+		gameData.setPlayers(aServer.getGalaxy().getPlayers(),isAndroid);
+		gameData.setPassword(aServer.getGalaxy().getPassword());
+		return gameData;
+	}
 	
 	/**
 	 * Check if a player has any unsaved games
@@ -1021,119 +1088,6 @@ public class ServerHandler {
 		return retStr;
 	}
 	
-	
-	
-	public String getCurrentGamesStartedByUserList(User aUser){
-		String retStr = "<table>";
-		retStr = retStr + "<tr><td>Game Name&nbsp;&nbsp;&nbsp;</td><td>GameWorld&nbsp;&nbsp;&nbsp;</td><td>Map Name&nbsp;&nbsp;&nbsp;</td><td>#Players&nbsp;&nbsp;&nbsp;</td><td>Game State&nbsp;&nbsp;&nbsp;</td><td>Current Turn&nbsp;&nbsp;&nbsp;</td><td>Next update&nbsp;&nbsp;&nbsp;</td><td></td><td></td></tr>\n";
-		retStr = retStr + "<tr><td colspan=\"9\" bgcolor=\"#FFBF00\" height=\"1\"><img src=\"images/pix.gif\" height=\"1\"></td></tr>\n";
-		SR_Server[] allSerArr = getServers();
-		if (allSerArr.length == 0){
-			retStr = retStr + "<td colspan=\"9\">You have not started any games</td></tr>\n";
-		}else{
-			int count = 0;
-			for (int i = 0; i < allSerArr.length; i++) {
-				SR_Server aServer = allSerArr[i];
-				if (aServer.getStartedByPlayer().equals(aUser.getLogin())){
-					// game is started by aUser
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
-					String nextUpdate = "None";
-					UpdateRunner ur = aServer.getUpdateRunner();
-					if (ur != null){
-						nextUpdate = ur.getNextUpdateShort();
-					}
-					// check if delete & update links should be present
-					String updateLink = "";
-					if ((aServer.getTurn() == 0) & (aServer.getGalaxy().getNrPlayers() > 1)){
-						updateLink = "&nbsp;&nbsp;<a href='start_game.jsp?gamename=" + aServer.getGameName() + "&todo=startnow'>Start</a>";
-					}
-					String deleteLink = "";
-					if (aServer.getTurn() == 0){
-						deleteLink = "&nbsp;&nbsp;<a href='start_game.jsp?gamename=" + aServer.getGameName() + "&todo=delete'>Delete</a>";
-					}
-					boolean showPlay = false;
-//					if (!tmpPlayer.getUpdatedThisTurn() & aServer.isPlayerParticipating(aUser) & (aServer.getTurn() > 0)){
-					if (aServer.isPlayerParticipating(aUser) & (aServer.getTurn() > 0)){
-						showPlay = true;
-					}
-					boolean showJoin = false;
-					if (!aServer.isPlayerParticipating(aUser) & (aServer.getTurn() == 0)){
-						showJoin = true;
-					}
-					String iconName = null;
-					boolean addGame = false;
-					if (!aServer.getLastUpdateComplete()){
-						iconName = "error";
-						addGame = true;
-//						showJoin = false;
-					}else
-					if (aServer.isPlayerParticipating(aUser)){
-						if (aServer.getGalaxy().gameEnded){
-							if (tmpPlayer.isDefeated()){
-								iconName = "defeat";
-								addGame = true;
-							}else{
-								iconName = "victory";
-								addGame = true;
-							}
-						}else
-						if (tmpPlayer.isDefeated()){
-							iconName = "defeat";
-							addGame = true;
-						}else
-						if (tmpPlayer.getUpdatedThisTurn()){
-							iconName = "check";
-							addGame = true;
-						}else
-						if (aServer.getTurn() > 0){
-							iconName = "cross";
-							addGame = true;
-						}else{
-							iconName = "exclamationmark";
-							addGame = true;
-						}
-					}else{ // player is not participating himself
-						if (aServer.getTurn() == 0){
-							iconName = "questionmark";
-							addGame = true;
-						}else{ // game has started
-							if (aServer.getGalaxy().gameEnded){
-								if (aServer.canBeDeletedByPlayer()){
-									iconName = "candelete";
-									addGame = true;
-								}else{
-									iconName = "empty";
-									addGame = true;
-								}
-							}else{
-								iconName = "empty";
-								addGame = true;
-							}
-						}
-					}	
-					if (addGame){
-						retStr = retStr + "<tr valign=\"bottom\" nowrap><td><img src=\"images/" + iconName + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td nowrap>" + aServer.getGalaxy().getGameWorld().getFullName() + "</td><td nowrap>" + aServer.getMapFileName() + "</td><td>" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td nowrap>" + nextUpdate + "</td><td nowrap><a href='current_game.jsp?port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=start_game.jsp'>Details</a>";
-						if (showJoin){
-							retStr = retStr + "&nbsp;&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=start_game.jsp' target=\"_top\">Join</a>";
-						}else
-						if (showPlay){
-							retStr = retStr + "&nbsp;&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=start_game.jsp' target=\"_top\">Play</a>";
-						}
-						retStr = retStr + updateLink;
-						retStr = retStr + deleteLink;
-						retStr = retStr + "</td></tr>\n";
-						count++;
-					}
-				}
-			}
-			if (count == 0){
-				retStr = retStr + "<td colspan=\"9\">You have not started any games</td></tr>\n";
-			}
-		}
-		retStr = retStr + "</table>";
-		return retStr;
-	}
-
 	public String getServersList(){
 		String retStr = "";
 		SR_Server[] allSerArr = getServers();
@@ -1472,13 +1426,13 @@ public class ServerHandler {
 			LoggingHandler.fine("aServer before: " + aServer.getName());
 		}
 */		// delete game file		
-		String path = PropertiesHandler.getProperty("basepath") + "saves";
+		String path = PropertiesHandler.getProperty("datapath") + "saves";
 		String pathAndFile = path + File.separator + gameName + ".srg";
 		Logger.fine("Path to savefile to remove: " + pathAndFile);
 		File tmp = new File(pathAndFile);
 		tmp.delete();
 		
-		path = PropertiesHandler.getProperty("basepath") + "messageDatabase";
+		path = PropertiesHandler.getProperty("datapath") + "messageDatabase";
 		pathAndFile = path + File.separator + gameName + ".srg";
 		Logger.fine("Path to savefile to remove: " + pathAndFile);
 		tmp = new File(pathAndFile);
@@ -1503,7 +1457,7 @@ public class ServerHandler {
 	}
 */
 	
-	//TODO varför måste password finns för spelaren i pågående spel? borde inte det tas bort så behövs inte detta göras?
+	//TODO varfï¿½r mï¿½ste password finns fï¿½r spelaren i pï¿½gï¿½ende spel? borde inte det tas bort sï¿½ behï¿½vs inte detta gï¿½ras?
 	/**
 	 * Called when a player has changed his password.
 	 * Update all games so that the players new password will be used.
@@ -1543,13 +1497,13 @@ public class ServerHandler {
 		// remove from serverhandler
 		allServers.remove(aGame);
 		// remove file
-    	String basePath = PropertiesHandler.getProperty("basepath");
-        String filePath = basePath + "saves" + "/" + aGame.getGameName() + ".srg";
+    	String dataPath = PropertiesHandler.getProperty("datapath");
+        String filePath = dataPath + "saves" + "/" + aGame.getGameName() + ".srg";
         Logger.info("Deleting file = too old, path: " + filePath);
         File gameFile = new File(filePath);
         gameFile.delete();
         
-        filePath = basePath + "messageDatabase" + "/" + aGame.getGameName() + ".srg";
+        filePath = dataPath + "messageDatabase" + "/" + aGame.getGameName() + ".srg";
         Logger.info("Deleting file = too old, path: " + filePath);
         gameFile = new File(filePath);
         gameFile.delete();

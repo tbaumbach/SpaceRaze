@@ -48,7 +48,7 @@ public class NewsHandler {
 	private LinkedList<NewsArticle> loadNews(){
     	LinkedList<NewsArticle> tmpList = null;
     	Logger.info("loadNews called");
-		String path = PropertiesHandler.getProperty("basepath") + "news" + File.separator + "articles.srn";
+		String path = PropertiesHandler.getProperty("datapath") + "news" + File.separator + "articles.srn";
     	Logger.finer("Complete file path: " + path);
         try{
             FileInputStream fis = new FileInputStream(path);
@@ -70,8 +70,8 @@ public class NewsHandler {
 
     private void saveNews(){
     	Logger.info("saveNews called");		
-    	String basePath = PropertiesHandler.getProperty("basepath");
-        String fn = basePath + "news" + File.separator + "articles.srn";
+    	String dataPath = PropertiesHandler.getProperty("datapath");
+        String fn = dataPath + "news" + File.separator + "articles.srn";
     	Logger.finer("Complete save news path: " + fn);
         try{
             FileOutputStream fos = new FileOutputStream(fn);
@@ -135,7 +135,7 @@ public class NewsHandler {
     	return i;
     }
 
-    public List<NewsArticle> getAllNews(){
+    public LinkedList<NewsArticle> getAllNews(){
     	return allNews;
     }
 	

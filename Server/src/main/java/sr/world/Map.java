@@ -41,7 +41,7 @@ public class Map implements Serializable, Comparable<Map>{
 	// creating a map from a published map
 	public Map(String mapFileName){
 		Logger.finest("New Map from mapName: " + mapFileName);
-		Properties props = PropertiesHandler.getInstance("map." + mapFileName);
+		Properties props = PropertiesHandler.getInstance("maps." + mapFileName);
 		initMap(mapFileName,props);
 	}
 
@@ -97,8 +97,8 @@ public class Map implements Serializable, Comparable<Map>{
 	}
 	
 	public Map(){
-		planets = new LinkedList<Planet>(); // behövs denna?
-		connections = new LinkedList<PlanetConnection>(); // behövs denna?
+		planets = new LinkedList<Planet>(); // behï¿½vs denna?
+		connections = new LinkedList<PlanetConnection>(); // behï¿½vs denna?
 		SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 		createdDate = sdf.format(new Date());
 	}
@@ -253,8 +253,8 @@ public class Map implements Serializable, Comparable<Map>{
 			Galaxy g = gc.createGalaxy("battleSim",mapName,3);
 			List allPlanets = g.getPlanets();
 			List allConnections = g.getPlanetConnections();
-			String basePath = PropertiesHandler.getProperty("basepath");
-			String completePath = basePath + "WEB-INF\\classes\\map." + mapName + ".properties";
+			String dataPath = PropertiesHandler.getProperty("datapath");
+			String completePath = dataPath + "map." + mapName + ".properties";
 			//		String path = "c:\\map." + mapName + ".properties";
 			File mapFile = new File(completePath);
 			try{
@@ -639,47 +639,47 @@ public class Map implements Serializable, Comparable<Map>{
 			edgePlanets.add(planets.get(0));
 			List<Planet> allNeighbours = new LinkedList<Planet>();
 			
-	      	// Gå igenom alla edgePlanets (dvs bara startplaneten initialt)
+	      	// Gï¿½ igenom alla edgePlanets (dvs bara startplaneten initialt)
 	        for (int i = 0; i < edgePlanets.size(); i++){
 	          Planet tempPlanet = (Planet)edgePlanets.get(i);
-	          // Hämta alla grannar till tempPlanet
+	          // Hï¿½mta alla grannar till tempPlanet
 	          allNeighbours = getAllDestinations(tempPlanet,true);
-	          // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+	          // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
 	          for (int j = 0; j < allNeighbours.size(); j++){
 	            Planet tempNeighbourPlanet = (Planet)allNeighbours.get(j);
 	            // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
 	            if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-	              // lägg i newEdgePlanets
+	              // lï¿½gg i newEdgePlanets
 	              newEdgePlanets.add(tempNeighbourPlanet);
 	            }
 	          }
 	        }
 	        
 	        while (newEdgePlanets.size() > 0){
-	            // töm edgePlanets
+	            // tï¿½m edgePlanets
 	            edgePlanets.clear();
 	            for (int l = 0; l < newEdgePlanets.size(); l++){
-	              // kopiera över newEdgePlanets till edgePlanets
+	              // kopiera ï¿½ver newEdgePlanets till edgePlanets
 	              edgePlanets.add((Planet)newEdgePlanets.get(l));
-	              // kopiera över newEdgePlanets till searchedPlanets
+	              // kopiera ï¿½ver newEdgePlanets till searchedPlanets
 	              searchedPlanets.add((Planet)newEdgePlanets.get(l));
 	            }
-	            // töm newEdgePlanets
+	            // tï¿½m newEdgePlanets
 	            newEdgePlanets.clear();
-	            // töm allNeighbours
+	            // tï¿½m allNeighbours
 	            allNeighbours.clear();
 
-		      	// Gå igenom alla edgePlanets (dvs bara startplaneten initialt)
+		      	// Gï¿½ igenom alla edgePlanets (dvs bara startplaneten initialt)
 		        for (int i = 0; i < edgePlanets.size(); i++){
 		          Planet tempPlanet = (Planet)edgePlanets.get(i);
-		          // Hämta alla grannar till tempPlanet
+		          // Hï¿½mta alla grannar till tempPlanet
 		          allNeighbours = getAllDestinations(tempPlanet,true);
-		          // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
+		          // Gï¿½ igenom alla allNeighbours  (lï¿½gg i newEdgePlanets)
 		          for (int j = 0; j < allNeighbours.size(); j++){
 		            Planet tempNeighbourPlanet = (Planet)allNeighbours.get(j);
 		            // kolla att tempNeighbourPlanet inte redan finns i searchedPlanets
 		            if ((!searchedPlanets.contains(tempNeighbourPlanet)) & (!newEdgePlanets.contains(tempNeighbourPlanet))){
-		              // lägg i newEdgePlanets
+		              // lï¿½gg i newEdgePlanets
 		              newEdgePlanets.add(tempNeighbourPlanet);
 		            }
 		          }
@@ -738,7 +738,7 @@ public class Map implements Serializable, Comparable<Map>{
 		  sb.append("<br>");
 		  sb.append("<br>");
 		  
-		  // visa bild på kartan
+		  // visa bild pï¿½ kartan
 		  sb.append("<img src=\"map_" + fileName + "\" alt=\"map_" + fileName + "\" />");
 		  
 		  return sb.toString();

@@ -22,20 +22,21 @@ import java.util.ResourceBundle;
  */
 public class PropertiesReader{
 	private static String basePath;
+	private static String dataPath;
 	
-	public static Properties getProperties(String propFileName) {
+	public static Properties getProperties(String propFileName, boolean isStaticData) {
 //		System.out.println("PropertiesReader.getProperties called, propFileName: " + propFileName);
-		getBasePath();
+		getPaths();
 		// create the correct file path to the file
-		String exactPath = getExactPath(null,propFileName + ".properties");
+		String exactPath = getExactPath(null,propFileName + ".properties", isStaticData);
 		// read the file
 		Properties prop = loadFile(exactPath);
 		return prop;
 	}
 	
-	public static String getExactPath(String folderPath, String propFileName){
+	public static String getExactPath(String folderPath, String propFileName, boolean isStaticData){
 //		System.out.println("getExactPath, folderPath: " + folderPath + " propFileName: " + propFileName);
-		String completePath = basePath + "WEB-INF\\classes\\";
+		String completePath = isStaticData ? basePath + "WEB-INF\\classes\\" : dataPath;
 		if (folderPath != null){
 			completePath = completePath + folderPath + File.separator;
 		}
@@ -58,7 +59,7 @@ public class PropertiesReader{
 					}else{
 						tmpFolderPath = folderPath + File.separator + firstPart;
 					}
-					completePath = getExactPath(tmpFolderPath,lastPart);
+					completePath = getExactPath(tmpFolderPath,lastPart, isStaticData);
 				}
 			}else{
 				completePath = null;
@@ -67,8 +68,8 @@ public class PropertiesReader{
 		return completePath;
 	}
 	
-	private static String getBasePath(){
-		if (basePath == null){
+	private static void getPaths(){
+		if (basePath == null || dataPath == null){
 			final String DEFAULT_PROPERTIES_NAME = "spaceraze";
 			ResourceBundle bundle = ResourceBundle.getBundle(DEFAULT_PROPERTIES_NAME);
 			Enumeration<String> tmpenum = bundle.getKeys();
@@ -78,11 +79,12 @@ public class PropertiesReader{
 				if (key.equals("basepath")){
 					basePath = (String)bundle.getObject(key);
 				}
+				if (key.equals("datapath")){
+					dataPath = (String)bundle.getObject(key);
+				}
 			}
 //			System.out.println("Reading from spaceraze.properties, basePath = " + basePath);
 		}
-		return basePath;
-
 	}
 	
 	private static Properties loadFile(String aFileName){

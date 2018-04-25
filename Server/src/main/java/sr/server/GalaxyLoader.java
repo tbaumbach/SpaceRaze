@@ -15,7 +15,7 @@ public class GalaxyLoader{
 
     public Galaxy loadGalaxy(String filename){
     	Logger.info("loadGalaxy called: " + filename);
-		String path = PropertiesHandler.getProperty("basepath") + "saves";
+		String path = PropertiesHandler.getProperty("datapath") + "saves";
     	String fn = path + File.separator + filename + ".srg";
     	Logger.finer("Complete file path: " + fn);
         try{

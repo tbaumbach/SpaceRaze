@@ -18,8 +18,8 @@ public class SavesHandler {
 	public String getActiveSaves(){
 		String saves = "";
 		// get path
-		String basePath = PropertiesHandler.getProperty("basepath");
-		String savesPath = basePath + "saves";
+		String dataPath = PropertiesHandler.getProperty("datapath");
+		String savesPath = dataPath + "saves";
 		saves = getSaves(savesPath,"..\\saves\\");
 		return saves;
 	}
@@ -27,8 +27,8 @@ public class SavesHandler {
 	public String getPreviousSaves(){
 		String saves = "";
 		// get path
-		String basePath = PropertiesHandler.getProperty("basepath");
-		String savesPath = basePath + "saves\\previous";
+		String dataPath = PropertiesHandler.getProperty("datapath");
+		String savesPath = dataPath + "saves\\previous";
 		saves = getSaves(savesPath,"..\\saves\\previous\\");
 		return saves;
 	}

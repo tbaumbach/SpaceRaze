@@ -20,6 +20,7 @@ public class Statistics implements Serializable{
 	private StatisticType statisticType;
 	private Map<String,List<Integer>> playersStatistics; // String = player name, List<Integer> values, and index = turn -1
 	private Galaxy g;
+	private static final int WIN_LOSE_PROD_PERCENTAGE = 66;
 	
 	public Statistics(StatisticType statisticType, Galaxy g){
 		this.statisticType = statisticType;
@@ -87,5 +88,19 @@ public class Statistics implements Serializable{
 		return playersStatistics.get(aPlayerName);
 	}
 
+	public List<Integer> getWinLimit(){
+		List<Integer> winLimitList = new LinkedList<Integer>();
+		for (int i = 0; i < getLastTurn(); i++){
+			int sum = 0;
+			Set<String> keys = playersStatistics.keySet();
+			Object[] keysArray = keys.toArray();
+			for (Object object : keysArray) {
+				List<Integer> aList = playersStatistics.get(object);
+				sum += aList.get(i);
+			}
+			winLimitList.add((int)Math.round(sum*WIN_LOSE_PROD_PERCENTAGE/100.0));
+		}
+		return winLimitList;
+	}
 	
 }

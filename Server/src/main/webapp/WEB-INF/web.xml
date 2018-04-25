@@ -35,9 +35,46 @@
 		<filter-name>CorsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
+	<servlet>
+        <servlet-name>SpaceRazeTunnel</servlet-name>
+        <servlet-class>
+          sr.tunnel.SpaceRazeTunnel
+        </servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>NotifierTunnel</servlet-name>
+        <servlet-class>
+          sr.notifier.NotifierTunnel
+        </servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    
+    <servlet>
+        <servlet-name>MapEditorTunnel</servlet-name>
+        <servlet-class>
+          sr.mapeditor.MapEditorTunnel
+        </servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
  
 	<servlet>
-		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-name>JerseyWebApplication</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
@@ -49,8 +86,23 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
 	<servlet-mapping>
-		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-name>JerseyWebApplication</servlet-name>
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>SpaceRazeTunnel</servlet-name>
+        <url-pattern>/servlet/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>MapEditorTunnel</servlet-name>
+        <url-pattern>/map/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>NotifierTunnel</servlet-name>
+        <url-pattern>/notifier/*</url-pattern>
+    </servlet-mapping>
 </web-app>

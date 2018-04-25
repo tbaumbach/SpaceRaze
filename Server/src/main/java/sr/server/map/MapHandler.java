@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sr.general.logging.Logger;
+import sr.mapeditor.MapEditorApplet;
 import sr.mapeditor.TransferWrapper;
 import sr.server.MapFileNameFilter;
 import sr.server.persistence.PHash;
@@ -28,7 +29,7 @@ import sr.world.Map;
  */
 public class MapHandler {
 	private static List<Map> allMaps;
-	private static String basePath; // inlagd för att fixa skum bugg, borde egentligen inte behövas...
+	private static String dataPath; // inlagd fï¿½r att fixa skum bugg, borde egentligen inte behï¿½vas...
 
 	/**
 	 * 
@@ -39,11 +40,11 @@ public class MapHandler {
 		if (allMaps == null){
 			allMaps = new LinkedList<Map>();
 			// read maps from file and create allMaps List
-			if (basePath == null){
-				basePath = PropertiesHandler.getProperty("basepath");
+			if (dataPath == null){
+				dataPath = PropertiesHandler.getProperty("datapath");
 			}
-			Logger.finer("basePath: " + basePath);
-			String completePath = basePath + "WEB-INF\\classes\\map\\";
+			Logger.finer("basePath: " + dataPath);
+			String completePath = dataPath + "maps\\";
 			List<String> allMapNames = getProps(completePath);
 			for (String mapName : allMapNames) {
 				allMaps.add(new Map(mapName));
@@ -56,11 +57,11 @@ public class MapHandler {
 		Logger.finer("getMapDrafts() called");
 		List<Map> allDrafts = new LinkedList<Map>();
 		// read maps from file and create allMaps List
-		if (basePath == null){
-			basePath = PropertiesHandler.getProperty("basepath");
+		if (dataPath == null){
+			dataPath = PropertiesHandler.getProperty("datapath");
 		}
-		Logger.finer("basePath: " + basePath);
-		String completePath = basePath + "WEB-INF\\classes\\map\\" + playerLogin + "\\";
+		Logger.finer("dataPath: " + dataPath);
+		String completePath = dataPath + "maps\\" + playerLogin + "\\";
 		List<String> allMapNames = getProps(completePath);
 		for (String mapName : allMapNames) {
 			allDrafts.add(new Map(playerLogin + "." + mapName));
@@ -71,11 +72,11 @@ public class MapHandler {
 	public static int getNrMapDrafts(String playerLogin){
 		Logger.finer("getNrMapDrafts() called");
 		// read maps from file and create allMaps List
-		if (basePath == null){
-			basePath = PropertiesHandler.getProperty("basepath");
+		if (dataPath == null){
+			dataPath = PropertiesHandler.getProperty("datapath");
 		}
-		Logger.finer("basePath: " + basePath);
-		String completePath = basePath + "WEB-INF\\classes\\map\\" + playerLogin + "\\";
+		Logger.finer("dataPath: " + dataPath);
+		String completePath = dataPath + "map\\" + playerLogin + "\\";
 		List<String> allMapDrafts = getProps(completePath);
 		return allMapDrafts.size();
 	}
@@ -141,7 +142,69 @@ public class MapHandler {
 		return retStr;
 	}
 
+	public static String getMapFiles(User aUser){
+		Logger.finer("getMapFiles called");
+		String retStr = "";
+		List<Map> allMapNames = MapHandler.getAllMaps();
+		Collections.sort(allMapNames);
+		Logger.finer("allMapNames.size(): " + allMapNames.size());
+		int i=0;
+		for (Map aMap : allMapNames) {
+			i = i + 1;
+			String RowName = i + "MapListRow";
+//			LoggingHandler.finer("in loop: " + aMap.getName());
+			String editStr = "";
+			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
+				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
+				editStr = editStr + " / ";
+//				editStr = editStr + "<a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getFileName() + "\">Delete</a>";
+				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";
+			}else{
+				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
+			}
+			retStr = retStr + "<tr class='ListTextRow' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',7,1);\" onMouseOut=\"TranparentRow('" + RowName + "',7,0);\"><td id='" + RowName + "1' class='ListText'></td><td id='" + RowName + "2' class='ListText'><div class='SolidText'><a href=\"Master.jsp?action=map_view&mapname=" + aMap.getFileName() + "\">" + aMap.getNameFull() + "</a></div></td><td id='" + RowName + "3' class='ListText'><div class='SolidText'>" + aMap.getFileName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + aMap.getNrPlanets() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aMap.getChangedDate() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aMap.getAuthorName() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'></div></td></tr>\n";
+		}
+		return retStr;
+	}
+	
+	public static String getMapDraftFiles(User aUser){
+		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
+		String retStr = "";
+		List<Map> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		Collections.sort(tmpMaps);
+		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
+		for (Map aMap : tmpMaps) {
+//			LoggingHandler.finer("in loop: " + aMap.getName());
+			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
+		}
+		return retStr;
+	}
 
+	public static String getMapDraftFilesNO(User aUser){
+		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
+		String retStr = "";
+		List<Map> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		Collections.sort(tmpMaps);
+		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
+		int i=0;
+		for (Map aMap : tmpMaps) {
+			i = i + 1;
+			String RowName = i + "MapDraftListRow";
+			String editStr = "";
+			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
+				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
+				editStr = editStr + " / ";
+				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";
+			}else{
+				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
+			}
+			
+			retStr = retStr + "<tr class='ListTextRow' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',7,1);\" onMouseOut=\"TranparentRow('" + RowName + "',7,0);\"><td id='" + RowName + "1' class='ListText'><div class='SolidText'></div></td><td id='" + RowName + "2' class='ListText'><div class='SolidText'><a href=\"Master.jsp?action=map_view&mapname=" + aMap.getFileName() + "\">" + aMap.getNameFull() + "</a></div></td><td id='" + RowName + "3' class='ListText'><div class='SolidText'>" + aMap.getFileName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + aMap.getNrPlanets() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aMap.getChangedDate() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aMap.getAuthorName() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'></div></td></tr>\n";
+			//retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
+		}
+		return retStr;
+	}
+	
 	
 	public static String getMapHTML(){
 		Logger.finer("getMapHTML called");
@@ -196,7 +259,7 @@ public class MapHandler {
 	public static String showMapNO(String mapName){
 		MapImageCreator mic = new MapImageCreator();
 		Map aMap = getMap(mapName,null);
-//		Dimension d = mic.createGifAndGetSize(mapName,aMap); verkar inte som om d behövs?
+//		Dimension d = mic.createGifAndGetSize(mapName,aMap); verkar inte som om d behï¿½vs?
 		mic.createGifAndGetSize(mapName,aMap);
 		String retStr = "<img src=\"images/maps/" + mapName + ".gif\" width=\"700\">";
 		return retStr;
@@ -222,11 +285,11 @@ public class MapHandler {
 		Logger.fine("playerLogin:: " + aMap.getAuthorLogin());
 		String success = null;
 		// create complete path to file to save
-		if (basePath == null){
-			basePath = PropertiesHandler.getProperty("basepath");
+		if (dataPath == null){
+			dataPath = PropertiesHandler.getProperty("datapath");
 		}
-		Logger.finer("basePath: " + basePath);
-		String completePath = basePath + "WEB-INF\\classes\\map\\" + path;
+		Logger.finer("dataPath: " + dataPath);
+		String completePath = dataPath + "maps\\" + path;
 		Logger.finer("completePath: " + completePath);
 		// check if file can be created
 		File aFile = new File(completePath);
@@ -272,7 +335,7 @@ public class MapHandler {
 	
 	public static String deleteMap(String mapFileName){
 		System.out.println("deleteMap called, mapFileName: " + mapFileName);
-		String exactPath = PropertiesReader.getExactPath(null,mapFileName + ".properties");
+		String exactPath = PropertiesReader.getExactPath(null,mapFileName + ".properties", false);
 		System.out.println("exactPath: " + exactPath);
 		String message = null;
 		if (exactPath != null){

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 
 import sr.general.Functions;
 import sr.general.logging.Logger;
+import sr.notifier.JnlpHandler;
 import sr.server.ServerHandler;
 import sr.server.properties.PropertiesHandler;
 import sr.webb.mail.MailHandler;
@@ -328,6 +329,7 @@ public class UserHandler {
 			getList();
 			allUsers.add(theUser);
 			saveUsers();
+			JnlpHandler.createJnlpFile(theUser);
 			
 			deleteTempUser(userLogin);
 			
@@ -497,8 +499,8 @@ public class UserHandler {
 	}
 
 	private static void saveUsers(){
-		String basePath = PropertiesHandler.getProperty("basepath");
-		String completePath = basePath + "WEB-INF\\classes\\users.properties";
+		String dataPath = PropertiesHandler.getProperty("datapath");
+		String completePath = dataPath + "users\\users.properties";
 		File usersFile = new File(completePath);
 		try{
 			FileWriter fw = new FileWriter(usersFile);
@@ -526,8 +528,8 @@ public class UserHandler {
 	}
 	
 	private static void saveTempUsers(){
-		String basePath = PropertiesHandler.getProperty("basepath");
-		String completePath = basePath + "WEB-INF\\classes\\tempUsers.properties";
+		String dataPath = PropertiesHandler.getProperty("datapath");
+		String completePath = dataPath + "users\\tempUsers.properties";
 		File usersFile = new File(completePath);
 		try{
 			FileWriter fw = new FileWriter(usersFile);
@@ -594,6 +596,7 @@ public class UserHandler {
 					Logger.finest("adding user: " + tmpStr);
 					User tmpUser = new User(tmpStr);
 					allUsers.add(tmpUser);
+					JnlpHandler.checkJnlpFile(tmpUser);
 					index++;
 				}else{
 					continueLoop = false;
@@ -646,7 +649,7 @@ public class UserHandler {
 			prop.put(key, bundle.getObject(key));
 		}
 */
-		Properties prop = PropertiesHandler.getInstance(file);
+		Properties prop = PropertiesHandler.getInstance("users." + file);
 		return prop;
 	}
 	

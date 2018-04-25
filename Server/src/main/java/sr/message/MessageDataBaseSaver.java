@@ -14,7 +14,7 @@ public class MessageDataBaseSaver{
     public void saveMessageDataBase(String filename, MessageDatabase aMessageDatabase){
     	Logger.info("saveMessageDataBase called: " + filename);		
         try{
-	    	String basePath = PropertiesHandler.getProperty("basepath");
+	    	String basePath = PropertiesHandler.getProperty("datapath");
 	        String fn = basePath + "messageDatabase" + "/" + filename + ".srg";
 	    	Logger.finer("Complete save file path: " + fn);
 	        try{

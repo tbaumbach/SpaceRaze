@@ -47,7 +47,7 @@ public class PropertiesHandler {
 	 */
 	public static Properties getInstance(String propFilePrefixName){
 //		System.out.println("getInstance: propFilePrefixName = " + propFilePrefixName);
-		Properties properties = PropertiesReader.getProperties(propFilePrefixName);
+		Properties properties = PropertiesReader.getProperties(propFilePrefixName, false);
 		return properties;
 	}
 
@@ -69,7 +69,7 @@ public class PropertiesHandler {
 
 	// used by other classes
 	public static Properties loadParams(String file) throws IOException {
-		return PropertiesReader.getProperties(file);
+		return PropertiesReader.getProperties(file, true);
 	}
 	
 	

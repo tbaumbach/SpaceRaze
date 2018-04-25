@@ -14,7 +14,7 @@ public class MessageDataBaseLoader{
 
     public MessageDatabase loadMessageDatabase(String filename){
     	Logger.info("loadMessageDatabase called: " + filename);
-		String path = PropertiesHandler.getProperty("basepath") + "messageDatabase";
+		String path = PropertiesHandler.getProperty("datapath") + "messageDatabase";
     	String fn = path + File.separator + filename + ".srg";
     	Logger.finer("Complete file path: " + fn);
         try{

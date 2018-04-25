@@ -64,8 +64,8 @@ public class PHash {
 	 *
 	 */
 	private static void readData(){
-		String basePath = PropertiesHandler.getProperty("basepath");
-		path = basePath + "WEB-INF" + File.separator + "persistence";
+		String basePath = PropertiesHandler.getProperty("datapath");
+		path = basePath + "persistence";
 		readDir(path,"");
 	}
 	

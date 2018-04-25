@@ -13,8 +13,8 @@ public class GalaxySaver{
 
     public void saveGalaxy(String filename, String path, Galaxy g){
     	Logger.info("saveGalaxy called: " + filename + " " + path);		
-    	String basePath = PropertiesHandler.getProperty("basepath");
-        String fn = basePath + path + "/" + filename + ".srg";
+    	String dataPath = PropertiesHandler.getProperty("datapath");
+        String fn = dataPath + path + "/" + filename + ".srg";
     	Logger.finer("Complete save file path: " + fn);
         try{
             FileOutputStream fos = new FileOutputStream(fn);
