@@ -1,0 +1,57 @@
+Sätt upp en utvecklingsmiljö för SpaceRaze
+0. Skapa en mappen C:\utveckling
+1. Ladda ner Java JDK
+2. Peka JAVA_HOME mot jdk mappen.
+3. Ladda ner Maven
+4. peka Path mot mot maven-x.x.x/bin mappen
+5. Ladda ner Eclipse
+6. Hämta hem och installera Git.
+7. Hämta hem Tomcat. installer den under C:\utveckling med namnet apache-tomcat för att slippa ändara i alla byggfiler i orginal projektet.
+8. Ladda ner Atom
+9.ladda ner och installer Node.js
+10. sätt upp Angular miljön https://angular.io/guide/quickstart OBS start cmd med adminrättigheter.
+Här ska uppdateras för nu skapas ett nytt projekt, men hur ska detta kopplas ihop med befintlig version från git. git installeras på något vis i projektet men hur fungera det?
+fireFox???
+
+11. skapa ett workspace C:\utveckling\workspace1
+12. Klona ner https://github.com/tbaumbach/SpaceRaze.git
+13. Äppna Eclipse file/import/Maven/Existing Maven Projects/Root Directory: C:\utveckling\Git_SpaceRaze\SpaceRaze
+
+13. Öpnna Eclipse och "Import"/"Projects from git"/"Clone URI"/Fyll i uppgifter
+URI: https://github.com/tbaumbach/SpaceRaze
+Host: github.com
+Repository path: /tbaumbach/SpaceRaze
+User: din användare i github
+/Välj aktuell Branch, eller Master för att sedan shifta.
+/ Skapa mappen "Git_SpaceRaze" för att sedan peka ut den som målmapp/Directory + SpaceRaze (som är projektet).
+14. Eclipse Sätt om så att alla projekt använder UTF-8: Preferences/General/Workspace/ Text file encoding = UTF-8
+15. properits/Deployment Assembly peka ut Maven Dependencies så att serven tar med sig alla Jar filer.
+16. Se till att allt körs med java 1.8. Build path, Java Compiler, Project Facet
+
+50. Hämte hem en Subverion SVN klient (subclipse) för att kunna ladda ner SpaceRaze orinal projekt. Här behövs troligen hämta hem en connctor också, görs när du kör imorten(uppdatera hur)
+51. Ange https://subversion.assembla.com/svn/spaceraze/ och användarnamn + lösen.
+52. I det nya projektet peka ut jar filerna i lib: properties/Java Build Path/Libraries "Add JARs..."
+53. Ändra så att alla länkar blir rätt i bygg-scripten under mappen build. OBS ska vara rätt om allt är uppsat enligt ovan.
+54. Kör Build.xml med Ant för att deploya SpaceRaze.
+
+60. Skapa en server och peka ut din Tomcat OBS måste av någon anledning göras ner serven är skapad utan att ha något projekt kopplat till sig, glöm inte att spara. Nu kan du lägga till Server projektet.
+61. Nu ska det gå att sufra mot applikationen, om det inte går kan serven behövs stoppas för att sedan start Tomcaten via bat filen, nu ska windows brandvägg upptäcka försöket. Nu kommer det fungera att start serven via Eclipse.
+62. För att siten ska få sina knappar vilket är knappar ska sidan http://localhost:8080/SpaceRaze/webb2/Buttons.jsp besökas, vilket skapar upp knapparna.
+63. Eftersom Applet inte stöds längre måste SpaceRaze spelas via Notifiern. Kör en Export/Jar file. Se till att ha src mappen med, troligen behövs även lib, properties, applet, map. Test dig fram lite. Döp filen till notifier.jar. Sedan ska den läggas i SpaceRaze/webb2/notifier här finns redan en templet som skapas upp för varje unik användare så att de får rätt parametrar.
+
+Fär att lägga till amarantin-imagepack i lokalt maven repo.
+mvn deploy:deploy-file -DgroupId=amarantin.imagepack -DartifactId=amarantin-imagepack -Dversion=1.0 -Durl=file:../local-maven-repo/ -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile=C:\utveckling\temp\amarantin-imagepack-1.0.jar
+
+Länkar för att köra komma åt webben, skapa webbens knappart och länkar till olika rest tjänster.
+http://localhost:8080/Server/webb2/Master.jsp huvudsidan.
+http://localhost:8080/Server/webb2/Buttons.jsp Skapar knappar.
+http://localhost:8080/Server/webb2/angular1/test.html Test sidan med olika anrop mot rest api.
+http://localhost:8080/Server/# testsida med lite bootstrap och responsive html lösningar
+http://localhost:8080/Server/api/maps/SLkartan rest tjänst som hämtar en karta.
+http://localhost:8080/Server/api/games/game/orders/1/tobbe hämta en spelares orders 1 = spelet tobbe = spelaren
+http://localhost:8080/Server/api/games/game/1/Testspelare%20A/1 retunerar en spelares turn. information om varje planet och spelarens övriga information.
+http://localhost:8080/Server/api/games/game/1/Testspelare%20A returnerar ett spels parametrar. Vet ej varför en användare skickas med.
+http://localhost:8080/Server/api/games/open ger alla öppna spel, alltså den som väntar på spelar ska gå med i spelen för att sedan startas när alla har gått med.
+http://localhost:8080/Server/api/PlanetInfo2/gameworld/thelastgreatwar/2 hämtar en hel spelvärd. 2 = version av spelvärlden.
+http://localhost:8080/Server/api/PlanetInfo2/get?gamename=ttt&planet=2 test tjänst, hämtar en spelars planet.
+http://localhost:8080/Server/api/PlanetInfo/get?gamename=ttt&planet=2 samma som ovan.
