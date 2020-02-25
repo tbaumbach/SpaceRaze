@@ -218,7 +218,7 @@
 					String errorType = "Login Error";
 					String errorMessage = message;%>
 					
-					<script language="javascript">
+					<script>
 						TextToLayerRED("<b>Login Error:</b> Wrong Username or Password",'GuideArea');
 					</script>
 		
@@ -349,8 +349,8 @@ Logged in user name: <%= theUser.getName() %><br>
 </font>
 -->
 
-<DIV id="divLocation" style="LEFT: 30px; POSITION: absolute; TOP: 200px" z-index="4"></DIV><LAYER id="layerLocation" z-index="4" height="97" width="205"></LAYER><SCRIPT language="Javascript">
-//showHelpLayerImp('layerLocation','divLocation','helpLayer0','175')</SCRIPT>
+<DIV id="divLocation" style="LEFT: 30px; POSITION: absolute; TOP: 200px" z-index="4"></DIV><LAYER id="layerLocation" z-index="4" height="97" width="205"></LAYER><script>
+//showHelpLayerImp('layerLocation','divLocation','helpLayer0','175')</script>
 		<span class="Text">
 			<input class="inpCords" name="txtX" id="txtX" type=hidden style="width=20;" value="">
 			<input class="inpCords" type=hidden value="" name="txtY" id="txtY">

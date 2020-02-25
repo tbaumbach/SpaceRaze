@@ -1,6 +1,6 @@
 package spaceraze.servlet.map;
 
-import sr.world.Map;
+import spaceraze.world.Map;
 
 public class MapLight {
 	

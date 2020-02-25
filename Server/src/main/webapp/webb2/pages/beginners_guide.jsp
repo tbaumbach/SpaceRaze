@@ -1,8 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>SpaceRaze Beginners Guide</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link REL="STYLESHEET" HREF="CSS/style.css">
 </head>
 

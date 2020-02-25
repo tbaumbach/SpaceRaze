@@ -1,10 +1,11 @@
+<%@page import="spaceraze.webb.support.world.GameWorldHelper"%>
 <%@ page import="sr.server.*"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>GameWorlds page</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">
 <style type="text/css">
@@ -16,7 +17,7 @@ table.sr td {
 </style>
 </head>
 
-<script language="javascript">
+<script>
 function OnMouseOver(Control)
 {
 	Control.className = "OnMouseOver";	
@@ -43,7 +44,7 @@ function OnMouseOut(Control)
 
 <div class="List" style="width:718">
 <table border="0" width="716" cellspacing="0" cellpadding="0" class="MenuMain">
-<%= GameWorldHandler.getGameWorldsTableContentHTMLNO() %>
+<%= GameWorldHelper.getGameWorldsTableContentHTMLNO() %>
 <tr class='ListTextRow' height='3'><td colspan='10' class='ListText'></td></tr>
 <tr class='ListTextRow' height='20'><td colspan='10' class='ListText'> <div class='ListHeadLeft' id="PageAction" name="PageAction"></div></td></tr>
 </table>

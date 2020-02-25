@@ -1,6 +1,5 @@
 package sr.servlet;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
@@ -11,10 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import spaceraze.world.GameWorld;
+import spaceraze.world.Planet;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.world.GameWorld;
-import sr.world.Planet;
 
 @SuppressWarnings("serial")
 public class JSONAndHTMLServlet extends HttpServlet{
@@ -65,7 +64,7 @@ public class JSONAndHTMLServlet extends HttpServlet{
 		System.out.println(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(new Integer(planet))));
 		
 		
-		// TODO fel n‰r vi retunerar hela listan. fungerar n‰r det bara ‰r planet 8
+		// TODO fel n√§r vi retunerar hela listan. fungerar n√§r det bara √§r planet 8
 		response.getWriter().print(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(new Integer(planet))));
 		
 		//request.getAttribute("");

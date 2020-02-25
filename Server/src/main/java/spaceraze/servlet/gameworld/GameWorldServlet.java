@@ -20,13 +20,13 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import sr.server.GameWorldHandler;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
+import spaceraze.world.GameWorld;
+import spaceraze.world.Planet;
+import spaceraze.world.StatisticGameType;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
-import sr.world.GameWorld;
-import sr.world.Planet;
-import sr.world.StatisticGameType;
 
 @Path("/gameworlds")
 public class GameWorldServlet{
@@ -55,6 +55,21 @@ public class GameWorldServlet{
 	@Path("/{name}/{version}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public GameWorld getGameWorld(@PathParam("name") String name, @PathParam("version") int version) throws NumberFormatException, JsonProcessingException {
+		
+		
+		//thelastgreatwar
+		GameWorld gameWorld = GameWorldHandler.getGameWorld(name);
+		
+		return gameWorld;
+		
+	}
+	
+	//TODO 2020-12-03 create a method getting the serialized GameWorld to be used by Java Client. Change the logic in spaceraze.com.client.startview.NewGamePanel to use this method instead of GameWorldHandler.
+	// Try to fix so this method is the same as the method over this, fix the logic around response format: XML, JSON or serialized java.
+	@GET
+	@Path("/{name}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public GameWorld getGameWorld(@PathParam("name") String name) {
 		
 		
 		//thelastgreatwar

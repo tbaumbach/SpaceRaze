@@ -19,16 +19,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 
+import spaceraze.world.EconomyReport;
+import spaceraze.world.Player;
+import spaceraze.world.Report;
+import spaceraze.world.StatisticGameType;
+import spaceraze.world.TurnInfo;
+import spaceraze.world.orders.Expense;
+import spaceraze.world.orders.Orders;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
-import sr.world.EconomyReport;
-import sr.world.Player;
-import sr.world.Report;
-import sr.world.StatisticGameType;
-import sr.world.TurnInfo;
-import sr.world.orders.Expense;
-import sr.world.orders.Orders;
 
 @Path("/games/game")
 public class GameServlet {

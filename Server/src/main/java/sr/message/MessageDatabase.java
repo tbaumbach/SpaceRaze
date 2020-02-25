@@ -1,13 +1,15 @@
 package sr.message;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import sr.general.logging.Logger;
-import sr.world.Galaxy;
-import sr.world.Message;
-import sr.world.UniqueIdCounter;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Message;
+import spaceraze.world.Player;
+import spaceraze.world.UniqueIdCounter;
 
 public class MessageDatabase implements Serializable{
 	static final long serialVersionUID = 1L;
@@ -36,7 +38,7 @@ public class MessageDatabase implements Serializable{
 	 */
 	public List<Message> addMessage(Message aMessage, Galaxy aGalaxy, int latestReadMessage){
 		aMessage.setTurn(aGalaxy.getTurn());
-		allMessages.addAll(0,aMessage.getPlayersUniqueMessages(this, aGalaxy));
+		allMessages.addAll(0, getPlayersUniqueMessages(aMessage, aGalaxy));
 		new MessageDataBaseSaver().saveMessageDataBase(aGalaxy.getGameName(), this);
 		return  getPlayerNewMessages(aMessage.getSender(), latestReadMessage);
 	}
@@ -125,6 +127,66 @@ public class MessageDatabase implements Serializable{
 			}
 		}
 		return ownMessages;
-	} 
+	}
+	
+	/**
+	   * Convert the incoming message (from client to server) to a list with an unique message per player. 
+	   * @param aGalaxy
+	   * @return
+	   */
+	  public List<Message> getPlayersUniqueMessages(Message message, Galaxy aGalaxy){
+		  List<Message> recipientMessages = new ArrayList<Message>();
+		  recipientMessages.add(getAsSentMessage(message, getUniqueMessageIDCounter().getUniqueId()));
+		  recipientMessages.addAll(getRecipientMessages(message, aGalaxy));
+		  
+		  return recipientMessages;
+	  }
+	  
+	  /**
+	   * Get sending plyers unique message
+	   * @return
+	   */
+	  private Message getAsSentMessage(Message message, int uniqueIdCounter){
+		  Message tempMessage = new Message(message, uniqueIdCounter);
+		  tempMessage.setOwner(message.getOwner());
+		  tempMessage.setRead(true);
+		  return tempMessage;
+	  }
+	  
+	  /**
+	   * Get all reciptient players unique messages
+	   * @param aGalaxy
+	   * @return
+	   */
+	  private List<Message> getRecipientMessages(Message mesage, Galaxy aGalaxy){
+		  List<Message> recipientMessages = new ArrayList<Message>();
+		  if(mesage.getType().equals("all")){
+			  List<Player> players = aGalaxy.getPlayers();
+			  for (Player player : players) {
+				  if(!player.isPlayer(mesage.getSender())){
+					  Logger.finer("Adding unique player mail to: " +player.getName() + " from:" + mesage.getSender());
+					  Message tempMessage = new Message(mesage, getUniqueMessageIDCounter().getUniqueId());
+					  tempMessage.setOwner(player.getName());
+					  recipientMessages.add(tempMessage);
+				  }
+			  }
+			  
+		  }else if(mesage.getType().equals("private")){
+			  Message tempMessage = new Message(mesage, getUniqueMessageIDCounter().getUniqueId());
+			  tempMessage.setOwner(mesage.getRecipientPlayer());
+			  recipientMessages.add(tempMessage);
+		  }else{ // meddelandet skall till alla i en Faction
+			  List<Player> players = aGalaxy.getFactionMember(aGalaxy.getFaction(mesage.getRecipientFaction()));
+			  for (Player player : players) {
+				  if(!player.isPlayer(mesage.getSender())){
+					  Logger.finer("Adding unique player mail to: " +player.getName() + " from:" + mesage.getSender());
+					  Message tempMessage = new Message(mesage, getUniqueMessageIDCounter().getUniqueId());
+					  tempMessage.setOwner(player.getName());
+					  recipientMessages.add(tempMessage);;
+				  }
+			  }
+		  }
+		  return recipientMessages;
+	  }
 
 }

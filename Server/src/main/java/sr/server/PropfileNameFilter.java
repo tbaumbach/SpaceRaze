@@ -6,7 +6,7 @@ package sr.server;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 
 /**
  * @author wmpabod

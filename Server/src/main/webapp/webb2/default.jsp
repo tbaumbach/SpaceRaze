@@ -364,7 +364,7 @@ Logged in user name: <%= theUser.getName() %><br>
 </font>
 -->
 
-<DIV id="divLocation" style="LEFT: 30px; POSITION: absolute; TOP: 200px" z-index="4"></DIV><LAYER id="layerLocation" z-index="4" height="97" width="205"></LAYER><SCRIPT language="Javascript">
+<DIV id="divLocation" style="LEFT: 30px; POSITION: absolute; TOP: 200px" z-index="4"></DIV><LAYER id="layerLocation" z-index="4" height="97" width="205"></LAYER><SCRIPT>
 //showHelpLayerImp('layerLocation','divLocation','helpLayer0','175')</SCRIPT>
 </form>
 </body>

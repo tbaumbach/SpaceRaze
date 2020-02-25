@@ -1,5 +1,5 @@
 <!-- Start start.jsp fragment -->
-<%@page import="sr.server.GameWorldHandler"%>
+<%@page import="spaceraze.servlethelper.handlers.GameWorldHandler"%>
 <%@page import="sr.server.map.MapHandler"%>
 <div style="left: 132px;width: 450px;position: absolute;top: 90px;">
 	

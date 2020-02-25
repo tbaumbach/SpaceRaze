@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import spaceraze.world.StatisticGameType;
 import sr.server.SR_Server;
-import sr.world.StatisticGameType;
 
 public class GameParameters {
 	
@@ -73,7 +73,7 @@ public class GameParameters {
 		this.gameWorldName = gameWorldName;
 	}
 
-	//TODO h‰r borde det nog l‰gga till lite ytterligare parametrar. t.ex. faction.
+	//TODO h√§r borde det nog l√§gga till lite ytterligare parametrar. t.ex. faction.
 	public GameParameters(SR_Server aServer) {
 		this.gameId = aServer.getId();
 		this.gameName = aServer.getGameName();

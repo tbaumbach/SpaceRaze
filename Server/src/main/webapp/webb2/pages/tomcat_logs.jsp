@@ -5,11 +5,11 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>Server administration page</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
 </head>
 <%@ include file="checklogin2.jsp" %>
@@ -18,6 +18,7 @@
 <h2>Tomcat logs page</h2>
 View Tomcat logs on the server.<p>
 <p>
-<%= LoggingHandler.getLogFilesString() %>
+Not in use
+<!--%= LoggingHandler.getLogFilesString() %-->
 </body>
 </html>

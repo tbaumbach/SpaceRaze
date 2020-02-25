@@ -1,7 +1,7 @@
 /*
  * Created on 2005-aug-26
  */
-package sr.world.comparator.spaceshiptype;
+package spaceraze.server.world.comparator.spaceshiptype;
 
 import java.util.Comparator;
 
@@ -23,15 +23,3 @@ public class SpaceshipTypeNameComparator implements Comparator<String> {
 	}
 
 }
-/*
-public class SpaceshipTypeNameComparator implements Comparator {
-    static final long serialVersionUID = 1L;
-
-	public int compare(Object arg0, Object arg1) {
-		SpaceshipType sst1 = (SpaceshipType)arg0;
-		SpaceshipType sst2 = (SpaceshipType)arg1;
-		return sst1.getName().compareTo(sst2.getName());
-	}
-
-}
-*/

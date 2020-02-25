@@ -3,8 +3,8 @@
  */
 package sr.webb.users;
 
-import sr.general.StringTokenizerPlusPlus;
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
+import spaceraze.util.general.StringTokenizerPlusPlus;
 import sr.webb.mail.Base64;
 
 /**

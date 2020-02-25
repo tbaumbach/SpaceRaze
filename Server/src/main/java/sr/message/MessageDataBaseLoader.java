@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.zip.GZIPInputStream;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 import sr.server.properties.PropertiesHandler;
 
 public class MessageDataBaseLoader{

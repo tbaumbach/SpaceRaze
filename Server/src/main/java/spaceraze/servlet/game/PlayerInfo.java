@@ -1,6 +1,6 @@
 package spaceraze.servlet.game;
 
-import sr.world.Player;
+import spaceraze.world.Player;
 
 public class PlayerInfo {
 	

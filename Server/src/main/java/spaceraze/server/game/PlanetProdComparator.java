@@ -1,12 +1,11 @@
 /*
  * Created on 2005-aug-26
  */
-package sr.world.comparator;
+package spaceraze.server.game;
 
 import java.util.Comparator;
 
-import sr.world.Planet;
-
+import spaceraze.world.Planet;
 
 public class PlanetProdComparator implements Comparator<Planet> {
     static final long serialVersionUID = 1L;

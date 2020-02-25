@@ -3,7 +3,7 @@
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="com.amarantin.imagepack.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 
 <script>
 	function validate(){

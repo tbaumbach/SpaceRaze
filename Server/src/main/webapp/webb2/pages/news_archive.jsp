@@ -1,3 +1,5 @@
+<%@page import="sr.server.ranking.RankingHandler"%>
+<%@page import="spaceraze.servlethelper.RankedPlayer"%>
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>
@@ -5,7 +7,6 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
-<%@ page import="sr.server.ranking.*"%>
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">

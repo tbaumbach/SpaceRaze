@@ -1,9 +1,9 @@
-package sr.world.comparator;
+package spaceraze.server.world.comparator;
 
 import java.util.Comparator;
 
-import sr.world.Building;
-import sr.world.BuildingType;
+import spaceraze.world.Building;
+import spaceraze.world.BuildingType;
 
 /**
  * Sorts building (wharves) in this order:

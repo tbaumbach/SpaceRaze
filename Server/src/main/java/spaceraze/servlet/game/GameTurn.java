@@ -3,10 +3,10 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.world.Building;
+import spaceraze.world.Planet;
+import spaceraze.world.Player;
 import sr.server.SR_Server;
-import sr.world.Building;
-import sr.world.Planet;
-import sr.world.Player;
 
 public class GameTurn {
 	

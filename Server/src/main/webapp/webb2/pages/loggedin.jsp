@@ -18,10 +18,6 @@
 		<td></td>
 		<td></td>
 		<td align=right>
-<%
-	// make sure the logout image exist
-	it.createImage("Logout");
-%>
 			<input type="image" src="images\btn_logout.jpg">
 		</td>
 	</Tr>

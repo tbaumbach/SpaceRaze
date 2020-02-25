@@ -20,15 +20,15 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import sr.server.GameWorldHandler;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
+import spaceraze.world.GameWorld;
+import spaceraze.world.Map;
+import spaceraze.world.Planet;
+import spaceraze.world.StatisticGameType;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
 import sr.webb.users.User;
-import sr.world.GameWorld;
-import sr.world.Map;
-import sr.world.Planet;
-import sr.world.StatisticGameType;
 
 @Path("/maps")
 public class MapServlet{

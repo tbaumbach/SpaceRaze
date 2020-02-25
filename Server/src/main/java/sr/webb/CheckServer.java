@@ -9,9 +9,9 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import sr.general.logging.Logger;
-import sr.world.Galaxy;
-import sr.world.Player;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Player;
 
 /**
  * @author WMPABOD

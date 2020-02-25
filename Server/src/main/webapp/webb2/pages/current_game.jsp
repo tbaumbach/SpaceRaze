@@ -5,6 +5,7 @@
 <%@ page import="sr.general.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="com.amarantin.imagepack.*"%>
+<%@ page import="spaceraze.util.general.*"%>
 
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">
@@ -83,7 +84,7 @@
 		sh.deleteGame(gameName);
 		message_todo = "<font color=\"#FFFF00\"><b>" + gameName + " deleted</b></font>";
 		%>
-		<script language="javascript">
+		<script>
 		location.href="redirect.jsp";
 		</script>
 		<%

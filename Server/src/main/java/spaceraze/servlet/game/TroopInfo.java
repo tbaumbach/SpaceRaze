@@ -3,8 +3,8 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import sr.enums.TypeOfTroop;
-import sr.world.Troop;
+import spaceraze.world.Troop;
+import spaceraze.world.enums.TypeOfTroop;
 
 public class TroopInfo {
 	

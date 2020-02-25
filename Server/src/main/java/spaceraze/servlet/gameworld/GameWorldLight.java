@@ -3,8 +3,8 @@ package spaceraze.servlet.gameworld;
 import java.util.ArrayList;
 import java.util.List;
 
-import sr.world.Faction;
-import sr.world.GameWorld;
+import spaceraze.world.Faction;
+import spaceraze.world.GameWorld;
 
 public class GameWorldLight {
 	

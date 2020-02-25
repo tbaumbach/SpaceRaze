@@ -13,19 +13,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import sr.general.Functions;
-import sr.general.logging.Logger;
+import spaceraze.util.general.Functions;
+import spaceraze.util.general.Logger;
+import spaceraze.world.CanBeLostInSpace;
+import spaceraze.world.Faction;
+import spaceraze.world.Highlight;
+import spaceraze.world.Player;
+import spaceraze.world.Report;
+import spaceraze.world.spacebattle.ReportLevel;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
 import sr.server.properties.PropertiesHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
-import sr.world.CanBeLostInSpace;
-import sr.world.Faction;
-import sr.world.Highlight;
-import sr.world.Player;
-import sr.world.Report;
-import sr.world.spacebattle.ReportLevel;
 
 /**
  * @author WMPABOD
@@ -67,7 +67,7 @@ public class MailHandler {
 	public static void sendNewGameMessage(SR_Server aNewServer){
 		// get users who want new game mails
 		List<User> users = UserHandler.getUsers(User.WANT_EMAIL_GAME);
-		// TODO (Paul) snygga till själva meddelandet
+		// TODO (Paul) snygga till sjÃ¤lva meddelandet
 		String title = aNewServer.getGameName() + " is open to join";
 		String content = "A new game has been started and is open to join.\n"; 
 		content = content + "Game name is: " + aNewServer.getGameName() + "\n";
@@ -126,7 +126,7 @@ public class MailHandler {
 			title = aServer.getGameName() + " updated";
 			content = aServer.getGameName() + " has been updated to turn " + aServer.getTurn() + "\n";
 		}
-		if (time > 0){ // TODO (Paul) nullPointer om drag 0, ur inte skapad än?
+		if (time > 0){ // TODO (Paul) nullPointer om drag 0, ur inte skapad ï¿½n?
 			UpdateRunner ur = aServer.getUpdateRunner();
 			if (ur != null){
 				content = content + "Next automatic update: " + ur.getNextUpdate() + "\n";
@@ -216,34 +216,50 @@ public class MailHandler {
 		}
 		return lisList;
 	}
-
+	
 	private static String getLostInSpace(Player aPlayer){
 		StringBuffer sb = new StringBuffer();
 		boolean lisExist = false;
 		Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
-		List<CanBeLostInSpace> allLostInSpace = lastReport.getLostInSpace();
+		List<CanBeLostInSpace> lostShips = lastReport.getLostShips();
+		List<CanBeLostInSpace> lostTrops = lastReport.getLostTroops();
 		// print players own losses
   		String playerFactionName = aPlayer.getFaction().getName();
-  		List<CanBeLostInSpace> tmpList = getLostInSpace(allLostInSpace,playerFactionName);
+  		List<CanBeLostInSpace> tmpList = getLostInSpace(lostShips,playerFactionName);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own ships lost"));
   			lisExist = true;
   		}
+  		tmpList = getLostInSpace(lostTrops,playerFactionName);
+  		if (tmpList.size() > 0){
+  			sb.append(drawFactionLis(tmpList,"Own troop lost"));
+  			lisExist = true;
+  		}
   		// print neutral ships destroyed
-  		tmpList = getLostInSpace(allLostInSpace,null);
+  		tmpList = getLostInSpace(lostShips,null);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral ships destroyed"));
+  			lisExist = true;
+  		}
+  		tmpList = getLostInSpace(lostTrops,null);
+  		if (tmpList.size() > 0){
+  			sb.append(drawFactionLis(tmpList,"Neutral troops destroyed"));
   			lisExist = true;
   		}
   		// print ships from other factions
   		List<Faction> allFactions = aPlayer.getGalaxy().getActiveFactions(aPlayer.getFaction());
   		for (Faction aFaction : allFactions) {
 
-  			tmpList = getLostInSpace(allLostInSpace,aFaction.getName());
+  			tmpList = getLostInSpace(lostShips,aFaction.getName());
   	  		if (tmpList.size() > 0){
   	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " ships destroyed"));
   	  			lisExist = true;
   	  		}
+  	  	tmpList = getLostInSpace(lostTrops,aFaction.getName());
+	  		if (tmpList.size() > 0){
+	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " troops destroyed"));
+	  			lisExist = true;
+	  		}
 		}
   		
   		// if no ships is lost in space, print "None"

@@ -1,20 +1,15 @@
 package spaceraze.servlet.game;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.hamcrest.core.IsInstanceOf;
-
-import sr.general.logging.Logger;
-import sr.world.Building;
-import sr.world.Galaxy;
-import sr.world.Planet;
-import sr.world.Player;
-import sr.world.Spaceship;
-import sr.world.Troop;
-import sr.world.VIP;
-import sr.world.mapinfo.FleetData;
+import spaceraze.world.Building;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Planet;
+import spaceraze.world.Player;
+import spaceraze.world.Spaceship;
+import spaceraze.world.Troop;
+import spaceraze.world.VIP;
 
 /*
  * Denna klass hanterar all information som en spelar ser om en planet under pågående drag.
@@ -56,8 +51,8 @@ public class PlanetInfo {
 	//TODO Det under denna rad är sådant som ännu inte är hanterat och bara inklippt från MapPlanetInfo. För att inte glömma något.
 	// info about last known info. 
 	// Försöker använda de riktiga värderna i stället och använder lastInfoTurn för att avgöra om det är historiska värden eller ej.
-	//private String lastKnownOwner; // null = neutral. P�verkar planetens f�rg. 
-	//private String lastKnownMaxShipSize; // visa bara en gr� storlek �ven om det fanns flera flottor vid planeten. Inkluderar info om civila skepp, t.ex. "small+civ"
+	//private String lastKnownOwner; // null = neutral. Påverkar planetens färg. 
+	//private String lastKnownMaxShipSize; // visa bara en grå storlek även om det fanns flera flottor vid planeten. Inkluderar info om civila skepp, t.ex. "small+civ"
 	//private List<String> lastKnownBuildingsInOrbit,lastKnownBuildingsOnSurface;
 	//private boolean lastKnownRazed;
 	
@@ -77,7 +72,7 @@ public class PlanetInfo {
 		//TODO klasserna PlanerInfos och sr.world.PlanetInfo ska ersättas av denna klass enligt samma model som MapPLanetInfo.
 		// Frågan är då om notes här kommer bli orginalet? Annars är all information här hämtad från andra källor.
 		// Kanske enkelt att bara skapa en länkad list i player med planet name som nyckel. Vänta med att göra det tills det går att spela på siten.
-		// Vill inte förstöra möjligheten att använda spel körde i appleten.
+		// Vill inte förstöra möjligheten att använda spel körde i swing klienten.
 		notes = player.getPlanetInfos().getNotes(planet.getName());
 		
 		Galaxy galaxy = player.getGalaxy();

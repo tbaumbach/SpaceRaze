@@ -1,6 +1,6 @@
+<%@page import="spaceraze.servlethelper.RankedPlayer"%>
 <%@page import="sr.webb.users.User"%>
 <%@page import="sr.server.ranking.RankingHandler"%>
-<%@page import="sr.server.ranking.RankedPlayer"%>
 <%@page import="sr.server.ServerHandler"%>
 <%@page import="sr.webb.users.UserHandler"%>
 <%@page import="java.util.LinkedList"%>

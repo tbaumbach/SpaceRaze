@@ -1,14 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>Close window</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
-<SCRIPT LANGUAGE="JScript">
+<script>
 function closenow(){
     window.close();
 }
-</SCRIPT>
+</script>
 </head>
 
 <body background="images/spaze.gif" onload="closenow();">

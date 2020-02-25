@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import sr.general.logging.Logger;
+import spaceraze.servlethelper.CreateNewGameData;
+import spaceraze.servlethelper.ReturnGames;
+import spaceraze.util.general.Logger;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
@@ -55,10 +57,10 @@ public class NotifierTunnel extends HttpServlet{
 
 		ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(request.getInputStream()));
 		Logger.finest("inputStream created");
-		NotifierTransferWrapper transferWrapper = null;
+		spaceraze.servlethelper.NotifierTransferWrapper transferWrapper = null;
 		try {
 			Logger.finest("Waiting to read...");
-			transferWrapper = (NotifierTransferWrapper)inputStream.readObject();
+			transferWrapper = (spaceraze.servlethelper.NotifierTransferWrapper)inputStream.readObject();
 			Logger.finest("transfer login: " + transferWrapper.getUserLogin());
 			Logger.finest("getallmaps: " + transferWrapper.isGetAllMaps());
 			if(transferWrapper != null){ 

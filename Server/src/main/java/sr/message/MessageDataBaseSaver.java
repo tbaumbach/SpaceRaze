@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.util.MissingResourceException;
 import java.util.zip.GZIPOutputStream;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 import sr.server.properties.PropertiesHandler;
 
 public class MessageDataBaseSaver{ 

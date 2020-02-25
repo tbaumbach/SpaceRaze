@@ -12,15 +12,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import sr.general.logging.Logger;
-import sr.mapeditor.MapEditorApplet;
-import sr.mapeditor.TransferWrapper;
+import spaceraze.servlethelper.map.MapImageCreator;
+import spaceraze.servlethelper.map.TransferWrapper;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Map;
 import sr.server.MapFileNameFilter;
 import sr.server.persistence.PHash;
 import sr.server.properties.PropertiesHandler;
 import sr.server.properties.PropertiesReader;
 import sr.webb.users.User;
-import sr.world.Map;
 
 /**
  * @author WMPABOD
@@ -29,7 +29,7 @@ import sr.world.Map;
  */
 public class MapHandler {
 	private static List<Map> allMaps;
-	private static String dataPath; // inlagd f�r att fixa skum bugg, borde egentligen inte beh�vas...
+	private static String dataPath; // inlagd för att fixa skum bugg, borde egentligen inte behövas...
 
 	/**
 	 * 
@@ -155,12 +155,12 @@ public class MapHandler {
 //			LoggingHandler.finer("in loop: " + aMap.getName());
 			String editStr = "";
 			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
-				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
+				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 //				editStr = editStr + "<a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getFileName() + "\">Delete</a>";
 				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";
 			}else{
-				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
+				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
 			}
 			retStr = retStr + "<tr class='ListTextRow' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',7,1);\" onMouseOut=\"TranparentRow('" + RowName + "',7,0);\"><td id='" + RowName + "1' class='ListText'></td><td id='" + RowName + "2' class='ListText'><div class='SolidText'><a href=\"Master.jsp?action=map_view&mapname=" + aMap.getFileName() + "\">" + aMap.getNameFull() + "</a></div></td><td id='" + RowName + "3' class='ListText'><div class='SolidText'>" + aMap.getFileName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + aMap.getNrPlanets() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aMap.getChangedDate() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aMap.getAuthorName() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'></div></td></tr>\n";
 		}
@@ -175,7 +175,7 @@ public class MapHandler {
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
 		for (Map aMap : tmpMaps) {
 //			LoggingHandler.finer("in loop: " + aMap.getName());
-			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
+			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
 		}
 		return retStr;
 	}
@@ -192,15 +192,15 @@ public class MapHandler {
 			String RowName = i + "MapDraftListRow";
 			String editStr = "";
 			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
-				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
+				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";
 			}else{
-				editStr = "<a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
+				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Copy & Edit</a>";
 			}
 			
 			retStr = retStr + "<tr class='ListTextRow' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',7,1);\" onMouseOut=\"TranparentRow('" + RowName + "',7,0);\"><td id='" + RowName + "1' class='ListText'><div class='SolidText'></div></td><td id='" + RowName + "2' class='ListText'><div class='SolidText'><a href=\"Master.jsp?action=map_view&mapname=" + aMap.getFileName() + "\">" + aMap.getNameFull() + "</a></div></td><td id='" + RowName + "3' class='ListText'><div class='SolidText'>" + aMap.getFileName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + aMap.getNrPlanets() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aMap.getChangedDate() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aMap.getAuthorName() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'></div></td></tr>\n";
-			//retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + MapEditorApplet.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
+			//retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + MapEditorPanel.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
 		}
 		return retStr;
 	}

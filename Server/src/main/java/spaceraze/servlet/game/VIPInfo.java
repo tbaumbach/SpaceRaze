@@ -1,7 +1,7 @@
 package spaceraze.servlet.game;
 
-import sr.world.Player;
-import sr.world.VIP;
+import spaceraze.world.Player;
+import spaceraze.world.VIP;
 
 public class VIPInfo {
 

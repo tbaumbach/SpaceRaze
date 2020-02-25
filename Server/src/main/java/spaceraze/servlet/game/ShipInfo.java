@@ -3,7 +3,7 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import sr.world.Spaceship;
+import spaceraze.world.Spaceship;
 
 public class ShipInfo {
 

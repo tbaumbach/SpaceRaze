@@ -20,11 +20,11 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import spaceraze.servlet.game.GameParameters;
+import spaceraze.world.Player;
+import spaceraze.world.StatisticGameType;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.webb.users.User;
-import sr.world.Player;
-import sr.world.StatisticGameType;
 
 @Path("/games")
 public class GamesServlet{

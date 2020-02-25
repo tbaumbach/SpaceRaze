@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.zip.GZIPInputStream;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
 import sr.server.properties.PropertiesHandler;
-import sr.world.Galaxy;
 
 public class GalaxyLoader{
     Galaxy g;

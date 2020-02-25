@@ -3,18 +3,18 @@ package sr.server;
 import java.util.Collections;
 import java.util.List;
 
-import sr.general.Functions;
-import sr.general.logging.Logger;
+import spaceraze.util.general.Functions;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
+import spaceraze.world.GameWorld;
+import spaceraze.world.Map;
+import spaceraze.world.Planet;
+import spaceraze.world.Spaceship;
+import spaceraze.world.SpaceshipType;
+import spaceraze.world.StatisticGameType;
+import spaceraze.world.Troop;
+import spaceraze.world.TroopType;
 import sr.server.map.MapHandler;
-import sr.world.Galaxy;
-import sr.world.GameWorld;
-import sr.world.Map;
-import sr.world.Planet;
-import sr.world.Spaceship;
-import sr.world.SpaceshipType;
-import sr.world.StatisticGameType;
-import sr.world.Troop;
-import sr.world.TroopType;
 
 public class GalaxyCreator{
 	
@@ -65,7 +65,7 @@ public class GalaxyCreator{
             tempp.setRes(Functions.getRandomInt(1,4));
           }
           int temp = Functions.getRandomInt(1,100);
-          if (temp <= g.getGameWorld().getClosedNeutralPlanetChance()){  // ändrar så att öppna blir stängda
+          if (temp <= g.getGameWorld().getClosedNeutralPlanetChance()){  // ï¿½ndrar sï¿½ att ï¿½ppna blir stï¿½ngda
             tempp.reverseVisibility();
           }
           SpaceshipType sst1 = g.getGameWorld().getNeutralSize1();

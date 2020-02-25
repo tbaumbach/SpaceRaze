@@ -62,27 +62,28 @@ String action2 = "";
 	String userMessage = "";
 	String userName2 = "";
 	String userLogin = "";
-	String userPassword = "";
-	String userPassword2 = "";
+	//String userPassword = "";
+	//String userPassword2 = "";
 	String userRole = User.ROLE_PLAYER;
 	String email = "";
 	String turnEmail = "checked";
 	String gameEmail = "checked";
 	String adminEmail = "checked";
-	String rulesOk = "false";
+	boolean rulesOk = false;
 
 	if ((todoStr != null) && (todoStr.equals("new_player"))){
 		userName2 = request.getParameter("name");
 		userLogin = request.getParameter("new_login");
-		userPassword = request.getParameter("new_password");
-		userPassword2 = request.getParameter("new_password2");
+		//userPassword = request.getParameter("new_password");
+		//userPassword2 = request.getParameter("new_password2");
 		userRole = User.ROLE_PLAYER;
 		email = request.getParameter("email");
 		turnEmail = request.getParameter("turn_email");
 		gameEmail = request.getParameter("newgame_email");
 		adminEmail = request.getParameter("admin_email");
-		rulesOk = request.getParameter("rules");
-		userMessage = UserHandler.addUser(userName2,userLogin,userPassword,userPassword2,userRole,email,turnEmail,gameEmail,adminEmail,rulesOk);
+		rulesOk = request.getParameter("rules") == "checked" ? true : false;
+		userMessage = UserHandler.addUser(userName2, userLogin, userRole, email, turnEmail, gameEmail, adminEmail, rulesOk);
+		//TODO UserHandler.addUser(userName2,userLogin,userPassword,userPassword2,userRole,email,turnEmail,gameEmail,adminEmail,rulesOk); Removed the password, need to secure the logic first around password.
 	}
 %>
 <!--table width='710' border='0' cellpadding='0' cellspacing='0'>
@@ -151,6 +152,7 @@ String action2 = "";
 <td><span class="paulTxtGreen">Login*:&nbsp;&nbsp;<i>(cannot be changed)</i></span></td>
 <td><nobr><input class="InputText" type="text" name="new_login" value="<%= userLogin %>"></nobr></td>
 </tr>
+<%-- 
 <tr>
 <td><span class="paulTxtGreen">Password*:</span></td>
 <td><input class="InputText" type="password" name="new_password" value="<%= userPassword %>"></td>
@@ -159,6 +161,7 @@ String action2 = "";
 <td><span class="paulTxtGreen">Repeat password*:</span></td>
 <td><input class="InputText" type="password" name="new_password2" value="<%= userPassword %>"></td>
 </tr>
+--%>
 <tr>
 <td><span class="paulTxtGreen">E-mail:</span></td>
 <td><input class="InputText" type="text" name="email" value="<%= email %>"></td>

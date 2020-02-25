@@ -14,7 +14,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import sr.general.logging.Logger;
+import spaceraze.servlethelper.RankedPlayer;
+import spaceraze.util.general.Logger;
+import spaceraze.util.general.StringTokenizerPlusPlus;
 import sr.server.properties.PropertiesHandler;
 
 /**
@@ -86,11 +88,38 @@ public class RankingHandler {
 	}
 	
 	private static RankedPlayer addNewPlayer(String playerLogin){
-		RankedPlayer newPlayer = new RankedPlayer(playerLogin);
+		RankedPlayer newPlayer = createRankedPlayer(playerLogin);
 		allRankedPlayers.add(newPlayer);
 //		saveUsers();
 		return newPlayer;
 	}
+	
+	private static RankedPlayer createRankedPlayer(String playerString){
+		StringTokenizerPlusPlus stpp = new StringTokenizerPlusPlus(playerString,"\t");
+		// always read the first token
+		String playerLogin = stpp.nextToken();
+		if (stpp.countTokens() <= 1){
+			return new RankedPlayer(playerLogin);
+		}
+		// recreate a player from data from a file
+		int nrDefeatedPlayers = readInt(stpp);
+		int soloWin = readInt(stpp);
+		int factionWin = readInt(stpp);
+		int loss = readInt(stpp);
+		
+		if (!stpp.hasMoreTokens()){
+			return new RankedPlayer(playerLogin, nrDefeatedPlayers, soloWin, factionWin, loss);
+		}
+			
+		int survival = readInt(stpp);
+		return new RankedPlayer(playerLogin, nrDefeatedPlayers, soloWin, factionWin, loss, survival);
+			
+	}
+	
+	private static int readInt(StringTokenizerPlusPlus stpp){
+		return Integer.parseInt(stpp.nextToken());
+	}
+	
 	
 	private static RankedPlayer findPlayer(String playerLogin){
 		RankedPlayer foundPlayer = null;

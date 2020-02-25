@@ -19,14 +19,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import sr.general.Functions;
-import sr.general.logging.Logger;
+import spaceraze.servlethelper.game.TransferWrapper;
+import spaceraze.util.general.Functions;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Faction;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Message;
+import spaceraze.world.Player;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.world.Faction;
-import sr.world.Galaxy;
-import sr.world.Message;
-import sr.world.Player;
 
 /**
  * @author WMPABOD
@@ -72,13 +73,13 @@ public class SpaceRazeTunnel extends HttpServlet{
 		TransferWrapper tw = null;
 		//try {
 			Logger.finest("Waiting to read...");
-			// Alt 1: hämta hela objektet med en gång
+			// Alt 1: hÃ¤mta hela objektet med en gÃ¥ng
 //			tw = (TransferWrapper)inputStream.readObject();
 			
-			// Alt 2: hämta data från en byte array
+			// Alt 2: hÃ¤mta data frÃ¥n en byte array
 	        byte[] buf = new byte[15*1000*1024]; 
 			
-			// sedan läs från inströmmen till arrayen 
+			// sedan lÃ¤s frÃ¥n instrÃ¶mmen till arrayen 
 	        int readSoFar = 0;
 	        final int BLOCK_SIZE = 100 * 1024; 
 	        try {
@@ -102,7 +103,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 	        buf = buf2;
         	Logger.finest("trimmed to: " + readSoFar);
 
-			// hämta ut objekten från arrayen
+			// hï¿½mta ut objekten frï¿½n arrayen
 			try {
 		        // Deserialize from a byte array
 				ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buf));
@@ -141,7 +142,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 			        }
 
 					Logger.finest("autobalance: " + aServer.getAutoBalance());
-					if (tw.isAndroid()){ // om klient är droid, ändra så att returnobjekt är factionnames
+					if (tw.isAndroid()){ // om klient ï¿½r droid, ï¿½ndra sï¿½ att returnobjekt ï¿½r factionnames
 						List<String> factionNames = new LinkedList<String>();
 						for (Faction aFaction : aServer.getOpenSelectableFactions()) {
 							factionNames.add(aFaction.getName());
@@ -189,9 +190,10 @@ public class SpaceRazeTunnel extends HttpServlet{
 					Logger.fine(message);
 					//tw.setReturnObject(getPlayer(message,tw.getPort()));
 					tmpPlayer = getPlayer2(message,tw.getPort(),sh);
+					/* Old Android client is not longer supported
 					if (tw.isAndroid()){ // is client is android, remove some unnessesary stuff from the player and galaxy objects
 						tmpPlayer = prunePlayer(tmpPlayer);
-					}
+					}*/
 					tw.setReturnObject(tmpPlayer);
 				}else{
 					// client saving a turn/player
@@ -213,9 +215,9 @@ public class SpaceRazeTunnel extends HttpServlet{
 		Logger.fine("Writing output");
 //		oos.writeObject(tw);
 		
-		// Alt 2: skicka data bit för bit
-		// först skapa en array med all data
-		Logger.fine("Alt 2: skicka data byte för byte");
+		// Alt 2: skicka data bit fï¿½r bit
+		// fï¿½rst skapa en array med all data
+		Logger.fine("Alt 2: skicka data byte fï¿½r byte");
         byte[] buffer = null;
         try {
             // Serialize to a byte array
@@ -231,7 +233,7 @@ public class SpaceRazeTunnel extends HttpServlet{
         	e.printStackTrace();
         }
 		
-		// sedan skriv från arrayen till utströmmen
+		// sedan skriv frÃ¥n arrayen till utstrÃ¶mmen
         int writtenSoFar = 0;
         int arrSize = buffer.length;
         final int BLOCK_SIZE_2 = 10 * 1024; 
@@ -259,69 +261,8 @@ public class SpaceRazeTunnel extends HttpServlet{
 		Logger.fine("Output flushed");
 		oos.close();
 		Logger.fine("Output closed");
-		// maybe set back GW if android
-//		if (tw.isAndroid()){ // is client is android, gw should not be included in the galaxy object (there is only one droid GW and that will be set on the client)
-//			tmpPlayer.getGalaxy().setGameWorld(oldGW);
-//			Logger.info("Android: GW restored");
-//			int index = 0;
-//			for (Faction aFaction : tmpPlayer.getGalaxy().getFactions()) {
-//				aFaction.setPlanetColor(factionColors.get(index));
-//				index++;
-//			}
-//		}
 	}
 	
-	/**
-	 * Lots of stuff do not need to be sent to the Android client:
-	 * -Factions
-	 * -GW
-	 * -enemy and neutral ships, VIPs and buildings
-	 * -old turn infos and map infos
-	 * -only current turn for the current player
-	 * 
-	 * This method will deepclone the player object and remove all that is not needed.
-	 * 
-	 * @param player the player to be sent to the android client
-	 * @return a deepcloned and pruned player object
-	 */
-	private Player prunePlayer(Player player){
-		Logger.info("Android: pruning Player");
-		// clone player
-		Player tmpPlayer = Functions.deepClone(player);
-		// prune galaxy
-		// ------------
-		Galaxy g = tmpPlayer.getGalaxy();
-		// remove gameworld
-		g.setGameWorld(null);
-		// remove factions
-		g.removeFactions();
-		// remove all ships,buildings,VIPs not belonging to the player
-		// remove alot from other players
-		g.pruneDroid(tmpPlayer);
-		// prune player
-		// ------------
-		// remove faction, but save faction name first
-		tmpPlayer.setFactionName(tmpPlayer.getFaction().getName());
-		tmpPlayer.setFaction(null);
-		// remove old turns in TurnInfo
-		if (tmpPlayer.getTurnInfo() != null){
-			tmpPlayer.getTurnInfo().pruneDroid();
-		}
-		// prune PlanetInfos
-		if (tmpPlayer.getPlanetInfos() != null){
-			tmpPlayer.getPlanetInfos().pruneDroid();
-		}
-		// remove Research
-		tmpPlayer.setResearch(null);
-		// remove old turns in MapInfos
-		if ((tmpPlayer.getMapInfos() != null) & (g.getTurn() > 0)){
-			tmpPlayer.getMapInfos().pruneDroid();
-		}
-		// finished, return pruned clone
-		Logger.info("Android: pruning finished");
-		return tmpPlayer;
-	}
-
 	private Player getPlayer2(String message,int port,ServerHandler sh){
 		Logger.fine(message);
 		Player tmpPlayer = null;
@@ -362,7 +303,7 @@ public class SpaceRazeTunnel extends HttpServlet{
     			Logger.finest("Player Name: " + tw.getPlayerName());
     			Player tempPlayer = aServer.getGalaxy().getPlayer(tw.getPlayerName());
     			tempPlayer.setOrders(tw.getOrders());
-//    			tempPlayer.setPlanetInfos(tw.getPi()); // TODO Paul 100701: denna bör tas bort då alla orders ligger i Orders-objektet
+//    			tempPlayer.setPlanetInfos(tw.getPi()); // TODO Paul 100701: denna bÃ¶r tas bort dÃ¥ alla orders ligger i Orders-objektet
     			tempPlayer.setPlanetOrderStatuses(tw.getPlanetOrderStatuses());
     			tempPlayer.setNotes(tw.getNotes());
     			tempPlayer.setFinishedThisTurn(tw.isFinishedThisTurn());
@@ -406,7 +347,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 		return aServer.getMessageDatabase().getPlayerSentMessages(tw.getPlayerName());
 	}
 	
-	private List<Message> addMessage(TransferWrapper tw,ServerHandler sh){
+	private List<Message> addMessage(TransferWrapper tw, ServerHandler sh){
 		int gameid = tw.getPort();
 		SR_Server aServer = sh.findGame(gameid);
 		return aServer.getMessageDatabase().addMessage(tw.getMailMessage(), aServer.getGalaxy(), tw.getLatestReadMessage());

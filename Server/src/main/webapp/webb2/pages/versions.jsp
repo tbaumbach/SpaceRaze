@@ -28,13 +28,13 @@
 
 
 %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">
 <head>
 <title>SpaceRaze Change Log</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 
 </head>
 <body background="images/spaze.gif">

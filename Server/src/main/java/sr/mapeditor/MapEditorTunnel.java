@@ -16,12 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import sr.general.logging.Logger;
+import spaceraze.servlethelper.map.TransferWrapper;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Map;
 import sr.server.map.MapHandler;
 import sr.server.properties.PropertiesHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
-import sr.world.Map;
 
 /**
  * @author WMPABOD
@@ -30,9 +31,6 @@ import sr.world.Map;
  */
 @SuppressWarnings("serial")
 public class MapEditorTunnel extends HttpServlet{
-	public static final String MAP_SAVED = "Map saved successfully";
-	public static final String MAP_SAVED_ERROR = "Map not saved due to server error";
-	public static final String COMFIRM_NEEDED = "File exists, confirm needed";
 
 	public void init(ServletConfig c) throws ServletException {
 		super.init (c);
@@ -47,19 +45,19 @@ public class MapEditorTunnel extends HttpServlet{
 		
 		ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(request.getInputStream()));
 		Logger.fine("inputStream created");
-		sr.mapeditor.TransferWrapper tw = null;
+		spaceraze.servlethelper.map.TransferWrapper tw = null;
 		try {
 			Logger.fine("Waiting to read...");
-			tw = (sr.mapeditor.TransferWrapper)inputStream.readObject();
+			tw = (spaceraze.servlethelper.map.TransferWrapper)inputStream.readObject();
 			Logger.fine("tw read: " + tw.getAction() + " " + tw.getPlayerLogin());
 			if(tw != null){ 
 				String action = tw.getAction();
-				if(action.equals(MapEditorApplet.LOAD_DRAFT)){
-					tw.setMessage("MapEditorApplet.LOAD_DRAFT");
+				if(action.equals(TransferWrapper.LOAD_DRAFT)){
+					tw.setMessage(TransferWrapper.LOAD_DRAFT);
 					tw.setMap(MapHandler.getMap(tw.getMapFileName(),tw.getPlayerLogin()));
 				}else
-				if(action.equals(MapEditorApplet.LOAD_PUB)){
-					tw.setMessage("MapEditorApplet.LOAD_PUB");
+				if(action.equals(TransferWrapper.LOAD_PUB)){
+					tw.setMessage(TransferWrapper.LOAD_PUB);
 					Map aMap = MapHandler.getMap(tw.getMapFileName(),null).getCopyFromFile();
 					// always set author, since the map can be a "copy" of another players published map
 					User curUser = UserHandler.findUser(tw.getPlayerLogin());
@@ -68,7 +66,7 @@ public class MapEditorTunnel extends HttpServlet{
 					// set map
 					tw.setMap(aMap);
 				}else
-				if(action.equals(MapEditorApplet.SAVE_DRAFT)){
+				if(action.equals(TransferWrapper.SAVE_DRAFT)){
 					// if needed, create player map folder
 					String basePath = PropertiesHandler.getProperty("datapath");
 					String folderPath = basePath + "maps\\" + tw.getPlayerLogin();
@@ -94,11 +92,11 @@ public class MapEditorTunnel extends HttpServlet{
 						// save the map
 						success = MapHandler.saveMapToFile(theMap,path);
 					}else{
-						success = COMFIRM_NEEDED;
+						success = TransferWrapper.COMFIRM_NEEDED;
 					}
 					tw.setMessage(success);
 				}else
-				if(action.equals(MapEditorApplet.SAVE_PUB)){
+				if(action.equals(TransferWrapper.SAVE_PUB)){
 					// set user name
 					Map theMap = tw.getMap();
 					User curUser = UserHandler.findUser(theMap.getAuthorLogin());
@@ -127,7 +125,7 @@ public class MapEditorTunnel extends HttpServlet{
 							// save the map
 							success = MapHandler.saveMapToFile(theMap,path);
 						}else{
-							success = COMFIRM_NEEDED;
+							success = TransferWrapper.COMFIRM_NEEDED;
 						}
 					}else{
 						success = "Cannot publish map with this filename, another player\nalready has a published map with the name " + tw.getMapFileName();

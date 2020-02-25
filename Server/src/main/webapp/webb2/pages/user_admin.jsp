@@ -2,11 +2,11 @@
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>User administration page</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
 </head>
 <%@ include file="checklogin2.jsp" %>
@@ -16,13 +16,13 @@
 	if ((todoStr != null) && (todoStr.equals("Add new user"))){
 		String userName = request.getParameter("name");
 		String userLogin = request.getParameter("login");
-		String userPassword = request.getParameter("password");
+		//String userPassword = request.getParameter("password");
 		String userRole = request.getParameter("role");
 		String email = request.getParameter("email");
 		String turnEmail = request.getParameter("turn_email");
 		String gameEmail = request.getParameter("newgame_email");
 		String adminEmail = request.getParameter("admin_email");
-		UserHandler.addUser(userName,userLogin,userPassword,userRole,email,turnEmail,gameEmail,adminEmail);
+		UserHandler.addUser(userName, userLogin, userRole, email ,turnEmail, gameEmail, adminEmail, true);
 	}else
 	if ((todoStr != null) && (todoStr.equals("Delete player"))){
 		String userName = request.getParameter("delete_name");

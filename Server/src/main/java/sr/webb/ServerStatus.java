@@ -3,11 +3,11 @@
  */
 package sr.webb;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Player;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
-import sr.world.Galaxy;
-import sr.world.Player;
 
 /**
  * @author WMPABOD

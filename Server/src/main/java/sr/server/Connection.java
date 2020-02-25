@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import sr.world.Player;
+import spaceraze.world.Player;
 
 public class Connection implements Runnable{
     protected Socket client;

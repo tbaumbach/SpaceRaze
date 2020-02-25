@@ -49,7 +49,7 @@ public class LineCounter{
     	topList.put(newKey, newLines);
     }
     
-    // förutsätter att map har 10 poster
+    // fÃ¶rutsÃ¤tter att map har 10 poster
     private String getLowestKey(){
     	int lowestValue = Integer.MAX_VALUE;
     	String lowestkey = null;
@@ -116,7 +116,7 @@ public class LineCounter{
     }
     
     private void printTop(){
-    	System.out.println(nrInList + " största filerna");
+    	System.out.println(nrInList + " stÃ¶rsta filerna");
     	System.out.println("---------------------");
     	// create sorted list
     	List<String> printList = new LinkedList<String>();

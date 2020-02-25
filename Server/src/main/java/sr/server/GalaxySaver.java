@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Galaxy;
 import sr.server.properties.PropertiesHandler;
-import sr.world.Galaxy;
 
 public class GalaxySaver{ 
 
     public void saveGalaxy(String filename, String path, Galaxy g){
     	Logger.info("saveGalaxy called: " + filename + " " + path);		
     	String dataPath = PropertiesHandler.getProperty("datapath");
-        String fn = dataPath + path + "/" + filename + ".srg";
+        String fn = dataPath + path + "\\" + filename + ".srg";
     	Logger.finer("Complete save file path: " + fn);
         try{
             FileOutputStream fos = new FileOutputStream(fn);

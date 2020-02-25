@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 import sr.webb.mail.MailHandler;
 
 /**

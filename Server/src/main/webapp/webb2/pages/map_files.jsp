@@ -5,11 +5,11 @@
 <%@ page import="sr.server.properties.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>View Map files</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">
 
@@ -88,9 +88,6 @@ table.sr td {
 		<div class="Form_header" ALIGN="RIGHT" style="width:718">
 			<div class="SolidText">
 				<%if (!theUserNO.isGuest()){%>
-				<!-- 
-				<a href="MapEditor.jsp?action=<%= MapEditorApplet.NEW_MAP %>" target="_top"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_createnewmap.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_createnewmap.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_createnewmap.jpg" vspace=0 border=0></a>
-				-->
 				<%	}%>	
 				<A href="Master.jsp?action=map_files"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_refreshlist.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_refreshlist.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_refreshlist.jpg" vspace=0 border=0></A>
 			</div>
@@ -105,10 +102,6 @@ table.sr td {
 		<br>
 * You can only delete maps you have created yourself. You can edit maps that other players have created but you must save them under a new name.
 <p>
-<h3>Create new map</h3>
-Click on the link below to open the Map Editor where you can create your own maps.<br>
-<a href="MapEditor.jsp?action=<%= MapEditorApplet.NEW_MAP %>" target="_top">Create new map</a>
-<BR>
 			The list below show all your saved drafts of maps.
 		</div></div>
 		
@@ -132,9 +125,7 @@ Click on the link below to open the Map Editor where you can create your own map
 		</table>
 		</div>
 			<div class="Form_header" ALIGN="RIGHT" style="width:718">
-			<div class="SolidText"><!-- 
-				<a href="MapEditor.jsp?action=<%= MapEditorApplet.NEW_MAP %>" target="_top"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_createnewmap.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_createnewmap.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_createnewmap.jpg" vspace=0 border=0></a>
-				-->
+			<div class="SolidText">
 			</div>
 		</div>
 		<div class="List_End"></div>	

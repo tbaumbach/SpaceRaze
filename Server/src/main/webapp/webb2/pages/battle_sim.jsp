@@ -1,15 +1,18 @@
+<%@page import="spaceraze.battlehandler.spacebattle.simulation.BattleSim"%>
+<%@page import="spaceraze.servlethelper.handlers.GameWorldHandler"%>
+<%@page import="spaceraze.webb.support.world.GameWorldHelper"%>
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
-<%@ page import="sr.world.*"%>
+<%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
 <%@ page import="sr.server.properties.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>SpaceRaze Battle Simulator</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
 </head>
 <%@ include file="checklogin2.jsp" %>
@@ -206,7 +209,7 @@ Message from BattleSim:<br>
 				<td rowspan=3 valign=top>
 					<SELECT id="cboShip" name="cboShip" tabIndex=1 style="width=150px">
 						<OPTION selected value="">Select Ship</OPTION>
-							<%= gameWorld.getSpaceshipTypeOptionsHTML() %>
+							<%= new GameWorldHelper(gameWorld).getSpaceshipTypeOptionsHTML() %>
 					</SELECT>
 				</td>
 				<td width="5"><img src="px.gix" width="5" height="1"></td>

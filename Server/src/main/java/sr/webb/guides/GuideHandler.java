@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 import sr.server.properties.PropertiesHandler;
 
 /**
@@ -159,9 +159,6 @@ public class GuideHandler {
     	Guide na = findGuide(id);
     	na.addRead();
     	saveguides();
-    	//.replace('£','?');
-  //  	.replace('£','?');
-    //	articleHTML.replace(char(13),"<br>");
     	
     	articleHTML = "<div class=TextArea450>" + na.getTitle() + "</h3>\n";
     	articleHTML = articleHTML + na.getContent() + "<br><br>\n";

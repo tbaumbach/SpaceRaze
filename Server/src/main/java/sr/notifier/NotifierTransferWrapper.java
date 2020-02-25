@@ -3,8 +3,11 @@ package sr.notifier;
 import java.io.Serializable;
 import java.util.List;
 
-import sr.server.ranking.RankedPlayer;
-import sr.world.Map;
+import spaceraze.servlethelper.CreateNewGameData;
+import spaceraze.servlethelper.GameListData;
+import spaceraze.servlethelper.RankedPlayer;
+import spaceraze.servlethelper.ReturnGames;
+import spaceraze.world.Map;
 
 public class NotifierTransferWrapper implements Serializable {
 	static final long serialVersionUID = 1L;
@@ -14,7 +17,7 @@ public class NotifierTransferWrapper implements Serializable {
 	private int changeTurn; // if set, the game should be advanced/rollbacked this number of turns. 0 = no change.
 	private String gameName; // only used if changeTurn != null
 	private boolean deleteGame;
-	private boolean getAllMaps; // h‰mta kartor och gameworlds
+	private boolean getAllMaps; // h√§mta kartor och gameworlds
 	private CreateNewGameData createNewGameData;
 	private boolean android; // true if caller is the android client
 	private int androidVersion; // used if caller is android client. If version is too low returnCode should contain specific error message
@@ -23,7 +26,7 @@ public class NotifierTransferWrapper implements Serializable {
 	private GameListData gameListData;
 	private List<Map> allMaps;
 	private RankedPlayer rankingData;
-	private int gameId; // anv‰nds av Android fˆr att veta id pÂ ett nyskapat spel
+	private int gameId; // anv√§nds av Android f√∂r att veta id p√• ett nyskapat spel
 
 	public GameListData getGameListData() {
 		return gameListData;

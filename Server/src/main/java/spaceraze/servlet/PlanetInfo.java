@@ -12,11 +12,11 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import spaceraze.world.GameWorld;
+import spaceraze.world.Planet;
+import spaceraze.world.gameworlds.TheLastGreatWar;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.server.gameworlds.TheLastGreatWar;
-import sr.world.GameWorld;
-import sr.world.Planet;
 
 @Path("/PlanetInfo")
 public class PlanetInfo{
@@ -35,7 +35,7 @@ public class PlanetInfo{
 		ObjectMapper mapper = new ObjectMapper();
 		//mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		
-		// START testar att skapa en gameWorld JSON för klienten.
+		// START testar att skapa en gameWorld JSON fï¿½r klienten.
 		System.out.println("######### Startar testningen ########");
 		
 		GameWorld gameWorld = TheLastGreatWar.getGameWorld();
@@ -48,7 +48,7 @@ public class PlanetInfo{
 		//sh.startNewGame(gameWorldFileName, gameName, mapName, stepsString, autoBalanceString, timeString, emailPlayers, maxNrPlayers, userLogin, gamePassword, groupFaction, selectableFactionNames, randomFactionString, diplomacy, singlePlayer, ranked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType)
 		
 		System.out.println("######### Slutar testningen ########");
-		// SLUT testar att skapa en gameWorld JSON för klienten.
+		// SLUT testar att skapa en gameWorld JSON fï¿½r klienten.
 		
 		System.out.println("TEST");
 		

@@ -1,16 +1,16 @@
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.mapeditor.*"%>
 <%@ page import="sr.server.*"%>
-<%@ page import="sr.world.*"%>
+<%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.server.map.*"%>
 <%@ page import="sr.server.properties.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <title>Delete Map</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
 
 <style type="text/css">

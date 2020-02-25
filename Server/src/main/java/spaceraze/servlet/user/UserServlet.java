@@ -29,7 +29,7 @@ public class UserServlet{
 		
 		System.out.println("Call aginst user/create: " + parameters.toString());
 		
-		//TODO Här får bara players skapas om det kommer in en role=admin så måste en koll göras för att se om en admin är inloggad = bara admin får skapa admins.
+		//TODO HÃ¤r fÃ¥r bara players skapas, om det kommer in en role=admin sÃ¥ mÃ¥ste en koll gÃ¶ras fÃ¶r att se om en admin Ã¤r inloggad = bara admin fÃ¥r skapa admins.
 		String message = UserHandler.addUser(parameters.getName(), parameters.getLogin(), parameters.getRole(), parameters.getEmail(), 
 				parameters.getTurnEmail(), parameters.getGameEmail(), parameters.getAdminEmail(), parameters.isRulesOk());
 				
@@ -48,7 +48,7 @@ public class UserServlet{
 	
 	}
 	
-	//TODO  detta ska ändras så att inte session används.
+	//TODO  detta ska Ã¤ndras sÃ¥ att inte session anvÃ¤nds.
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -69,7 +69,7 @@ public class UserServlet{
 		
 	}
 	
-	//TODO  detta ska ändras så att inte session används. Här måste sedan användan skicka in, nu finns den i session så det är onödigt.
+	//TODO  detta ska Ã¤ndras sÃ¥ att inte session anvÃ¤nds. HÃ¤r mÃ¥ste sedan anvÃ¤ndan skicka in, nu finns den i session sÃ¥ det Ã¤r onÃ¶digt.
 	@GET
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -86,7 +86,7 @@ public class UserServlet{
 		
 	}
 	
-	//TODO  detta ska ändras så att inte session används.
+	//TODO  detta ska Ã¤ndras sÃ¥ att inte session anvÃ¤nds.
 	@POST
 	@Path("/activate")
 	@Produces(MediaType.APPLICATION_JSON)

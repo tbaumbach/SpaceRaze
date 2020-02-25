@@ -1,8 +1,8 @@
-package sr.world.comparator;
+package spaceraze.server.world.comparator;
 
 import java.util.Comparator;
 
-import sr.world.BuildingType;
+import spaceraze.world.BuildingType;
 
 /**
  * Sorts building on name alfabetically

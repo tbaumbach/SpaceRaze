@@ -1,11 +1,11 @@
 /*
  * Created on 2005-aug-26
  */
-package sr.world.comparator.spaceshiptype;
+package spaceraze.server.world.comparator.spaceshiptype;
 
 import java.util.Comparator;
 
-import sr.world.SpaceshipType;
+import spaceraze.world.SpaceshipType;
 
 /**
  * @author WMPABOD

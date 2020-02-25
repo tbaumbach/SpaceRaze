@@ -1,7 +1,7 @@
 //Title:        SpaceRaze
 //Author:       Paul Bodin
 //Description:  Javabaserad version av Spaceraze.
-//Bygger på Spaceraze Galaxy fast skall fungera mera som Wigges webbaserade variant.
+//Bygger pï¿½ Spaceraze Galaxy fast skall fungera mera som Wigges webbaserade variant.
 //Detta Javaprojekt omfattar serversidan av spelet.
 
 package sr.server;
@@ -15,37 +15,42 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import sr.enums.DiplomacyGameType;
-import sr.enums.DiplomacyLevel;
-import sr.enums.HighlightType;
-import sr.enums.InitiativeMethod;
-import sr.general.Functions;
-import sr.general.logging.Logger;
+import spaceraze.battlehandler.landbattle.LandBattle;
+import spaceraze.battlehandler.landbattle.TaskForceTroop;
+import spaceraze.battlehandler.spacebattle.SpaceBattlePerformer;
+import spaceraze.server.game.StartGameHandler;
+import spaceraze.server.game.update.CheckAbandonedSquadrons;
+import spaceraze.util.general.Functions;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Building;
+import spaceraze.world.EconomyReport;
+import spaceraze.world.Faction;
+import spaceraze.world.Galaxy;
+import spaceraze.world.Message;
+import spaceraze.world.Planet;
+import spaceraze.world.PlanetInfos;
+import spaceraze.world.Player;
+import spaceraze.world.Spaceship;
+import spaceraze.world.SpaceshipType;
+import spaceraze.world.Troop;
+import spaceraze.world.TroopType;
+import spaceraze.world.VIP;
+import spaceraze.world.diplomacy.DiplomacyLevel;
+import spaceraze.world.diplomacy.DiplomacyState;
+import spaceraze.world.enums.DiplomacyGameType;
+import spaceraze.world.enums.HighlightType;
+import spaceraze.world.landbattle.report.LandBattleReport;
+import spaceraze.world.orders.Orders;
+import spaceraze.world.report.PlanetReport;
+import spaceraze.world.report.PlayerReport;
+import spaceraze.world.spacebattle.TaskForce;
 import sr.message.MessageDatabase;
 import sr.server.persistence.PHash;
 import sr.server.ranking.RankingHandler;
 import sr.webb.mail.MailHandler;
-import sr.world.Building;
-import sr.world.EconomyReport;
-import sr.world.Faction;
-import sr.world.Galaxy;
-import sr.world.Message;
-import sr.world.Planet;
-import sr.world.PlanetInfos;
-import sr.world.Player;
-import sr.world.Spaceship;
-import sr.world.SpaceshipType;
-import sr.world.TaskForce;
-import sr.world.Troop;
-import sr.world.TroopType;
-import sr.world.VIP;
-import sr.world.diplomacy.DiplomacyState;
-import sr.world.landbattle.LandBattle;
-import sr.world.orders.Orders;
-import sr.world.spacebattle.AttackReportSpace;
-import sr.world.spacebattle.SpaceBattleReport;
 
 public class GalaxyUpdater {
   protected Galaxy g;
@@ -63,10 +68,11 @@ public class GalaxyUpdater {
   			// spelet skall ej uppdateras
   			Logger.info("Game is over. Galaxy not updated.");
   		}else
-  		// om det är det första draget, innan spelet har börjat
+  		// om det Ã¤r det fÃ¶rsta draget, innan spelet har bÃ¶rjat
   		if (g.turn == 0){
   			// antal startplaneter
-  			g.setStartPlanets(this);
+  			StartGameHandler  startGameHandler = new StartGameHandler();
+  			startGameHandler.setStartPlanets(this);
   			Logger.info("First turn.");
   			g.setPlayerDiplomacy();
   			for (int x = 0; x < g.players.size(); x++){
@@ -86,14 +92,16 @@ public class GalaxyUpdater {
   		}else{ // update galaxy
 			Logger.info("Update galaxy");
 			// update reports
-			for (int x = 0; x < g.players.size(); x++){
-				Player temp = (Player)g.players.get(x);
-				temp.updateTurnInfo();
-				temp.setUpdatedThisTurn(false);
-				temp.setFinishedThisTurn(false);
-				temp.addToGeneral("Game has been updated to turn " + (g.turn + 1) + ".");
-				temp.addToGeneral("");
-				temp.resetDiplomacyOffers();
+			for (Player player : g.players){
+				// 2019-12-30 new logic reports
+				player.getPlayerReports().put(g.getTurn(), new PlayerReport());
+				
+				player.updateTurnInfo();
+				player.setUpdatedThisTurn(false);
+				player.setFinishedThisTurn(false);
+				player.addToGeneral("Game has been updated to turn " + (g.turn + 1) + ".");
+				player.addToGeneral("");
+				player.resetDiplomacyOffers();
 			}
 			// add last turn economy data to economy report
 			updateEconomyReport1();
@@ -141,7 +149,7 @@ public class GalaxyUpdater {
 				// check if any planets are infestated by aliens from ships with troops
 				checkInfestationFromShips();
 				// destroy abandoned squadrons
-				checkAbandonedSquadrons();
+				(new CheckAbandonedSquadrons(g)).checkAbandonedSquadrons();
 				// check destruction of civilian ships
 				checkCivilianShips();
 				// perform diplomacy orders
@@ -161,7 +169,7 @@ public class GalaxyUpdater {
 				// uppdatera PlanetInfos
 				updatePlanetInfos();
 				updateMapPlanetInfos();
-				// nollställ orders
+				// nollstï¿½ll orders
 				clearOrders();
 				// reset diplomacy states
 				g.getDiplomacy().resetDiplomacyStates();
@@ -653,7 +661,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 					List<Player> enemyPlayers = getEnemyPlayers(enemyMilitarys);
 					Logger.finer("aSpaceship.isAlwaysRetreat(): " + aSpaceship.isAlwaysRetreat());
 					if (aSpaceship.isAlwaysRetreat() & !stopRetreats){
-						boolean gotAway = aSpaceship.retreat();
+						boolean gotAway = aSpaceship.isRetreating();
 						Logger.finer("gotAway: " + gotAway);
 						if (gotAway){ // ship have retreated
 							for (Player player : enemyPlayers) {
@@ -789,18 +797,6 @@ protected void rankingLoss(String playerLogin, boolean survived){
 		  }
 	  }
 	  return ships;
-  }
-
-  /**
-   * Destroy all squadrons who are on a neutral or enemy planet without
-   * at least one carrier from the same player at the same planet
-   *
-   */
-  protected void checkAbandonedSquadrons(){
-      Logger.fine("checkAbandonedSquadrons called");
-	  for (Player aPlayer : g.getPlayers()) {
-		  g.checkAbandonedSquadrons(aPlayer);
-	  }
   }
 
   protected void initGeneralReports(){
@@ -1394,9 +1390,9 @@ protected void rankingLoss(String playerLogin, boolean survived){
   	List<VIP> found = new LinkedList<VIP>();
     for (int i = 0; i < allDips.size(); i++){
       VIP tempVIP = (VIP)allDips.get(i);
-      if (tempVIP != aDip){ // kolla om tempVIP inte är aGov
+      if (tempVIP != aDip){ // kolla om tempVIP inte ï¿½r aGov
         Planet tempLocation = tempVIP.getPlanetLocation();
-        if (tempLocation == aPlanet){ // Dip är vid aPlanet
+        if (tempLocation == aPlanet){ // Dip ï¿½r vid aPlanet
         	Faction f1 = aDip.getBoss().getFaction();
         	Faction f2 = tempVIP.getBoss().getFaction();
         	if (f1 != f2){
@@ -1420,7 +1416,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
   	for (VIP tempVIP : allInfs) {
   		if (tempVIP != anInf){ 
   			Planet tempLocation = tempVIP.getPlanetLocation();
-  			if (tempLocation == aPlanet){ // tempVIP är vid aPlanet
+  			if (tempLocation == aPlanet){ // tempVIP ï¿½r vid aPlanet
   				if (anInf.getBoss() != (tempVIP.getBoss())){
   					found.add(tempVIP);
   				}
@@ -1443,7 +1439,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	  for (VIP tempVIP : allInfs) {
 		  if (tempVIP != anInf){ 
 			  Planet tempLocation = tempVIP.getPlanetLocation();
-			  if (tempLocation == aPlanet){ // tempVIP är vid aPlanet
+			  if (tempLocation == aPlanet){ // tempVIP ï¿½r vid aPlanet
 				  if (anInf.getBoss() == (tempVIP.getBoss())){
 					  found.add(tempVIP);
 				  }
@@ -1464,9 +1460,9 @@ protected void rankingLoss(String playerLogin, boolean survived){
   	List<VIP> found = new LinkedList<VIP>();
     for (int i = 0; i < allDips.size(); i++){
         VIP tempVIP = (VIP)allDips.get(i);
-        if (tempVIP != aDip){ // kolla om tempVIP inte är aDip
+        if (tempVIP != aDip){ // kolla om tempVIP inte ï¿½r aDip
         	Planet tempLocation = tempVIP.getPlanetLocation();
-        	if (tempLocation == aPlanet){ // tempDip är vid aPlanet
+        	if (tempLocation == aPlanet){ // tempDip ï¿½r vid aPlanet
         		Player p1 = aDip.getBoss();
         		Player p2 = tempVIP.getBoss();
         		Faction f1 = p1.getFaction();
@@ -1489,9 +1485,9 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected List<VIP> getAllOwnDiplomatOnNeutral(VIP aDip, Planet aPlanet, List<VIP> allDips){
   	List<VIP> found = new LinkedList<VIP>();
     for (VIP tempVIP : allDips){
-        if (tempVIP != aDip){ // kolla om tempVIP inte är aDip
+        if (tempVIP != aDip){ // kolla om tempVIP inte ï¿½r aDip
         	Planet tempLocation = tempVIP.getPlanetLocation();
-        	if (tempLocation == aPlanet){ // tempDip är vid aPlanet
+        	if (tempLocation == aPlanet){ // tempDip ï¿½r vid aPlanet
         		Player p1 = aDip.getBoss();
         		Player p2 = tempVIP.getBoss();
         		if (p1 == p2){ // same player
@@ -1508,7 +1504,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     List<Spaceship> removeShips = new LinkedList<Spaceship>();
     List<Spaceship> addShips = new LinkedList<Spaceship>();
     for (Spaceship ss : allss){
-      if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet är neutralt och är vid planeten
+      if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet ï¿½r neutralt och ï¿½r vid planeten
           // add new ship instead of the neutral one
           SpaceshipType sstTemp = dip.getBoss().findSpaceshipType(ss.getSpaceshipType().getName());
           if(sstTemp == null){
@@ -1566,7 +1562,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	  List<Spaceship> allss = g.getSpaceships();
 	  List<Spaceship> removeShips = new LinkedList<Spaceship>();
 	  for (Spaceship ss : allss){
-		  if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet är neutralt och är vid planeten
+		  if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet ï¿½r neutralt och ï¿½r vid planeten
 			  // add ship to remove vector
 			  removeShips.add(ss);
 		  }
@@ -1702,7 +1698,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 				  planet.setPlayerInControl(infestator);
 				  if (planet.isHasNeverSurrendered()){
 					  planet.setHasNeverSurrendered(false);
-					  // lägg till en slumpvis VIP till infestator spelaren
+					  // lï¿½gg till en slumpvis VIP till infestator spelaren
 					  VIP aVIP = infestator.getGalaxy().maybeAddVIP(infestator);
 					  if (aVIP != null){
 						  aVIP.setLocation(planet);
@@ -1749,12 +1745,12 @@ protected void rankingLoss(String playerLogin, boolean survived){
       for (int i = 0; i < allss.size(); i++){
         Spaceship ss = (Spaceship)allss.elementAt(i);
         if (ss.getOwner() == tempPlayer){
-          if (ss.getLocation() == null){ // skeppet är på flykt
+          if (ss.getLocation() == null){ // skeppet ï¿½r pï¿½ flykt
             ss.moveShip(ss.getRetreatingTo(),ss.getOwner().getTurnInfo());
-            // kolla om skeppet anlänt till en av spelarens planeter
+            // kolla om skeppet anlï¿½nt till en av spelarens planeter
             if (ss.getRetreatingTo().getPlayerInControl() != ss.getOwner()){
-              // sätt skeppet att fly vidare om det kan
-              boolean planetExistsToRunTo = ss.runAway(true); // returnerar false om skeppet inte har några planeter kvar att fly till (egna, samma faction eller neutrala)
+              // sï¿½tt skeppet att fly vidare om det kan
+              boolean planetExistsToRunTo = ss.runAway(true); // returnerar false om skeppet inte har nï¿½gra planeter kvar att fly till (egna, samma faction eller neutrala)
               if (!planetExistsToRunTo){
                 // remove ship from game
                 g.checkVIPsInScuttledShips(ss,tempPlayer);
@@ -1794,7 +1790,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
       int genSize = tempPlayer.getTurnInfo().getGeneralSize();
       // move all who can move on their own, except squadrons in a carrier
       for (int i = 0; i < allss.size(); i++){
-        Spaceship ss = (Spaceship)allss.get(i);
+        Spaceship ss = allss.get(i);
         if (ss.getOwner() == tempPlayer){
           if (ss.isRetreating()){ 
         	  if (ss.getRange().canMove()){
@@ -1826,14 +1822,14 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected void performShipRepairs(){
   	Logger.fine("performShipRepairs called");
     List<Spaceship> allss = g.getSpaceships();
-    for (Spaceship ss : allss){  // gå igenom alla rymdskepp
-      if (ss.getCurrentDc() < ss.getDamageCapacity()){  // skeppet är skadat
+    for (Spaceship ss : allss){  // gï¿½ igenom alla rymdskepp
+      if (ss.getCurrentDc() < ss.getDamageCapacity()){  // skeppet ï¿½r skadat
         Planet location = ss.getLocation();
-        if (location != null){  // skeppet är ej på flykt
-          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet är vid en av spelarens planeter
+        if (location != null){  // skeppet ï¿½r ej pï¿½ flykt
+          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet ï¿½r vid en av spelarens planeter
         	 // int maxResupplySize = location.getMaxWharfsSize();
             int maxRepairTonnage = location.getMaxRepairTonnage();
-            if (ss.getTonnage() <= maxRepairTonnage){  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
+            if (ss.getTonnage() <= maxRepairTonnage){  // det finns ett skeppsvarv som ï¿½r tillrï¿½ckligt stort fï¿½r att reparera skeppet
               ss.performRepairs();
             }
           }
@@ -1885,16 +1881,16 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected void performResupply(){ 
   	Logger.fine("performResupply called");
     List<Spaceship> allss = g.getSpaceships();
-    for (Spaceship ss : allss){  // gå igenom alla rymdskepp
-      if (ss.getNeedResupply()){  // skeppet är skadat
+    for (Spaceship ss : allss){  // gï¿½ igenom alla rymdskepp
+      if (ss.getNeedResupply()){  // skeppet ï¿½r skadat
         Planet location = ss.getLocation();
-        if (location != null){  // skeppet är ej på flykt
-          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet är vid en av spelarens planeter
+        if (location != null){  // skeppet ï¿½r ej pï¿½ flykt
+          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet ï¿½r vid en av spelarens planeter
           	// max repair at wharfs is same as resupply level
             int maxResupplySize = location.getMaxWharfsSize();
             ss.supplyWeapons(maxResupplySize);
           }
-          if (ss.getNeedResupply()){ // skeppet är fortfarande i behov av resupply 
+          if (ss.getNeedResupply()){ // skeppet ï¿½r fortfarande i behov av resupply 
           	// kolla efter supplyships
             int maxResupplySize = g.getMaxResupplyFromShip(location,ss.getOwner());
             ss.supplyWeapons(maxResupplySize);          	
@@ -1982,7 +1978,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
       for (int x = 0; x < g.players.size(); x++){
         Player tempPlayer = (Player)g.players.get(x);
         if (!tempPlayer.isDefeated()){
-          // räkna antalet planeter spelaren har
+          // rï¿½kna antalet planeter spelaren har
           boolean noPlanet = g.checkNoPlanet(tempPlayer);
 //          boolean noPlanet = true;
 //          for (int i = 0; i < g.planets.size();i++){
@@ -1991,7 +1987,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 //              noPlanet = false;
 //            }
 //          }
-          // kolla att spelaren fortfarande har kvar sin Guvernör
+          // kolla att spelaren fortfarande har kvar sin Guvernï¿½r
           // eller
           // om spelaren har planeter
           if (noPlanet | g.findVIPGovenor(tempPlayer) == null){
@@ -2215,7 +2211,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 		    List<TaskForce> taskforces = new ArrayList<TaskForce>();
 		
 		    taskforces = g.getTaskForces(tempPlanet,false);
-		    // kolla om det blir några konflikter (rymdstrider och belägringar)
+		    // kolla om det blir nÃ¥gra konflikter (rymdstrider och belÃ¤gringar)
 		    if (taskforces.size() > 0){
 		    	Logger.finer("TaskForces > 0, size: " + taskforces.size() + " " + tempPlanet.getName());
 		    	checkConflicts(taskforces,tempPlanet);
@@ -2234,7 +2230,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
       }
       // remove abandoned squadrons in taskforces
       checkAbandonedSquadrons(taskforces,aPlanet);
-      // check if there are any abanboned troops
+      // check if there are any abandoned troops
       //g.checkAbandonedTroops(aPlanet);
       // if there are at least one TF left at planet
       if (taskforces.size() > 0){
@@ -2250,7 +2246,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
         for (int i = taskforces.size()-1; i >= 0; i--){
             TaskForce tmpTF = taskforces.get(0);
             // check the ships in the TF
-      	  tmpTF.checkAbandonedSquadrons(aPlanet);
+            (new CheckAbandonedSquadrons(g)).checkAbandonedSquadrons(tmpTF,aPlanet);
       	  if (tmpTF.getTotalNrNonDestroyedShips() == 0){
       		  taskforces.remove(tmpTF);
       	  }
@@ -2258,18 +2254,18 @@ protected void rankingLoss(String playerLogin, boolean survived){
     }
     
     
-    // metod som kollar om det blir några rymdstrider vid en given planet
+    // metod som kollar om det blir nÃ¥gra rymdstrider vid en given planet
     protected void checkSpaceshipBattles(List<TaskForce> taskforces,Planet aPlanet,int curtf_low,int curtf_high){
       Logger.finer("checkSpaceshipBattles: taskforces.size(): " + taskforces.size()+" "+curtf_low+" "+curtf_high);
       TaskForce defenderTF = null;
-      if (taskforces.get(0).getPlayer() == aPlanet.getPlayerInControl()){ // bryt ut ev. försvarare så den kan slåss sist
+      if (g.getPlayerByGovenorName(taskforces.get(0).getPlayerName()) == aPlanet.getPlayerInControl()){ // bryt ut ev. fÃ¶rsvarare sÃ¥ den kan slÃ¥ss sist
     	  defenderTF = taskforces.get(0);
     	  taskforces.remove(defenderTF);
       }
       Collections.shuffle(taskforces);
-      for (TaskForce tf1 : taskforces) { // loopa igenom alla TF så att alla får chansen att slåss med varandra
+      for (TaskForce tf1 : taskforces) { // loopa igenom alla TF sÃ¥ att alla fÃ¥r chansen att slÃ¥ss med varandra
           for (TaskForce tf2 : taskforces) {
-          if (tf1 != tf2){ // så flottorna ej slåss mot sig själva :)
+          if (tf1 != tf2){ // sÃ¥ flottorna ej slÃ¥ss mot sig sjÃ¤lva :)
           handleSpaceshipBattle(tf1,tf2,aPlanet);
           }
           }
@@ -2288,7 +2284,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     		  index++;
     	  }
       }
-      // ev, lägg tillbaka defender om de finns och ej är besegrade
+      // ev, lÃ¤gg tillbaka defender om de finns och ej Ã¤r besegrade
       if (defenderTF != null){
     	  if (defenderTF.getTotalNrShips() > 0){
     		  taskforces.add(0, defenderTF);
@@ -2298,11 +2294,92 @@ protected void rankingLoss(String playerLogin, boolean survived){
     }
     
     protected void handleSpaceshipBattle(TaskForce tf1, TaskForce tf2,Planet aPlanet){
-    	if ((tf1.getTotalNrShips() > 0) & (tf2.getTotalNrShips() > 0)){ // om någon av flottorna har slut på skepp är den redan besegrad
+    	if ((tf1.getTotalNrShips() > 0) & (tf2.getTotalNrShips() > 0)){ // om nÃ¥gon av flottorna har slut pÃ¥ skepp Ã¤r den redan besegrad
     		if (hostile(tf1,tf2,aPlanet)){  // at least one of the tf:s want to fight
     			Logger.finest("Hostile!");
-    			performCombat(tf1,tf2,aPlanet); // performCombat returnerar den förlorande sidan
+    			
+    			
+    			(new SpaceBattlePerformer()).performCombat(tf1, tf2,g.getGameWorld().getInitMethod(), aPlanet.getName());
+    			
+    			// 2019-12-26 Hantera detta, behÃ¶ver vi detta? eller kan vi rÃ¤kna ihop alla skepp nu nÃ¤r de ligger i SpaceBattleAttack. FÃ¥r vara kvar ett tag till dÃ¥ enheter i listan anvÃ¤nds bÃ¥de av servern och klienten.
+    			if(tf1.getPlayerName() != null) {
+    				tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+    				tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+    			}
+    			
+    			if(tf2.getPlayerName() != null) {
+    				tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+    				tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+    			}
+    			
+    			highlightsSpaceBattle(tf1.getTotalNrShips() > 0 ? tf1 : tf2, tf1.getTotalNrShips() > 0 ? tf2 : tf1, aPlanet);
+    			
+    			//2019-12-30 Removing destroyed ships.
+    			tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.removeShip(destroyedShip));
+    			tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.removeShip(destroyedShip));
+    			
+    			//TODO 2019-12-26 Flyttad frÃ¥n SpaceBattlePerformer UndersÃ¶k Ã¤ven mÃ¶jligheten om skÃ¶lderna ska Ã¥terstÃ¤llas nÃ¤r alla strider Ã¤r genomfÃ¶rda d.v.s. om en flotta slÃ¥ss fler Ã¤n en gÃ¥ng sÃ¥ kommer den inte fÃ¥ ladda om sin skÃ¶ld i mellan. Ã„r det bra eller dÃ¥ligt? den vinnande flottan kommer dÃ¥ vara svagare i nÃ¤sta strid. Flytta till checkSpaceshipBattles, metoden som anroppar den hÃ¤r, lÃ¤gg i sÃ¥ fall logiken nÃ¤r alla strider pÃ¥ planeten Ã¤r genomfÃ¶rda.
+    			//TODO 2019-12-26 Dock ska troligen fÃ¶rstÃ¶rda och skepp som har flytt nollstÃ¤llas om samma TF kan anvÃ¤ndas igen.
+    			tf1.restoreShieldsAndCleanDestroyedAndRetreatedLists();
+    			tf2.restoreShieldsAndCleanDestroyedAndRetreatedLists();
+    			
+    			// reload winning sides squadrons if they have a carrierLocation
+    			if (tf1.getTotalNrShips() > 0){
+    				tf1.reloadSquadrons();
+    			}
+    			if (tf2.getTotalNrShips() > 0){
+    				tf2.reloadSquadrons();
+    			}
+    			
+    			addSpaceBattleReport(tf1, aPlanet);
+    			addSpaceBattleReport(tf2, aPlanet);
+    			
     		}          
+    	}
+    }
+    
+    private void highlightsSpaceBattle(TaskForce tfWinner, TaskForce tfLoser, Planet aPlanet) {
+    	if (tfLoser.getRetreatedShips().size() == 0){
+	      	// the loser dig not retreat with any ships (all destroyed)
+	      	if (tfWinner.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfWinner.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_BATTLE_WON);
+	      	}
+	      	if (tfLoser.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfLoser.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_BATTLE_LOST);
+	      	}
+    	}else if (tfLoser.getDestroyedShips().size() == 0){
+	      	// the loser did not lose any ships (all retreated)
+	      	if (tfWinner.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfWinner.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_RETREAT_IN_COMBAT_ENEMY);
+	      	}
+	      	if (tfLoser.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfLoser.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_RETREAT_IN_COMBAT_OWN);
+	      	}
+    	}else{
+	      	// else = partial retreat
+	      	if (tfWinner.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfWinner.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_BATTLE_WON_PARTIAL_RETREAT);
+	      	}
+	      	if (tfLoser.getPlayerName() != null){
+	      		g.getPlayerByGovenorName(tfLoser.getPlayerName()).addToHighlights(aPlanet.getName(), HighlightType.TYPE_BATTLE_LOST_PARTIAL_RETREAT);
+	      	}
+    	}
+    	
+    }
+    
+    private void addSpaceBattleReport(TaskForce taskForce, Planet planet) {
+    	if(taskForce.getPlayerName() != null) {
+	    	Player player = g.getPlayerByGovenorName(taskForce.getPlayerName());
+			Optional<PlanetReport> optional = player.getPlayerReports().get(g.getTurn()).getChildeReportsOfType(PlanetReport.class).stream()
+			.filter(planetReport -> planetReport.getPlanetName().equals(planet.getName())).findAny();
+			if(optional.isPresent()) {
+				optional.get().addReport(taskForce.getSpaceBattleReport());
+			}else {
+				PlanetReport planetReport = new PlanetReport(planet.getName());
+				planetReport.addReport(taskForce.getSpaceBattleReport());
+				player.getPlayerReports().get(g.getTurn()).addReport(planetReport);
+				
+			}
     	}
     }
 
@@ -2320,20 +2397,20 @@ protected void rankingLoss(String playerLogin, boolean survived){
     protected boolean hostile(TaskForce tf1, TaskForce tf2, Planet aPlanet){
       Logger.finer("hostile: " + aPlanet.getName());
       boolean hostile = false;
-      // kolla först om ena tf:n är neutral
-      if (tf1.getPlayer() == null){
-      	Logger.finer("tf1 är neutral");
-      	hostile = tf2.getPlayer().getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
+      // kolla fÃ¶rst om ena tf:n Ã¤r neutral
+      if (tf1.getPlayerName() == null){
+      	Logger.finer("tf1 Ã¤r neutral");
+      	hostile = g.getPlayerByGovenorName(tf2.getPlayerName()).getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
       	Logger.finer("hostile, attack if neutral:" + hostile);
       }else
       // eller den andra...
-      if (tf2.getPlayer() == null){
-      	Logger.finer("tf2 är neutral");
-        hostile = tf1.getPlayer().getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
+      if (tf2.getPlayerName() == null){
+      	Logger.finer("tf2 Ã¤r neutral");
+        hostile = g.getPlayerByGovenorName(tf1.getPlayerName()).getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
       	Logger.finer("hostile, attack if neutral:" + hostile);
-      }else   // bägge flottorna tillhör spelare
-//      if (tf1.getPlayer().getFaction() != tf2.getPlayer().getFaction()){ // här skulle man kunna kolla på diplomatiska status istället om de existerade...
-      if (g.getDiplomacy().hostileTaskForces(tf1.getPlayer(),tf2.getPlayer(),aPlanet)){ // check diplomaticState..
+      }else   // bÃ¤gge flottorna tillhÃ¶r spelare
+//      if (tf1.getPlayer().getFaction() != tf2.getPlayer().getFaction()){ // hÃ¤r skulle man kunna kolla pÃ¥ diplomatiska status istÃ¤llet om de existerade...
+      if (g.getDiplomacy().hostileTaskForces(g.getPlayerByGovenorName(tf1.getPlayerName()), g.getPlayerByGovenorName(tf2.getPlayerName()), aPlanet)){ // check diplomaticState..
       	Logger.finer("Diplomacy say fight!");
         hostile = true;
         Logger.finer("Hostile, end of diff fac: " + hostile);
@@ -2344,22 +2421,22 @@ protected void rankingLoss(String playerLogin, boolean survived){
 
     protected boolean hostile(TaskForce tf, Planet aPlanet){
     	Logger.finer("hostile (planet): " + aPlanet.getName());
-    	if (tf.getPlayer() != null){
-    		Logger.finer("hostile (governor): " + tf.getPlayer().getGovenorName());
+    	if (tf.getPlayerName() != null){
+    		Logger.finer("hostile (governor): " + tf.getPlayerName());
     	}else{
     		Logger.finer("Taskforce is neutral");
     	}
     	boolean hostile = false;
-    	if (tf.getPlayer() != null && tf.canBesiege()){
-    		if (tf.getPlayer() != aPlanet.getPlayerInControl()){
+    	if (tf.getPlayerName() != null && tf.canBesiege()){
+    		if (aPlanet.getPlayerInControl() == null || !tf.getPlayerName().equalsIgnoreCase(aPlanet.getPlayerInControl().getGovenorName())){
     			Logger.finer("Planet does not belong to player: " + aPlanet.getName());
-    			if (aPlanet.getPlayerInControl() == null){  // kolla om den är neutral
+    			if (aPlanet.getPlayerInControl() == null){  // kolla om den Ã¤r neutral
     				Logger.finer("Planet is neutral");
-    				hostile = tf.getPlayer().getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
+    				hostile = g.getPlayerByGovenorName(tf.getPlayerName()).getPlanetOrderStatuses().isAttackIfNeutral(aPlanet.getName());
     				Logger.finer("Planet is neutral, hostile = " + hostile);
-    			}else  // kolla om det är fred med planetägan.
+    			}else  // kolla om det Ã¤r fred med planet Ã¤gare.
 //    				if (aPlanet.getPlayerInControl().getFaction() != tf.getPlayer().getFaction()){
-       				if (g.getDiplomacy().hostileBesiege(aPlanet.getPlayerInControl(),tf.getPlayer())){
+       				if (g.getDiplomacy().hostileBesiege(aPlanet.getPlayerInControl(), g.getPlayerByGovenorName(tf.getPlayerName()))){
     					Logger.finer("Planet belongs to player from another faction");
     					hostile = true;
     					Logger.finer("Hostile = " + hostile);
@@ -2376,12 +2453,12 @@ protected void rankingLoss(String playerLogin, boolean survived){
       Player tempPlayer = null;
       for (int i = 0; i < taskforces.size(); i++){
         temptf = (TaskForce)taskforces.get(i);
-        tempPlayer = temptf.getPlayer();
+        tempPlayer = g.getPlayerByGovenorName(temptf.getPlayerName());
         if (aPlanet.getPlayerInControl() == tempPlayer){
           found = i;
         }
       }
-      if (found > -1){ // flytta försvararna till vectorns första plats
+      if (found > -1){ // flytta fÃ¶rsvararna till vectorns fÃ¶rsta plats
         temptf = (TaskForce)taskforces.get(found);
         taskforces.remove(found);
         taskforces.add(0,temptf);
@@ -2469,19 +2546,19 @@ protected void rankingLoss(String playerLogin, boolean survived){
       if (!aPlanet.isRazedAndUninfected()){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
     	  // check if defenders have no TF at planet
     	  TaskForce firstTF = taskforces.get(0);
-    	  Player attackingPlayer = firstTF.getPlayer();
-    	  if (firstTF.getPlayer() != aPlanet.getPlayerInControl()){
+    	  Player attackingPlayer = g.getPlayerByGovenorName(firstTF.getPlayerName());
+    	  if (g.getPlayerByGovenorName(firstTF.getPlayerName()) != aPlanet.getPlayerInControl()){
     		  Logger.finer("First taskforce does not own the planet.");
     		  // check if attackers are more than one TF
     		  List<TaskForce> tfsWantingToBesiege = countBesiegingTFs(taskforces,aPlanet);
     		  if(tfsWantingToBesiege.size() > 0){
-	    		  // logik för cannon fire. Om alla skepp dör så upphör belägringen.
+	    		  // logik fï¿½r cannon fire. Om alla skepp dï¿½r sï¿½ upphï¿½r belï¿½gringen.
 	    		  performCannonDefenceFire(aPlanet,tfsWantingToBesiege);
 	    		  // recount and check if any TF can besiege.
 	    		  tfsWantingToBesiege = countBesiegingTFs(taskforces,aPlanet);
     		  }
 			  if (tfsWantingToBesiege.size() < 1){
-    			  // alla flottor är döda
+    			  // alla flottor ï¿½r dï¿½da
     		  }else
     		  if (tfsWantingToBesiege.size() > 1){  // if more than one TF wants to besiege planet is blocked
     			  Logger.finer("More than one taskforce in orbit = Blockade!");
@@ -2492,17 +2569,17 @@ protected void rankingLoss(String playerLogin, boolean survived){
     			  Logger.finer("One taskforce in orbit that wants to besiege");
     			  // find besieging taskforce
     	    	  firstTF = tfsWantingToBesiege.get(0);
-    	    	  attackingPlayer = firstTF.getPlayer();
+    	    	  attackingPlayer = g.getPlayerByGovenorName(firstTF.getPlayerName());
 
-    			  g.checkDestroyBuildings(aPlanet,firstTF.getPlayer(),false);
+    			  g.checkDestroyBuildings(aPlanet,g.getPlayerByGovenorName(firstTF.getPlayerName()),false);
 
     			  // siege with psywarfare
     			  int resSiege = 0;
    				  // siege, psyWarfare should work the same for both non-aliens and aliens
-				  resSiege = aPlanet.besieged(firstTF);
+				  resSiege = aPlanet.besieged(firstTF, g);
 
     			  // bombardment
-    			  int resBomb = aPlanet.underBombardment(firstTF);
+    			  int resBomb = aPlanet.underBombardment(firstTF, g);
 
     			  Player defPlayer = aPlanet.getPlayerInControl();
     			  List<Troop> defTroops = g.getTroopsOnPlanet(aPlanet,defPlayer);
@@ -2515,16 +2592,16 @@ protected void rankingLoss(String playerLogin, boolean survived){
 				  Logger.fine("1");
     			  if (((aPlanet.getPopulation() < 1) & !infectedByAlien) | ((aPlanet.getResistance() < 1) & infectedByAlien)){ // planet razed
     				  // remove player on planet and set planet as razed
-    				  aPlanet.razed(firstTF.getPlayer());
+    				  aPlanet.razed(g.getPlayerByGovenorName(firstTF.getPlayerName()));
     				  // check if defender have troops on planet
     				  if (g.getTroopsOnPlanet(aPlanet, aPlanet.getPlayerInControl()).size() == 0){
-    					  // TODO Ta bort alla troops. Hindra alltså möjligheten att troops kan finnas på en belägrade planet. Är det inte risk att egna trupper dör då?
+    					  // TODO Ta bort alla troops. Hindra alltsï¿½ mï¿½jligheten att troops kan finnas pï¿½ en belï¿½grade planet. ï¿½r det inte risk att egna trupper dï¿½r dï¿½?
     					  // remove defending troops
     				 //     g.checkAbandonedTroops(aPlanet);
     				  }
     				  // check if attacker is alien
-    				  if (firstTF.getPlayer().isAlien()){
-    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,firstTF.getPlayer()) > 0;
+    				  if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()){
+    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
     					  if (psychExist){ // attacker have psychWarfare ability
     						  // planet conquered by alien
     						  aPlanet.infectedByAttacker(attackingPlayer);
@@ -2533,7 +2610,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     			  }else{
     				  Logger.fine("2");
     				  if ((resSiege + resBomb) == 0 && !g.getGameWorld().isTroopGameWorld()){
-    					  aPlanet.resistanceNotLowered(firstTF);
+    					  aPlanet.resistanceNotLowered(firstTF, g);
     				  }
     				  
     				  List<Troop> allTroopsOnPlanet = g.findAllTroopsOnPlanet(aPlanet);
@@ -2545,42 +2622,42 @@ protected void rankingLoss(String playerLogin, boolean survived){
 							  // check if resistance < 1
 							  if (aPlanet.checkSurrender(g)){
 								  // planet is razed
-								  aPlanet.razed(firstTF.getPlayer());
+								  aPlanet.razed(g.getPlayerByGovenorName(firstTF.getPlayerName()));
 								  // check if attacker is alien
-								  if (firstTF.isAlien()){
-			    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,firstTF.getPlayer()) > 0;
+								  if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()){
+			    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
 			    					  if (psychExist){ // attacker have psychWarfare ability
 										  // planet conquered by alien
 										  aPlanet.infectedByAttacker(attackingPlayer);
 									  }
 								  }
 							  }else{ // planet under siege but still holding
-								  aPlanet.holding(firstTF);
+								  aPlanet.holding(firstTF, g);
 							  }
 						  }else{ // defender is not alien
 							  // check if attacker is alien
-							  if (firstTF.isAlien()){
+							  if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()){
 								  // check if resistance < 1
 								  if (aPlanet.checkSurrender(g)){
-			    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,firstTF.getPlayer()) > 0;
+			    					  boolean psychExist = g.getMaxPsychWarfare(aPlanet,g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
 			    					  if (psychExist){ // attacker have psychWarfare ability
 										  // planet conquered by alien
 										  aPlanet.infectedByAttacker(attackingPlayer);
 									  }else{ // no troops
 										  // planet is razed
-										  aPlanet.razed(firstTF.getPlayer());
+										  aPlanet.razed(g.getPlayerByGovenorName(firstTF.getPlayerName()));
 									  }
 								  }else{ // planet under siege but still holding
-									  aPlanet.holding(firstTF);
+									  aPlanet.holding(firstTF, g);
 								  }
 							  }else{ // attacker is not alien
 								  Logger.fine("attacker is not alien");
 								  // check if planet surrenders
 								  if (aPlanet.checkSurrender(g)){ 
 									  // planet conquered
-									  aPlanet.planetSurrenders(firstTF);
+									  aPlanet.planetSurrenders(firstTF, g);
 								  }else{ // planet under siege but still holding
-									  aPlanet.holding(firstTF);
+									  aPlanet.holding(firstTF, g);
 								  }
 							  }
 						  }
@@ -2597,7 +2674,9 @@ protected void rankingLoss(String playerLogin, boolean survived){
     
     }
     
-    
+    private List<TaskForceTroop> getPlayerTroopsAndVipsOnPlanet(Player player, Planet planet){
+    	return  g.findTroopsOnPlanet(planet, player).stream().map(troop -> new TaskForceTroop(troop, g.findLandBattleVIPs(troop,true))).collect(Collectors.toList());
+    }
     
     protected void troopFight(Planet aPlanet){
         if (!aPlanet.isRazedAndUninfected()){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
@@ -2618,13 +2697,17 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	        		}
 	        		// one of the players i hostile.
 	        		if(i < players.size()){
-	        			List<Troop> defendingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-						List<Troop> attackingTroops = g.findTroopsOnPlanet(aPlanet,players.get(i));
+	        			//TODO 2020-01-04 kolla att detta fungerar som det ska, varfÃ¶r anvÃ¤nds attacking(Player) fÃ¶r att hÃ¤mta fÃ¶rsvarande troops?
+	        			List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet); //g.findTroopsOnPlanet(aPlanet,attacking);
+	        			List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet); //g.findTroopsOnPlanet(aPlanet,players.get(i));
+						
+	        			
 						Logger.finer("perform land battle between " + attacking.getGovenorName() + " and " + players.get(i).getGovenorName());
-						performLandBattle(attacking,defendingTroops,players.get(i),attackingTroops,aPlanet);
-						defendingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-						attackingTroops = g.findTroopsOnPlanet(aPlanet,players.get(i));
+						performLandBattle(attacking, defendingTroops, players.get(i), attackingTroops, aPlanet);
+						defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet); //g.findTroopsOnPlanet(aPlanet,attacking);
+						attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet); //g.findTroopsOnPlanet(aPlanet,players.get(i));
 				      
+						//TODO 2020-01-05 Se till att detta lÃ¤ggs in i nya rapporteringen
 						addLandbattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,attacking,players.get(i),aPlanet.getName());
 						// Remove players that have fight this turn.
 						players.remove(i);
@@ -2640,12 +2723,13 @@ protected void rankingLoss(String playerLogin, boolean survived){
 		        	Logger.finer("perform land battle aginst defender");
 		        		Player attacking = players.get(0);
 						// get both defending player/troops and attackning player/troops
-						List<Troop> defendingTroops = g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-						List<Troop> attackingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
+						List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(aPlanet.getPlayerInControl(), aPlanet);// g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
+						List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet); //g.findTroopsOnPlanet(aPlanet,attacking);
 						performLandBattle(aPlanet.getPlayerInControl(),defendingTroops,attacking,attackingTroops,aPlanet);
-						defendingTroops = g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-						attackingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
+						defendingTroops = getPlayerTroopsAndVipsOnPlanet(aPlanet.getPlayerInControl(), aPlanet); //g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
+						attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet); //g.findTroopsOnPlanet(aPlanet,attacking);
 				      
+						//TODO 2020-01-05 Se till att detta lÃ¤ggs in i nya rapporteringen
 						addLandbattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,aPlanet.getPlayerInControl(),attacking,aPlanet.getName());
 	        	}
 	        }
@@ -2653,7 +2737,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
         	
         	// get all players with troops after the battles.
     		players = g.getAttackingPlayersWithTroopsOnPlanet(aPlanet);
-        	if(g.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl()).size() == 0){ // Försvarande spelar har inga trupper kvar.
+        	if(g.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl()).size() == 0){ // FÃ¶rsvarande spelar har inga trupper kvar.
         		if(players.size() == 1){// only one attacker and the planet should change owner.
         			if (players.get(0).isAlien()){
         				Logger.finer("Attacker is alien");
@@ -2688,83 +2772,6 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	        	
 	      } // end !aPlanet.isRazedAndUninfected()
       }
-    /*
-    private void troopFight(Planet aPlanet){
-        if (!aPlanet.isRazedAndUninfected()){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
-      	  
-        	List<Player> players = g.getAttackingPlayersWithTroopsOnPlanet(aPlanet);
-        	if(players.size() > 0){
-        	
-	        	Player attacking = null;
-	        	for (Player player : players) {
-					if(attacking == null){
-						attacking = player;
-					}else{
-						if(g.getDiplomacy().hostileBesiege(attacking, player)){
-							Logger.finer("perform land battle");
-							// get both defending player/troops and attackning player/troops
-							List<Troop> defendingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-							List<Troop> attackingTroops = g.findTroopsOnPlanet(aPlanet,player);
-							performLandBattle(attacking,defendingTroops,player,attackingTroops,aPlanet);
-		//			    		  performGroundAssault(defendingPlayer,defendingTroops,attackingPlayer,attackingTroops,firstTF,aPlanet);
-							// get troops after battle
-							defendingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-							attackingTroops = g.findTroopsOnPlanet(aPlanet,player);
-					      
-							addLandbattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,attacking,player,aPlanet.getName());
-							
-							attacking = null;
-						}
-					}
-				}
-	        	if(attacking != null && (g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl())).size() > 0){// one attacker have not jet fight.
-	        		if(aPlanet.getPlayerInControl() == null || g.getDiplomacy().hostileBesiege(attacking, aPlanet.getPlayerInControl())){
-		        		Logger.finer("perform land battle");
-						// get both defending player/troops and attackning player/troops
-						List<Troop> defendingTroops = g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-						List<Troop> attackingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-						performLandBattle(aPlanet.getPlayerInControl(),defendingTroops,attacking,attackingTroops,aPlanet);
-		//		    		  performGroundAssault(defendingPlayer,defendingTroops,attackingPlayer,attackingTroops,firstTF,aPlanet);
-						// get troops after battle
-						defendingTroops = g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-						attackingTroops = g.findTroopsOnPlanet(aPlanet,attacking);
-				      
-						addLandbattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,aPlanet.getPlayerInControl(),attacking,aPlanet.getName());
-	        		}
-	        	}
-	        	
-	        	// Försvarande spelar har inga trupper kvar.
-        		players = g.getAttackingPlayersWithTroopsOnPlanet(aPlanet);
-	        	if(g.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl()).size() == 0){
-	        		if(players.size() == 1){// only one attacker and the planet should change owner.
-	        			if (players.get(0).isAlien()){
-	        				Logger.finer("Attacker is alien");
-							// planet conquered by alien
-							aPlanet.razed(players.get(0));
-							aPlanet.infectedByAttacker(players.get(0));
-	        			}else{ // attacker is not alien
-	        				Logger.finer("Attacker is not alien");
-							// check if defender is alien
-							if (aPlanet.getInfectedByAlien()){
-							    // planet is razed
-								aPlanet.razed(players.get(0));
-							}else{ // defender is not alien
-								// planet conquered	
-								aPlanet.conqueredByTroops(players.get(0));
-							}
-	        			}
-	        		}
-	        	}else{
-	        		if(players.size() >= 1){ // at least one player still have troops on the planet (and should have to have ships in orbit as well)
-	        			aPlanet.besiegedAfterInconclusiveLandbattle();
-	        		}
-	        	}
-        		
-     
-        	}
-      	  } // end !aPlanet.isRazedAndUninfected()
-      }
-    */
     
       
     protected void addLandbattleHighlights(boolean defHaveTroops, boolean attHaveTroops, Player defPlayer, Player attPlayer, String planetName){
@@ -2803,39 +2810,15 @@ protected void rankingLoss(String playerLogin, boolean survived){
     	List<TaskForce> tfsWantinToBesiege = new LinkedList<TaskForce>();
     	for (int i = 0; i < taskforces.size(); i++){
     		TaskForce temptf = (TaskForce)taskforces.get(i);
-    		if (hostile(temptf,aPlanet) && !temptf.getPlayer().getPlanetOrderStatuses().isDoNotBesiege(aPlanet.getName())){ // kolla om de är fientligt inställda
+    		if (hostile(temptf,aPlanet) && !g.getPlayerByGovenorName(temptf.getPlayerName()).getPlanetOrderStatuses().isDoNotBesiege(aPlanet.getName())){ // kolla om de Ã¤r fientligt instÃ¤llda
     			tfsWantinToBesiege.add(temptf);
     		}
     	}
     	return tfsWantinToBesiege;
     }
 
-    protected void checkGovOnNeutralPlanet(Planet aPlanet, TaskForce tf){
-    	Logger.finer("called");
-    	boolean neutralPlanet = (aPlanet.getPlayerInControl() == null);
-    	if (neutralPlanet){
-        	Logger.finer("Planet is neutral");
-        	Logger.finer("tf: " + tf);
-        	Logger.finer("tf.getPlayer(): " + tf.getPlayer());
-    		Faction aFaction = tf.getPlayer().getFaction();
-    		Player aPlayer = tf.getPlayer();
-    		Galaxy g = aPlayer.getGalaxy();
-    		List<VIP> govs = g.getAllGovsFromFactionOnPlanet(aPlanet,aFaction);
-        	Logger.finer("Govs found: " + govs.size());
-    		for (VIP aVIP : govs) {
-				Player vipPlayer = aVIP.getBoss();
-    	    	Logger.finer("In loop, removing VIP from governor: " + vipPlayer.getGovenorName());
-				g.removeVIP(aVIP);
-				vipPlayer.addToHighlights(aPlanet.getName(),HighlightType.TYPE_GOVENOR_ON_HOSTILE_NEUTRAL);
-				vipPlayer.addToGeneral("While visiting the planet " + aPlanet.getName() + " on a diplomatic mission, the planet has been attacked by forces belonging to the same faction as you.");
-				vipPlayer.addToGeneral("The population, enraged by this betrayal, immediately attacks your Governor.");
-//				vipPlayer.defeated(true,g.getTurn()); detta sätt senade i GalaxyUpdater.defeatedPlayers()
-			}
-    	}
-    }
-
     protected void performBlockade(Planet aPlanet, List<TaskForce> alltf){
-      aPlanet.underBlockade(alltf);
+      aPlanet.underBlockade(alltf, g);
     }
     
     protected void performCannonDefenceFire(Planet aPlanet, List<TaskForce> alltf){
@@ -2843,12 +2826,12 @@ protected void rankingLoss(String playerLogin, boolean survived){
     		Building aBuilding = aPlanet.getBuildings().get(i);
     		if(aBuilding.getBuildingType().getCannonDamage() > 0){
     			for(int index=0; index < aBuilding.getBuildingType().getCannonRateOfFire(); index++){
-    				// skall ha 50% chans att träffa...
+    				// skall ha 50% chans att trÃ¤ffa...
     				int random = Functions.getRandomInt(0, 99) + 1;
 					int randomIndex = Functions.getRandomInt(0, alltf.size()-1);
     				TaskForce tf = (TaskForce)alltf.get(randomIndex);
     				if(random < aBuilding.getBuildingType().getCannonHitChance()){// hit
-        				tf.incomingCannonFire(aPlanet, aPlanet.getBuildings().get(i));
+        				tf.incomingCannonFire(aPlanet, aPlanet.getBuildings().get(i), g);
         				if(tf.getStatus().equalsIgnoreCase("destroyed")){
         					Logger.finer("destroyed");
         					alltf.remove(randomIndex);
@@ -2859,7 +2842,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
         				}
     				}else{
     					String s = tf.getTotalNrShips()>1 ? "s" : "";
-    			    	tf.getPlayer().addToGeneral("Your ship"+s+" at " + aPlanet.getName() + " was fired upon by an enemy " + aBuilding.getBuildingType().getName() + " but it misses.");
+    			    	g.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("Your ship"+s+" at " + aPlanet.getName() + " was fired upon by an enemy " + aBuilding.getBuildingType().getName() + " but it misses.");
     			    	if(aPlanet.getPlayerInControl() != null){
     			    		aPlanet.getPlayerInControl().addToGeneral("Your " + aBuilding.getBuildingType().getName() + " at " + aPlanet.getName() + " fires but misses the enemy ships.");
     			    	}
@@ -2870,24 +2853,24 @@ protected void rankingLoss(String playerLogin, boolean survived){
     }    
     
     /**
-     *     	Luftangrepp sker innan striden börjar? Nix.
-    		Luftförsvar sker samtidigt? Ja
-    		Artilleri sker också först??? Nix.
-    		Alla strider kan ge skada åt bägge hållen? Ja.
+     *     	Luftangrepp sker innan striden bÃ¶rjar? Nix.
+    		LuftfÃ¶rsvar sker samtidigt? Ja
+    		Artilleri sker ocksÃ¥ fÃ¶rst??? Nix.
+    		Alla strider kan ge skada Ã¥t bÃ¤gge hÃ¥llen? Ja.
 
-    		För den större styrkan så används reserven för att anfalla motståndare 2-1. Reserven sorteras slumpvis och en efter en allokeras 
-    			trupperna för att anfalla lämpliga motståndare. Detta baseras på anfallsvärden och motståndarens typ (armor/ej armor)
-    			Trupper som är i strid med 2 motståndare anfaller slumpvis en av dem vid varje attack.
-    		Flankerande trupper tar strid 1-1 slumpvis om de finns på bägge sidor.
-    		Om ena sidan har fler flankerare än andra sidan sker något av följande (med de flankers som kommer förbi ev. motståndarens flankers):
-    		1. Om motståndaren har SLD-trupp(er) så anfalls en av dem.
-    		2. Om motståndaren saknar SLD:
-    			2a: Om motståndaren har support troops anfalls slumpvis en av dessa.
-    			2b: Annars anfalls en first line troop i ryggen. Den som anfalls i ryggen har svårt att skjuta tillbaka. En trupp kan endast anfallas av 1st flanker i ryggen i en strid.
-    		Rymdskepp som hjälper till läggs till i listan över utslumpade attacker, men de kan inte attackeras (dock skjutas tillbaka på av AA).
-    		Artilleri läggs också till men får ingen moteld alls.
-    		Sedan utförs alla strider/attacker i utslumpad ordning. Om en trupp inte längre har en motståndare så gör den inget mer i denna strid.
-    		För varje nytt drag görs en helt ny uppställning. 
+    		FÃ¶r den stÃ¶rre styrkan sÃ¥ anvÃ¤nds reserven fÃ¶r att anfalla motstÃ¥ndare 2-1. Reserven sorteras slumpvis och en efter en allokeras 
+    			trupperna fÃ¶r att anfalla lÃ¤mpliga motstÃ¥ndare. Detta baseras pÃ¥ anfallsvÃ¤rden och motstÃ¥ndarens typ (armor/ej armor)
+    			Trupper som Ã¤r i strid med 2 motstÃ¥ndare anfaller slumpvis en av dem vid varje attack.
+    		Flankerande trupper tar strid 1-1 slumpvis om de finns pÃ¥ bÃ¤gge sidor.
+    		Om ena sidan har fler flankerare Ã¤n andra sidan sker nÃ¥got av fÃ¶ljande (med de flankers som kommer fÃ¶rbi ev. motstÃ¥ndarens flankers):
+    		1. Om motstÃ¥ndaren har SLD-trupp(er) sÃ¥ anfalls en av dem.
+    		2. Om motstÃ¥ndaren saknar SLD:
+    			2a: Om motstÃ¥ndaren har support troops anfalls slumpvis en av dessa.
+    			2b: Annars anfalls en first line troop i ryggen. Den som anfalls i ryggen har svÃ¥rt att skjuta tillbaka. En trupp kan endast anfallas av 1st flanker i ryggen i en strid.
+    		Rymdskepp som hjÃ¤lper till lÃ¤ggs till i listan Ã¶ver utslumpade attacker, men de kan inte attackeras (dock skjutas tillbaka pÃ¥ av AA).
+    		Artilleri lÃ¤ggs ocksÃ¥ till men fÃ¥r ingen moteld alls.
+    		Sedan utfÃ¶rs alla strider/attacker i utslumpad ordning. Om en trupp inte lÃ¤ngre har en motstÃ¥ndare sÃ¥ gÃ¶r den inget mer i denna strid.
+    		FÃ¶r varje nytt drag gÃ¶rs en helt ny uppstÃ¤llning. 
 
      * @param defendingPlayer
      * @param defendingTroops	
@@ -2896,17 +2879,41 @@ protected void rankingLoss(String playerLogin, boolean survived){
      * @param attackingTaskForce
      * @param aPlanet
      */
-    public void performLandBattle(Player defendingPlayer,List<Troop> defendingTroops, Player attackingPlayer, List<Troop> attackingTroops, Planet aPlanet){
-    	LandBattle battle = new LandBattle(defendingPlayer,defendingTroops,attackingPlayer,attackingTroops,aPlanet,g.getTurn(),g);
+    
+    
+    
+    public void performLandBattle(Player defendingPlayer,List<TaskForceTroop> defendingTroops, Player attackingPlayer, List<TaskForceTroop> attackingTroops, Planet aPlanet){
+    	
+    	LandBattle battle = new LandBattle(defendingTroops, attackingTroops, aPlanet.getName(), aPlanet.getResistance(), g.getTurn());
     	battle.performBattle();
-    	// add land battle reports to players
-    	attackingPlayer.addToGeneral(battle.getAttackingSummary());
-    	attackingPlayer.getTurnInfo().addToLatestLandBattleReports(battle.getAttackingBattleReport());
-    	if (defendingPlayer != null){
-        	defendingPlayer.addToGeneral(battle.getDefendingSummary());
-    		defendingPlayer.getTurnInfo().addToLatestLandBattleReports(battle.getDefendingBattleReport());
+    	    	
+    	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
+    	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
+    	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
+    	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
+    	    	
+    	// Om en VIP var pÃ¥ en troop ska den dÃ¥ dÃ¶? eller gÃ¶rs det senare i koden nÃ¤r VIPar gÃ¥s igenom?
+    	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> g.removeTroop(troop));
+    	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> g.removeTroop(troop));
+    	
+    	addLandBattleReport(attackingPlayer, battle.getAttBG().getReport(), aPlanet);
+		addLandBattleReport(defendingPlayer, battle.getDefBG().getReport(), aPlanet);
+    }
+    
+    private void addLandBattleReport(Player player, spaceraze.world.report.landbattle.LandBattleReport landBattleReport, Planet planet) {
+    	if(player != null) {
+			Optional<PlanetReport> optional = player.getPlayerReports().get(g.getTurn()).getChildeReportsOfType(PlanetReport.class).stream()
+			.filter(planetReport -> planetReport.getPlanetName().equals(planet.getName())).findAny();
+			if(optional.isPresent()) {
+				optional.get().addReport(landBattleReport);
+			}else {
+				PlanetReport planetReport = new PlanetReport(planet.getName());
+				planetReport.addReport(landBattleReport);
+				player.getPlayerReports().get(g.getTurn()).addReport(planetReport);
+				
+			}
     	}
-    }    
+    }
 
     protected void bombardTroops(Player defendingPlayer,List<Troop> defendingTroops, Player attackingPlayer, int bombardment, Planet aPlanet){
     	int performedBombardments = 0;
@@ -2934,147 +2941,6 @@ protected void rankingLoss(String playerLogin, boolean survived){
     	}
     }
     
-    public TaskForce performCombat(TaskForce tf1, TaskForce tf2, Planet aPlanet){
-      Logger.fine(aPlanet.getName());
-      boolean neutral = false;
-      Player notNeutralPlayer = null;
-      TaskForce notNeutralTaskForce = null; 
-//      TaskForce neutralTaskForce = null;
-      Player player1 = tf1.getPlayer();
-      Player player2 = tf2.getPlayer();
-      // hantera neutrala tf:s...
-      if (player1 == null){
-        notNeutralPlayer = player2;
-        notNeutralTaskForce = tf2;
-//        neutralTaskForce = tf1;
-        neutral = true;
-      }else
-      if (player2 == null){
-        notNeutralPlayer = player1;
-        notNeutralTaskForce = tf1;
-//        neutralTaskForce = tf2;
-        neutral = true;
-      }
-      SpaceBattleReport report = new SpaceBattleReport(aPlanet); 
-      // initiala meddelanden, även räkna upp styrkorna eller kanske bara antalet skepp på varje sida?
-      if (!neutral){
-        player1.addToGeneral("Your forces at " + aPlanet.getName() + " have engaged hostile forces from governor " + player2.getGovenorName() + ".");
-        player2.addToGeneral("Your forces at " + aPlanet.getName() + " have engaged hostile forces from player " + player1.getGovenorName() + ".");
-      }else{
-        notNeutralPlayer.addToGeneral("Your forces have engaged neutral forces at " + aPlanet.getName() + ".");
-      }
-      report.setInitialForces1(tf1);
-      report.setInitialForces2(tf2);
-      Logger.finer("Fighting starts");
-      String tf1status = "fighting";
-      String tf2status = "fighting";
-      Random r = Functions.getRandom();
-      int shootingSide = 0;
-      Spaceship firingShip = null;
-//      String oldStatus = "";
-      // loopa tills ena sidan är "gone"
-      while ((!tf1status.equalsIgnoreCase("destroyed")) & (!tf2status.equalsIgnoreCase("destroyed")) & (!tf1status.equalsIgnoreCase("ran away")) & (!tf2status.equalsIgnoreCase("ran away"))){
-      	Logger.finest("In battle loop: " + tf1status + " " + tf2status); 
-      	AttackReportSpace attackReport = new AttackReportSpace();
-        shootingSide = getShootingSide(tf1,tf2,r);
-        if (shootingSide == 1){
-          firingShip = tf1.getFiringShip(tf2,r,attackReport); // returnerar null om ett skepp flyr istället för att skjuta
-          if (firingShip != null){
-        	  Logger.finest("firingShip: " + firingShip.getName() + " ");
-          }else{
-        	  Logger.finest("firingShip == null ");
-          }
-          tf1status = tf1.getStatus();
-          if (firingShip != null){ // tf2 är beskjutet
-            tf2status = tf2.shipHit(tf1,firingShip,r,attackReport);
-          }else{   // om inget skepp returneras betyder det att tf1 håller på att retirera
-            tf2status = "fighting";
-          }
-        }else{
-          firingShip = tf2.getFiringShip(tf1,r,attackReport);
-          tf2status = tf2.getStatus();
-          if (firingShip != null){ // tf1 är beskjutet
-            tf1status = tf1.shipHit(tf2,firingShip,r,attackReport);
-          }else{   // om inget skepp returneras betyder det att tf2 håller på att retirera
-            tf1status = "fighting";
-          }
-          // räkna hur många skepp som kommer undan?
-        }
-        report.addAttackResult(attackReport);
-      }
-      // vem vann?
-      TaskForce tfWinner = tf2;
-      TaskForce tfLoser = tf1;
-      Logger.finer("tf2.getNrShips(): " + tf2.getTotalNrShips());
-      Logger.finer("tf1.getNrShips(): " + tf1.getTotalNrShips());
-      if (tf1.getTotalNrShips() > 0){
-      	Logger.finer("tf1.getNrShips(): " + tf1.getTotalNrShips());
-        tfWinner = tf1;
-        tfLoser = tf2;
-      }
-      report.setPostBattleForces1(tf1);
-      report.setPostBattleForces2(tf2);
-      if (tfWinner.getPlayer() != null){
-          tfWinner.getPlayer().getTurnInfo().addToLatestSpaceBattleReports(report);
-          Logger.finer("tfWinner.getPlayer().getGovenorName(): " + tfWinner.getPlayer().getGovenorName());
-      }else{
-          Logger.finer("tfWinner is neutral");
-      }
-      if (tfLoser.getPlayer() != null){
-          tfLoser.getPlayer().getTurnInfo().addToLatestSpaceBattleReports(report);
-          Logger.finer("tfLoser.getPlayer().getGovenorName(): " + tfLoser.getPlayer().getGovenorName());
-      }else{
-    	  Logger.finer("tfLoser is neutral");
-      }
-      tfWinner.addToLatestGeneralReport("Your forces has won a glorious victory.");
-      tfLoser.addToLatestGeneralReport("Your forces has lost the battle.");
-      if (tfLoser.getRetreatedShips().size() == 0){
-      	// the loser dig not retreat with any ships (all destroyed)
-      	if (tfWinner.getPlayer() != null){
-      		tfWinner.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_BATTLE_WON);
-      	}
-      	if (tfLoser.getPlayer() != null){
-      		tfLoser.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_BATTLE_LOST);
-      	}
-      }else
-      if (tfLoser.getDestroyedShips().size() == 0){
-      	// the loser did not lose any ships (all retreated)
-      	if (tfWinner.getPlayer() != null){
-      		tfWinner.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_RETREAT_IN_COMBAT_ENEMY);
-      	}
-      	if (tfLoser.getPlayer() != null){
-      		tfLoser.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_RETREAT_IN_COMBAT_OWN);
-      	}
-      }else{
-      	// else = partial retreat
-      	if (tfWinner.getPlayer() != null){
-      		tfWinner.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_BATTLE_WON_PARTIAL_RETREAT);
-      	}
-      	if (tfLoser.getPlayer() != null){
-      		tfLoser.getPlayer().addToHighlights(aPlanet.getName(),HighlightType.TYPE_BATTLE_LOST_PARTIAL_RETREAT);
-      	}
-      }
-      tfWinner.addToLatestGeneralReport("");
-      tfLoser.addToLatestGeneralReport("");
-      Logger.finer("tfLoser.getStatus(): " + tfLoser.getStatus());
-
-      // mera detaljerat för battle report
-      if (tfLoser.getStatus().equalsIgnoreCase("destroyed")){
-    	report.setLastShipDestroyed(true);
-      }else{
-   	    report.setLastShipDestroyed(false);
-      }
-      tfWinner.restoreAllShields(); // nollställ även variabler... antal förstörda
-      // reload winning sides squadrons if they have a carrierLocation
-      tfWinner.reloadSquadrons();
-      // check if any governor from same planet as attacker is on planet
-      if (neutral){
-      	checkGovOnNeutralPlanet(aPlanet,notNeutralTaskForce); 
-      }
-      Logger.finer("performCombat finished");
-      return tfLoser;
-    }
-
 //    private String shipNames(List<Spaceship> ships){
 //      String allNames = "";
 //      for(int i = 0; i < ships.size(); i++){
@@ -3099,75 +2965,19 @@ protected void rankingLoss(String playerLogin, boolean survived){
 //      return allNames;
 //    }
 
-    // chansen för att den ena tf:en får skjuta baseras på antalet skepp i resp. flotta samt initiativbonus
-    // Generaler, Jedis etc kanske kan öka chansen att få skjuta?
-    protected int getShootingSide(TaskForce tf1, TaskForce tf2, Random r){
-      int returnValue = 0;
-//      double tf1ratio = (tf1.getNrFirstLineShips()*1.0) / ((tf1.getNrFirstLineShips() + tf2.getNrFirstLineShips()*1.0));
-      double tf1ratio = getInitRatio(tf1,tf2,r);
-//      double tf1ratio = (tf1.getRelativeSize()*1.0) / ((tf1.getRelativeSize() + tf2.getRelativeSize()*1.0));
-//      int tf1initBonus = tf1.getTotalInitBonus() - tf2.getTotalInitBonus();
-      int tf1initBonus = getInitBonusTotal(tf1,tf2);
-      Logger.finer("tf1initbonus: " + tf1initBonus + " ratio: " + tf1ratio);
-      double randomDouble = r.nextDouble();
-      if (tf1initBonus > 0){ // increase chance of initiative
-        tf1ratio = tf1ratio + ((1.0-tf1ratio)*(tf1initBonus/100.0));
-      }else
-      if (tf1initBonus < 0){ // decrease chance of initiative
-        tf1ratio = tf1ratio*(1.0+(tf1initBonus/100.0));
-      }
-      Logger.finer("tf1ratio (inc bonuses) --> " + tf1ratio + " randomDouble: " + randomDouble);
-      if (tf1ratio > randomDouble){
-        returnValue = 1;
-      }
-      //return Math.abs(r.nextInt()%2) + 1;
-      return returnValue;
-    }
 
-    protected double getInitRatio(TaskForce tf1, TaskForce tf2, Random r){
-    	InitiativeMethod initMethod = g.getGameWorld().getInitMethod();
-    	double tf1ratio = 0.0d;
-    	if (initMethod == InitiativeMethod.WEIGHTED){
-    		Logger.finer("tf1.getRelativeSize(): " + tf1.getRelativeSize());
-    		Logger.finer("tf2.getRelativeSize(): " + tf2.getRelativeSize());
-//    		tf1ratio = (tf1.getRelativeSize()*1.0) / ((tf1.getRelativeSize() + tf2.getRelativeSize()*1.0));
-    		tf1ratio = getWeightedRatio(0,tf1.getRelativeSize(),tf2.getRelativeSize());
-    	}else
-       	if (initMethod == InitiativeMethod.WEIGHTED_1){
-       		tf1ratio = getWeightedRatio(1,tf1.getRelativeSize(),tf2.getRelativeSize());
-       	}else
-       	if (initMethod == InitiativeMethod.WEIGHTED_2){
-       		tf1ratio = getWeightedRatio(2,tf1.getRelativeSize(),tf2.getRelativeSize());
-       	}else
-       	if (initMethod == InitiativeMethod.WEIGHTED_3){
-       		tf1ratio = getWeightedRatio(3,tf1.getRelativeSize(),tf2.getRelativeSize());
-       	}else
-    	if (initMethod == InitiativeMethod.LINEAR){
-    		tf1ratio = (tf1.getTotalNrFirstLineShips()*1.0) / ((tf1.getTotalNrFirstLineShips() + tf2.getTotalNrFirstLineShips()*1.0));
-    	}else
-       	if (initMethod == InitiativeMethod.FIFTY_FIFTY){
-       		tf1ratio = 0.5d;
-       	}
-    	return tf1ratio;
+    
+    public Galaxy getGalaxy() {
+    	return g;
     }
     
-    protected double getWeightedRatio(double base, double tf1RelSize, double tf2RelSize){
-    	double tf1RelSizeMod = tf1RelSize + base;
-    	double tf2RelSizeMod = tf2RelSize + base;
-		double tf1ratio = tf1RelSizeMod / (tf1RelSizeMod + tf2RelSizeMod);
-		return tf1ratio;
-    }
-    
-    protected int getInitBonusTotal(TaskForce tf1, TaskForce tf2){
-      int tf1initBonus = tf1.getTotalInitBonus() - tf2.getTotalInitDefence();
-      if (tf1initBonus < 0){
-      	tf1initBonus = 0;
+    public void removeNeutralShips(Planet homeplanet){
+        for (int i = g.getSpaceships().size() - 1; i >= 0 ; i--){
+          Spaceship tempShip = g.getSpaceships().get(i);
+          if ((tempShip.getLocation() == homeplanet) & (tempShip.getOwner() == null)){
+        	  g.getSpaceships().remove(tempShip);
+          }
+        }
       }
-      int tf2initBonus = tf2.getTotalInitBonus() - tf1.getTotalInitDefence();
-      if (tf2initBonus < 0){
-      	tf2initBonus = 0;
-      }
-      return tf1initBonus - tf2initBonus;
-    }
     
 }

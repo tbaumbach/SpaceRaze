@@ -8,22 +8,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 import spaceraze.servlet.game.GameParameters;
-import sr.enums.DiplomacyGameType;
-import sr.general.logging.Logger;
-import sr.notifier.GameData;
-import sr.notifier.GameListData;
-import sr.notifier.ReturnGames;
+import spaceraze.servlethelper.GameData;
+import spaceraze.servlethelper.GameListData;
+import spaceraze.servlethelper.ReturnGames;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
+import spaceraze.util.general.Logger;
+import spaceraze.world.Faction;
+import spaceraze.world.Galaxy;
+import spaceraze.world.GameWorld;
+import spaceraze.world.Map;
+import spaceraze.world.Player;
+import spaceraze.world.StatisticGameType;
+import spaceraze.world.enums.DiplomacyGameType;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
 import sr.server.properties.PropertiesHandler;
 import sr.webb.mail.MailHandler;
 import sr.webb.users.User;
-import sr.world.Faction;
-import sr.world.Galaxy;
-import sr.world.GameWorld;
-import sr.world.Map;
-import sr.world.Player;
-import sr.world.StatisticGameType;
 
 /**
  * @author WMPABOD
@@ -178,7 +179,7 @@ public class ServerHandler {
 								"<td id='" + RowName + "2' width='48' valign='middle' class='ListText'><div class='SolidText'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\">"+ mail +"</div></td>" +
 								"<td id='" + RowName + "3' class='ListText' valign='middle'><div class='SolidText'>" + aServer.getGameName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gw.getFileName() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aServer.getMapFileName() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + aServer.getStatus() + "</div></td><td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + aServer.getTurn()+"" + sEndTurn + "</div></td><td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + nextUpdate + "</div></td><td id='" + RowName + "10' class='ListText'><div class='SolidText'>" + aServer.getStartedByPlayerName() + "</div></td><td id='" + RowName + "11' class='ListText'><div class='SolidText'></div></td><td id='" + RowName + "12' class='ListText'><div class='SolidText'>&nbsp;";
 						if (showJoin){
-// �ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+// ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 							retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 						}
 						retStr = retStr + "</div></td></tr>\n";
@@ -193,116 +194,6 @@ public class ServerHandler {
 		}
 		retStr = retStr + "</table>";
 		return retStr;
-/*
-	 
-	 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-		id='<%=RowName%>3' class='ListText' align=Center><div class='SolidText'>
-		
-		<tr class='ListheaderRow' height="16" style="width:250">
-			<td class='ListHeader'>&nbsp;</td>
-			<td class='ListHeader'><div class="SolidText">Players</div></td>
-			<td class='ListHeader' align=Center width=20><div class="SolidText">W</div></td>
-			<td class='ListHeader' align=Center width=20><div class="SolidText">F</div></td>
-			<td class='ListHeader' align=Center width=20><div class="SolidText">L</div></td>
-			<td class='ListHeader' align=Center width=20><div class="SolidText"><b>GP</b></div></td>
-			<td class='ListHeader'>&nbsp;</td>
-		</tr>
-
-			<% 
-			for (int i = 0; ((i < players.length) & (i < 5)); i++){ 
-				String userName = players[i].getLogin();
-				String RowName = i + "ListRow"; 
-			
-				User statUser = UserHandler.findUser(userName);
-				if (statUser != null){
-					userName = statUser.getName() + " (" + players[i].getLogin() + ")";
-				}
-			
-				%>
-			
-				<tr class='' onMouseOver="TranparentRow('<%=RowName%>',7,1);" onMouseOut="TranparentRow('<%=RowName%>',7,0);">
-					<td id='<%=RowName%>1' class='ListText'>&nbsp;</td>
-					<td id='<%=RowName%>2' class='ListText'><div class="SolidText"><%= i + 1 %>. <%= userName %></div></td>
-					<td id='<%=RowName%>3' class='ListText' align=Center><div class="SolidText"><%= players[i].getSoloWin() %></div></td>
-					<td id='<%=RowName%>4' class='ListText' align=Center><div class="SolidText"><%= players[i].getFactionWin() %></div></td>
-					<td id='<%=RowName%>5' class='ListText' align=Center><div class="SolidText"><%= players[i].getLoss() %></div></td>
-					<td id='<%=RowName%>6' class='ListText' align=Center><div class="SolidText"><b><%= players[i].getNrDefeatedPlayers() %></b></div></td>
-					<td id='<%=RowName%>7' class='ListText'>&nbsp;</td>
-				</tr>
-			<% } %>
-		</table>
-
-	
-		String retStr = "<table border='0' width='708' cellspacing='0' cellpadding='0' class='MenuMain'><tr height=1 class='ListLine'><td colspan=8></td></tr>";
-		retStr = retStr + "<tr class='ListheaderRow' height='16'><td class='ListHeader' WIDTH='3'></td><td class='ListHeader' WIDTH='25'></td><td class='ListHeader'>Game Name&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>GameWorld&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Map Name&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>#Players&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Game State&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Current Turn&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Next update&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Started by&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'></td><td class='ListHeader'></td></tr>\n";
-		retStr = retStr + "<tr><td colspan=\"11\" bgcolor=\"#FFBF00\" height=\"1\"><img src=\"images/pix.gif\" height=\"1\"></td></tr>\n";
-		SR_Server[] allSerArr = getServers();
-		if (allSerArr.length == 0){
-			retStr = retStr + "<td colspan=\"8\">No games found</td></tr>\n";
-		}else{
-			int count = 0;
-			for (int i = 0; i < allSerArr.length; i++) {
-				SR_Server aServer = allSerArr[i];
-				if (aServer.isPlayerParticipating(aUser)){
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
-					String nextUpdate = "None";
-					UpdateRunner ur = aServer.getUpdateRunner();
-					if (ur != null){
-						nextUpdate = ur.getNextUpdateShort();
-					}
-					String iconName = null;
-					boolean addGame = false;
-					boolean showJoin = true;
-					if (!aServer.getLastUpdateComplete()){
-						iconName = "error";
-						addGame = true;
-						showJoin = false;
-					}else
-					if (aServer.getGalaxy().gameEnded){
-						if (tmpPlayer.isDefeated()){
-							iconName = "defeat";
-							addGame = true;
-						}else{
-							iconName = "victory";
-							addGame = true;
-						}
-					}else
-					if (tmpPlayer.isDefeated()){
-						iconName = "defeat";
-						addGame = true;
-					}else
-					if (tmpPlayer.isFinishedThisTurn()){
-						iconName = "check";
-						addGame = true;
-					}else
-					if (tmpPlayer.getUpdatedThisTurn()){
-						iconName = "saved";
-						addGame = true;
-					}else
-					if (aServer.getTurn() > 0){
-						iconName = "cross";
-						addGame = true;
-					}
-					if (addGame){
-						GameWorld gw = aServer.getGalaxy().getGameWorld();
-						retStr = retStr + "<tr class='ListTextRow' style='height:21px' valign='middle' onMouseOver=this.style.backgroundColor='#148f14'; onMouseOut=this.style.backgroundColor='';><td width='3'></td><td width='25' valign='middle'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\"></td><td width='25' valign='middle'>" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td>" + nextUpdate + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;";
-						if (showJoin){
-// �ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
-							retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
-						}
-						retStr = retStr + "</td></tr>\n";
-						count++;
-					}
-				}
-			}
-			if (count == 0){
-				retStr = retStr + "<td colspan=\"6\">You are not currently participating in any games</td></tr>\n";
-			}
-		}
-		retStr = retStr + "</table>";
-		return retStr;
-		*/		
 	}
 	
 
@@ -394,7 +285,7 @@ public class ServerHandler {
 										"<td id='" + RowName + "2' width='25' valign='middle' class='ListText'><div class='SolidText'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\"></div></td>" +
 										"<td id='" + RowName + "3' class='ListText' valign='middle'><div class='SolidText'>" + aServer.getGameName() + "</div></td><td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gw.getFileName() + "</div></td><td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + aServer.getMapFileName() + "</div></td><td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + aServer.getGalaxy().getNrActivePlayers() + "/" + aServer.getGalaxy().getNrPlayers() + "</div></td><td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + aServer.getStatus() + "</div></td><td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + aServer.getTurn() + "</div></td><td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + nextUpdate + "</div></td><td id='" + RowName + "10' class='ListText'><div class='SolidText'>" + aServer.getStartedByPlayerName() + "</div></td><td id='" + RowName + "11' class='ListText'><div class='SolidText'>&nbsp;";
 								if (showJoin){
-//		 �ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+//		 ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 									retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 								}
 								retStr = retStr + "</div></td></tr>\n";
@@ -499,7 +390,7 @@ public class ServerHandler {
 									//"<td id='" + RowName + "6' class='ListText'><div class='SolidText'><a href=''>Details</a></div></td>" +
 									"<td id='" + RowName + "6' class='ListText'><div class='SolidText'>&nbsp;";
 							if (showJoin){
-//	 �ndrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
+//	 ändrat av Paul 070905	retStr = retStr + "&nbsp;<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Play</a>";
 								retStr = retStr + "&nbsp;<a href='SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=games_list' target=\"_top\">Play</a>";
 							}
 							retStr = retStr + "</div></td></tr>\n";
@@ -577,81 +468,7 @@ public class ServerHandler {
 		retStr = retStr + "</table>";
 		return retStr;
 		
-		/*	
-		String retStr = "<table border='0' width='7' cellspacing='0' cellpadding='0' class='MenuMain'><tr height=1 class='ListLine'><td colspan=8></td></tr>";
-		retStr = retStr + "<tr class='ListheaderRow' height='16'><td class='ListHeader' WIDTH='10'></td><td class='ListHeader'>Game Name&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>GameWorld&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Map&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>#Players&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Game State&nbsp;&nbsp;&nbsp;</td><td>Auto updates&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Started by&nbsp;&nbsp;&nbsp;</td><td></td><td></td></tr>\n";
-		retStr = retStr + "<tr><td colspan=\"9\" bgcolor=\"#FFBF00\" height=\"1\"><img src=\"images/pix.gif\" height=\"1\"></td></tr>\n";
-		SR_Server[] allSerArr = getServers();
-		if (allSerArr.length == 0){
-			retStr = retStr + "<td colspan=\"7\">No games found</td></tr>\n";
-		}else{
-			int count = 0;
-//			int countAlreadyParticipating = 0;
-			for (int i = 0; i < allSerArr.length; i++) {
-				SR_Server aServer = allSerArr[i];
-				GameWorld gw = aServer.getGalaxy().getGameWorld();
-				if (aServer.getTurn() == 0){
-					count++;
-					if (!aServer.isPlayerParticipating(aUser)){
-						String joinLink = "<a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"_top\">Join</a>";
-						if (aServer.isPasswordProtected()){
-							joinLink = "<a href='password_protected_game.jsp?port=" + aServer.getId() + "&autouser=true&returnto=startpage.jsp' target=\"mainFrame\">Join</a>";
-						}
-						String iconString = "questionmark";
-						if (aServer.isPasswordProtected()){
-							iconString = "unlocked";
-						}
-						retStr = retStr + "<tr class='ListTextRow' onMouseOver=this.style.backgroundColor='#148f14'; onMouseOut=this.style.backgroundColor=''; valign=\"bottom\"><td><img src=\"images/" + iconString + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + aServer.getGalaxy().getNrPlayers() + "/" + aServer.getGalaxy().getNrStartPlanets() + "</td><td>" + aServer.getStatus() + "</td><td>" + UpdateRunner.getShortDescription(aServer.getGalaxy().getTime()) + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;&nbsp;" + joinLink + "</td></tr>\n";
-//						retStr = retStr + "<tr><td><img src=\"images/questionmark.gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + aServer.getMapName() + "</td><td>" + aServer.getTurn() + "</td><td>" + aServer.getStatus() + "</td><td><a href='current_game.jsp?port=" + aServer.getPort() + "&gamename=" + aServer.getGameName() + "'>Details</a></td><td>&nbsp;&nbsp;<a href='../SpaceRaze_client.jsp?port=" + aServer.getPort() + "&autouser=true' target=\"gameframe\">Join</a></td></tr>\n";
-					}else{
-//						countAlreadyParticipating++;
-						String iconString = "exclamationmark";
-						if (aServer.isPasswordProtected()){
-							iconString = "locked";
-						}
-						retStr = retStr + "<tr class='ListTextRow' onMouseOver=this.style.backgroundColor='#148f14'; onMouseOut=this.style.backgroundColor='';  valign=\"bottom\"><td><img src=\"images/" + iconString + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + aServer.getGalaxy().getNrPlayers() + "/" + aServer.getGalaxy().getNrStartPlanets() + "</td><td>" + aServer.getStatus() + "</td><td>" + UpdateRunner.getShortDescription(aServer.getGalaxy().getTime()) + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;</td></tr>\n";
-					}
-				}
-			}
-			if (count == 0){
-//				if (countAlreadyParticipating == 0){
-					retStr = retStr + "<td></td><td colspan=\"6\">There are no games currently starting up</td></tr>\n";
-//				}else{
-//					retStr = retStr + "<td colspan=\"6\">There are no games currently starting up (that you have not already joined...)</td></tr>\n";
-//				}
-			}
-		}
-		retStr = retStr + "</table>";
-		return retStr;
-		*/
 	}
-
-	/*	public String getCurrentGamesListNO(User aUser){
-		String retStr = "<table border='0' width='708' cellspacing='0' cellpadding='0' class='MenuMain'><tr height=1 class='ListLine'><td colspan=8></td></tr>";
-		retStr = retStr + "<tr class='ListheaderRow' height='16'><td class='ListHeader' WIDTH='10'></td><td class='ListHeader'>Game Name&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Map Name&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Current Turn&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Game State&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'>Started by&nbsp;&nbsp;&nbsp;</td><td class='ListHeader'></td><td class='ListHeader'></td></tr>\n";
-		retStr = retStr + "<tr><td colspan=\"7\" bgcolor=\"#FFBF00\" height=\"1\"><img src=\"images/pix.gif\" height=\"1\"></td></tr>\n";
-		SR_Server[] allSerArr = getServers();
-		if (allSerArr.length == 0){
-			retStr = retStr + "<td colspan=\"6\">No games found</td></tr>\n";
-		}else{
-			for (int i = 0; i < allSerArr.length; i++) {
-				SR_Server aServer = allSerArr[i];
-				retStr = retStr + "<tr class='ListTextRow' onMouseOver=this.style.backgroundColor='#148f14'; onMouseOut=this.style.backgroundColor=''; valign=\"bottom\"><td>" + aServer.getGameName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + aServer.getTurn() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getStartedByPlayerName() + " (" + aServer.getStartedByPlayer() + ")</td><td><a href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=false&returnto=current_games.jsp'>Details</a></td><td><a href='../applet/SpaceRaze_client.jsp?port=" + aServer.getId() + "&returnto=current_games.jsp' target=\"_top\">Login</a></td></tr>\n";
-//				retStr = retStr + "<tr><td>" + aServer.getGameName() + "</td><td>" + aServer.getMapName() + "</td><td>" + aServer.getTurn() + "</td><td>" + aServer.getStatus() + "</td><td><a href='current_game.jsp?port=" + aServer.getPort() + "&gamename=" + aServer.getGameName() + "'>Details</a></td><td><a href='../SpaceRaze_client.jsp?port=" + aServer.getPort() + "' target=\"gameframe\">Login</a></td></tr>\n";
-				retStr = retStr + "<tr><td>" + aServer.getGameName() + "</td><td>" + aServer.getMapName() + "</td><td>" + aServer.getTurn() + "</td><td>" + aServer.getStatus() + "</td><td><a href='current_game.jsp?port=" + aServer.getPort() + "&gamename=" + aServer.getGameName() + "'>View Info</a></td><td>";
-				if (aServer.getTurn() == 0){
-					retStr = retStr + "<a href='../SpaceRaze_client.jsp?port=" + aServer.getPort() + "' target=\"gameframe\">Join</a>";
-				}else
-				if (aServer.isPlayerParticipating(aUser)){
-					retStr = retStr + "<a href='../SpaceRaze_client.jsp?port=" + aServer.getPort() + "' target=\"gameframe\">Play</a>";
-				}
-				retStr = retStr + "</td></tr>\n";
-			}
-		}
-		retStr = retStr + "</table>";
-		return retStr;
-	}
-*/
 		
 		
 		public String getCurrentGamesListNO(User aUser){
@@ -1457,7 +1274,7 @@ public class ServerHandler {
 	}
 */
 	
-	//TODO varf�r m�ste password finns f�r spelaren i p�g�ende spel? borde inte det tas bort s� beh�vs inte detta g�ras?
+	//TODO varför måste password finns för spelaren i pågående spel? borde inte det tas bort så behövs inte detta göras?
 	/**
 	 * Called when a player has changed his password.
 	 * Update all games so that the players new password will be used.

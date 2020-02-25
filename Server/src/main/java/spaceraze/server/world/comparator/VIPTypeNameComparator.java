@@ -1,4 +1,4 @@
-package sr.world.comparator;
+package spaceraze.server.world.comparator;
 
 import java.util.Comparator;
 

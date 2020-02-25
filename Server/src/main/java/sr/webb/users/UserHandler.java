@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import sr.general.Functions;
-import sr.general.logging.Logger;
+import spaceraze.util.general.Functions;
+import spaceraze.util.general.Logger;
 import sr.notifier.JnlpHandler;
 import sr.server.ServerHandler;
 import sr.server.properties.PropertiesHandler;

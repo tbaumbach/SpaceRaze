@@ -11,11 +11,11 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import sr.server.GameWorldHandler;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
+import spaceraze.world.GameWorld;
+import spaceraze.world.Planet;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.world.GameWorld;
-import sr.world.Planet;
 
 @Path("/PlanetInfo2")
 public class PlanetInfo2{

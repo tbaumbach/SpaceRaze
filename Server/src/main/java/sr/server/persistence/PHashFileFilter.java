@@ -3,7 +3,7 @@ package sr.server.persistence;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import sr.general.logging.Logger;
+import spaceraze.util.general.Logger;
 
 /**
  * File filter used to find datafiles for PHash class

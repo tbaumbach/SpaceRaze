@@ -1,11 +1,11 @@
 /*
  * Created on 2005-aug-26
  */
-package sr.world.comparator;
+package spaceraze.server.world.comparator;
 
 import java.util.Comparator;
 
-import sr.world.Planet;
+import spaceraze.world.Planet;
 
 /**
  * @author WMPABOD
