@@ -16,10 +16,7 @@
 
 <%
 	// get action
-	String action = request.getParameter("action"); 
-String action2 = "";
-	// create ImageText object to create buttons
-	ImageText it = new ImageText("imagepack2");
+	String action = request.getParameter("action");
 	// handle session/login/logout
 	String message = "";
 	User theUser = null;

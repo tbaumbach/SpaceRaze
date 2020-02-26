@@ -32,7 +32,6 @@ function OnMouseOut(Control)
 
 
 <body background="images/spaze.gif">
-<form name="form1" id="form1">
 
 <div style="left:130px;width:718px;position: absolute;top: 89px;">
 		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
@@ -54,6 +53,5 @@ function OnMouseOut(Control)
 		</div>
 		<div class="List_End"></div>	
 </div>
-</form>
 </body>
 </html>

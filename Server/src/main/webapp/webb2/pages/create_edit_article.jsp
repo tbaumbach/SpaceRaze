@@ -60,7 +60,6 @@
 
 //			response.sendRedirect("Master.jsp?action=news_archive");
 //			pageContext.forward("Master.jsp?action=news_archive");
-			//pageContext.forward("view_news_archive.jsp");
 //		}
 //		catch (ServletException  ioe){
 //			ioe.printStackTrace();

@@ -122,8 +122,6 @@
 	// get PageURL
 	String PageURL = request.getParameter("action"); 
 
-	// create ImageText object to create buttons
-	ImageText it = new ImageText("imagepack2");
 	// handle session/login/logout
 	String message = "";
 	User theUser = null;
@@ -170,19 +168,11 @@
 
 <!-- body class="main" bgcolor="#000000" background="" onmousedown="MoveOrigo(event);"  onmousemove="show_coords(event)" onLoad="document.forms[0].login.focus()"-->
 <body bgcolor="#000000" background=images/SpacerazeBG.jpg style="background-repeat: no-repeat;margin-top: 0px;margin-left: 0px;" >
-<FORM id="form2" metod="post" action="Master.jsp">
+<%if (!theUser.isGuest()){ %>
+<FORM id="form2" method="post" action="Master.jsp">
 <input type="hidden" name="action" id="action" value="logout">
 </form>
-
-
-	<!--Include Login Area -->
-		<%//if (theUser.isGuest()){%>
-			<!-- user is guest, show login fields -->
-			<%//@ include file="pages/login.jsp" %>
-		<%//}else{%>
-			<!-- an user is logged in -->
-			<%//@ include file="pages/loggedin.jsp" %>
-		<%//}%>
+<%} %>
 
 	<!--Include Left Menu Area -->
 		<%@ include file="buttons/menu_buttons.jsp" %>
@@ -203,7 +193,7 @@
 			<%
 		}	%>
 
-<FORM name="form1" id="form1" metod="post" action="Master.jsp?action=login">
+<FORM name="form1" id="form1" method="post" action="Master.jsp?action=login">
 	<!--Include Content Area -->
 		<div id="GuideDiv" style="left: 160px;width: 388px;position: absolute;top: 57px;z-index:99;">
 				<div id="GuideArea" class='GuideAreaBlue'>
@@ -295,31 +285,30 @@ return;
 				    <td></td>
 				    <td class="LoginText">UserID:</td>
 				    <td></td>
-				    <td><input taborder="0" class="LoginInputText" id="login" name="login" type=text value=""/></td>
+				    <td><input tabindex="1" class="LoginInputText" id="login" name="login" type=text value=""/></td>
 				    <td class="Text"></td>
 				</tr>
 				<tr>
 				    <td></td>
 				    <td class="LoginText">Password:</td>
 				    <td></td>
-				    <td><input taborder="1" class="LoginInputText" id="password" name="password" type="password" value=""/></td>
+				    <td><input tabindex="2" class="LoginInputText" id="password" name="password" type="password" value=""/></td>
 				    <td></td>
 				    <td align="right">
-						<A href="#" onclick='document.forms["form1"].submit();'><IMG onmouseout="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_login.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_Over_login.jpg','Login: Enter SpaceRaze Acoount name and password.','GuideArea');" height=21 alt="Login" hspace=0 src="images/btn_Blue_login.jpg" width=85 vspace=0 border=0></A><BR>
+						<A href="#" onclick='document.forms["form1"].submit();' tabindex="3"><IMG onmouseout="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_login.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_Over_login.jpg','Login: Enter SpaceRaze Acoount name and password.','GuideArea');" height=21 alt="Login" hspace=0 src="images/btn_Blue_login.jpg" width=85 vspace=0 border=0></A><BR>
 				    </td>
 				    <td class="Text"></td>
 				</tr>
 				</table>
 		</div>
 	<%}else{%>
-	<input type="hidden" value="login" id="action" name="action"  >
 		<div id="LoginDiv" style="left: 575px;width: 200px;position: absolute;top: 25px;z-index:99;">
 			    <table>
 				<tr>
 				    <td></td>
 				    <td class="LoginText">UserID:</td>
 				    <td></td>
-				    <td><input taborder="0" class="LoginInputText" id="login" name="login" type=text value="<%=theUser.getName()%>"/></td>
+				    <td><input class="LoginInputText" id="login" name="login" type=text value="<%=theUser.getName()%>" disabled="disabled"/></td>
 				    <td class="Text"></td>
 				</tr>
 				<tr>
@@ -327,7 +316,7 @@ return;
 				    <td colspan="3">
 				    	<a class="Login" href="Master.jsp?action=settings">Settings</a>&nbsp;&nbsp;&nbsp;
 				    	<a class="Login" href="Master.jsp?action=change_password">Change Password</a>
-				    	<input taborder="1" class="InputText" id="password" name="password" type="hidden" value=""/>
+				    	<input class="InputText" id="password" name="password" type="hidden" value=""/>
 				    </td>
 				    <td></td>
 				    <td align="right">
@@ -406,7 +395,6 @@ Logged in user name: <%= theUser.getName() %><br>
 <a href=Master.jsp?action=user_show> user_show</a><br> 
 <a href=Master.jsp?action=view_last_game_log> view_last_game_log</a><br> 
 <a href=Master.jsp?action=view_log> view_log</a><br> 
-<a href=Master.jsp?action=view_news_archive> view_news_archive</a><br> 
 <a href=Master.jsp?action=view_props> view_props</a><br--> 
 
 

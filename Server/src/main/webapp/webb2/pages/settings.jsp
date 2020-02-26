@@ -39,8 +39,6 @@
 			UserHandler.newPassword(tmpUser.getLogin(),password,sh);
 		}
 	}
-	
-	ImageText it = new ImageText("buttonimage");
 %>
 <% if ((ok != null) && (ok.equals("true"))){ %>
 <body background="images/spaze.gif">

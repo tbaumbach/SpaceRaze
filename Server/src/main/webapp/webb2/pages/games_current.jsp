@@ -9,9 +9,6 @@
 <%
 	// get PageURL
 	String PageURL = request.getParameter("action"); 
-
-	// create ImageText object to create buttons
-	ImageText it = new ImageText("imagepack2");
 	
 	User theUser = null;
 	User tmpUser = null;
@@ -40,8 +37,6 @@
 <div class=TextHead710><b>Game List</b></div>
 <div class=TextArea710>
 <%
-	ImageText it2 = new ImageText("buttonimage");
-	it2.setAttributes(" border=\"0\" onClick=\"document.location='current_games.jsp'\"");
 	// check if a ServerHandler exists
 	//String found = ServerStatus.checkServerHandler(request,application);
 	Object foundz = application.getAttribute("serverhandler");

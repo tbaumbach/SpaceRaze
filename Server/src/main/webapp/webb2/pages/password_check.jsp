@@ -16,8 +16,6 @@
 	String returnPage = request.getParameter("returnto");
 	String gamePassword = request.getParameter("game_password");
 	
-	ImageText it = new ImageText("buttonimage");
-	
 	ServerHandler sh = (ServerHandler)application.getAttribute("serverhandler");
 	
 	boolean showErrorPage = true;

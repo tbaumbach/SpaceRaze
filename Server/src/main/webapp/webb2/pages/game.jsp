@@ -31,8 +31,6 @@
 		sh = (ServerHandler)found;
 	}
 	SR_Server aServer = sh.findGame(port);
-	ImageText it = new ImageText("buttonimage");
-	it.setAttributes(" border=\"0\" onclick=\"document.location='current_game.jsp?port=" + port + "&autouser=" + autoUser + "'\"");
 	
 %>
 <body background="images/spaze.gif">

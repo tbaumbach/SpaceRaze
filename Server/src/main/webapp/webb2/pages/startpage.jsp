@@ -14,9 +14,6 @@
 </head>
 <%@ include file="checklogin2.jsp" %>
 <%
-	ImageText it = new ImageText("buttonimage");
-//	it.setAttributes(" border=\"0\" onClick=\"document.location='startpage.jsp'\"");
-	it.setAttributes(" border=\"0\" ");
 	// check if a ServerHandler exists
 	//String found = ServerStatus.checkServerHandler(request,application);
 	Object found = application.getAttribute("serverhandler");
@@ -75,7 +72,5 @@ No articles exist yet.
 <%
 	}
 %>
-<p>
-<a href="view_news_archive.jsp"><%= it.getTagAndImage("View All News") %></a><br>
 </body>
 </html>

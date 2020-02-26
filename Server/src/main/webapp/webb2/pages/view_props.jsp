@@ -14,8 +14,6 @@
 <%@ include file="checklogin2.jsp" %>
 <%@ include file="admin_only.jsp" %>
 <%
-	ImageText it = new ImageText("buttonimage");
-	it.setAttributes(" border=\"0\" ");
 	String filename = request.getParameter("propname");
 	String proptext = PropertiesHandler.getPropertiesContent(filename);
 %>

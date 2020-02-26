@@ -202,10 +202,7 @@ function MoveOrigo(event)
 
 <%
 	// get action
-	String action = request.getParameter("action"); 
-String action2 = "";
-	// create ImageText object to create buttons
-	ImageText it = new ImageText("imagepack2");
+	String action = request.getParameter("action");
 	// handle session/login/logout
 	String message = "";
 	User theUser = null;
@@ -290,26 +287,9 @@ String action2 = "";
 	
 <%-- compute which page should be shown --%>	
 <%
-	if (action == null){
+	if (action == null || action.equals("start")){
 %>
-<!-- action is null -->
 <%@ include file="pages/start.jsp" %>
-<%
-	}else
-	if (action.equals("start")){
-%>
-<!-- action is start -->
-<%@ include file="pages/start.jsp" %>
-<%
-	}else
-	if (action.equals("view_news_archive")){
-	action2 = "pages/" + action + ".jsp";
-	//pages/view_news_archive.jsp
-%>
-<%=action2%>
-<!-- action is start -->
-<jsp:include page='<%= action2 %>' />
-
 <%
 	}else
 	if (action.equals("login")){

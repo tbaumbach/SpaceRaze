@@ -30,8 +30,6 @@
 	}
 
 
-	ImageText it = new ImageText("buttonimage");
-	it.setAttributes(" border=\"0\" onClick=\"document.location='games_list.jsp'\"");
 	// check if a ServerHandler exists
 	//String found = ServerStatus.checkServerHandler(request,application);
 	Object found = application.getAttribute("serverhandler");

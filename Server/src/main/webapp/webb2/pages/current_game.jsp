@@ -51,9 +51,6 @@
 		Endturn = "/" + aServer.getEndTurn();
 	}
 	String returnTo = request.getParameter("returnto");
-
-	ImageText it = new ImageText("buttonimage");
-	it.setAttributes(" border=\"0\" onclick=\"document.location='current_game.jsp?port=" + port + "&autouser=" + autoUser + "'\"");
 	
 	if (aServer.isPlayerParticipating(theUser)){
 		if (!aServer.getLastUpdateComplete()){

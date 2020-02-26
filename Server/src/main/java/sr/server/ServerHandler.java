@@ -169,7 +169,7 @@ public class ServerHandler {
 					}
 					if (aServer.getMessageDatabase().haveNewMessages(tmpPlayer.getName()))
 					{
-						mail = "<img src=\"images/mail.png\" vspace=\"0\" hspace=\"0\"  border=\"0\">";
+						mail = "<img src=\"images/mail.jpg\" vspace=\"0\" hspace=\"0\"  border=\"0\">";
 					}		
 					
 					if (addGame){

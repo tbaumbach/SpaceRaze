@@ -11,7 +11,6 @@
 <head>
 <title>View Map files</title>
 <meta charset="UTF-8">
-<link rel="stylesheet" HREF="styles.css" type="text/css">
 </head>
 
 
