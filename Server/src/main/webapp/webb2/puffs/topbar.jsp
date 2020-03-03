@@ -14,11 +14,11 @@
 	User user = (User)tmpUser;
 %>
 <body background="images/spaze.gif">
-<table width="95%" border="0" cellspacing="0" cellpadding="0">
+<table class="ListTable">
   <tr>
     <td width=500 valign="middle"><h1>SpaceRaze</h1></td>
     <td>
-	<table width="95%" border="0" cellspacing="0" cellpadding="0">
+	<table class="ListTable">
   <tr>
     <td>&nbsp;</td>
     <td>Current version: </td>

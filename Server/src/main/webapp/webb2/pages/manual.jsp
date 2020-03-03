@@ -47,7 +47,7 @@ table.sr td {
 <body background="images/spaze.gif">
 
 <div style="left: 129px;width: 450px;position: absolute;top: 89px;padding-bottom:20px;">	
-	<div class="Form_name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:450"><div class="SolidText"><b>Manual</b></div></div>
 	<div class="Form_Text" style="width:450"><div class="SolidText">
 		<b>Table of contents</b><br>
@@ -70,7 +70,7 @@ table.sr td {
 	<div class="List_End"></div>		
 <br>
 
-<div class="Form_name" style="width:450"><div class="SolidText">SpaceRaze Manual</div></div>
+<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze Manual</div></div>
 <div class="Form_Header" style="width:450"><div class="SolidText"><a name="intro"><b>1. Introduction</b></a></div></div>
 <div class="Form_Text" style="width:450" style="width:450"><div class="SolidText">
 

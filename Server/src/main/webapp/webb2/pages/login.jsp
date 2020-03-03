@@ -2,7 +2,7 @@
 
 <form id="loginform" name="loginform" action="Master.jsp">
 <input type="hidden" name="action" value="login">
-<table width='840' border='0' cellspacing='0' cellpadding='0'>
+<table class="ListTable">
 	<tr>
 		<td width=683></td>
 		<td width=50><span class=MenuMain>UserID:</span></td>

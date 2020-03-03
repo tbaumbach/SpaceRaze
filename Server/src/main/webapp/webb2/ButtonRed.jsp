@@ -20,6 +20,7 @@
 	<%= itOver.getTagAndImage("Update") %>
 	<%= itOver.getTagAndImage("Create New") %>
 	<%= itOver.getTagAndImage("Save") %>
+	<%= itOver.getTagAndImage("Change") %>
 <%= itOver.getTagAndImage("Cancel") %>
 	<%= itOver.getTagAndImage("Settings") %>
 	<%= itOver.getTagAndImage("New game") %>

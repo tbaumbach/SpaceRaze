@@ -23,7 +23,7 @@ public class ServerStatus {
 		if (cs.getTurn() == 0){
 			msg = "New game is starting. Click the Client/Login link in the menu to log in and join the game.";
 		}else{
-			msg = "Server is online (current game turn number is " + cs.getTurn() + ").<br> Click <a href=\"../SpaceRaze_client.htm\" target=\"_blank\">Client/Login</a> to log in to the current game, or <a href=\"current_game.jsp\">Game Status</a> to see more information about the game.";
+			msg = "Server is online (current game turn number is " + cs.getTurn() + ").<br> Click <a href=\"current_game.jsp\">Game Status</a> to see more information about the game.";
 		}
 		return msg;
 	}

@@ -26,7 +26,7 @@
 
 	// get news handler
 	NewsHandler nh = (NewsHandler)application.getAttribute("newshandler");
-	List allNews = nh.getAllNews();
+	List<NewsArticle> allNews = nh.getAllNews();
 
 	// handle different action
 	String action = request.getParameter("newsaction");
@@ -120,7 +120,7 @@
 </script>
 <form id="formNews" name="formNews" method="post" action="NewsOperator.jsp">
 <div style="left: 132px;width: 710px;position: absolute;top: 90px;">	
-	<div class="Form_name"><div class="SolidText">SpaceRaze - Newshandler</div></div>
+	<div class="Form_Name"><div class="SolidText">SpaceRaze - Newshandler</div></div>
 	<div class="Form_Header"><div class="SolidText"><b>Edit - <%= pageTitle %></b></div></div>
 	<div class="Form_Text"  style="width:710"><div class="SolidText">
 
@@ -139,9 +139,9 @@ Posted by: <input type="text" class="InputText" id="creator" name="creator" valu
 <!--input id="todo" name="todo" type="button" onclick="submit();" value="Save"-->
 
 	</div>
-	<div class="Form_header" ALIGN=RIGHT>
+	<div class="Form_Header" ALIGN=RIGHT>
 	<%if (theUser.isAdmin()){%>
-			<A href="#" id="nas" name="nas" onclick='document.forms["formNews"].submit();'><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_save.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_save.jpg','Save: Save or update Article.','GuideArea');" alt="Save" hspace=0 src="images/btn_save.jpg" vspace=0 border=0></A>
+			<A href="#" id="nas" onclick='document.forms["formNews"].submit();'><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_save.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_save.jpg','Save: Save or update Article.','GuideArea');" alt="Save" hspace=0 src="images/btn_save.jpg" vspace=0 border=0></A>
 	<% } 
 %>
 			

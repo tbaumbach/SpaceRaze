@@ -91,7 +91,7 @@
 <!-- <%= todoStr %> -->
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;">
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Game Information - <%= aServer.getGameName() %></b>&nbsp;</div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 
@@ -252,29 +252,6 @@ Game is password-protected
 Turn number is <%= aServer.getTurn() %>
 <p>
 -->
-<!-- autoUser: <%= autoUser %> test-->
-<%
-if(!theUser.isGuest()){
-	if (aServer.getLastUpdateComplete()){
-		if (aServer.getTurn() == 0){
-			if (!aServer.isPlayerParticipating(theUser) | (autoUser.equals("false"))){
-%>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=current_game.jsp"  target="_top">Login to Game</a>
-<p>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=close.jsp"  target="new_window">Login to Game (open in separate window)</a>
-<p>
-<%
-			}
-		}else{
-%>
-<p>
-
-<p>
-<%
-		}
-	}
-	}
-%>
 
 
 <!--Last updated:&nbsp;<%= aServer.getLastUpdatedString() %>
@@ -287,7 +264,7 @@ if(!theUser.isGuest()){
 <!--A href="Master.jsp?action=games_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_refreshlist.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_refreshlist.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_refreshlist.jpg" vspace=0 border=0></A-->
 </div>
 		</div>
-				<div class="Form_header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>			
+				<div class="Form_Header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>			
 			<div class="SolidText">
 <table><tr><td valign=top>
 <%if (theUser.isAdmin())
@@ -305,17 +282,12 @@ if(!theUser.isGuest()){
 			
 			<!--a href="SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=close.jsp"  target="new_window">Login to Game (open in separate window)</a-->
 			<A href="Master.jsp?action=current_game&port=<%=port%>&autouser=<%=autoUser%>"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_refreshlist.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_refreshlist.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_refreshlist.jpg" vspace=0 border=0></A>
-			<a href="SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=current_game&returnto_delete=<%= returnTo %>" target="_top">
 <%if (showJoin){%>
 	<IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_play.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_play.jpg','Requirements: What do you need to play SpaceRaze.','GuideArea');" height=21 alt="Requirements" hspace=0 src="images/btn_play.jpg" width=85 vspace=0 border=0>
   <%}%>	
 	</td>
 	</tr>
 	</table>
-	
-</a>
-			
-			
 			</div>
 			
 		</div>

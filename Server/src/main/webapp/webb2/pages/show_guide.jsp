@@ -59,12 +59,12 @@ table.sr td {
 <body background="images/spaze.gif">
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;">
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze - Guides</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze - Guides</div></div>
 		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Guides</b>&nbsp;</div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 			<%=nh.getGuideHTMLNO(Integer.parseInt(GuideID))%>
 		</div></div>
-	<div class="Form_header" ALIGN="RIGHT" style="width:718">
+	<div class="Form_Header" ALIGN="RIGHT" style="width:718">
 	<div class="SolidText">
 	<%if (theUser.isAdmin()){%>
 			<a href="Master.jsp?action=create_edit_guide&guideaction=edit&id=<%= GuideID%>"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_edit.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_edit.jpg','Update guide.','GuideArea');" alt="Create new News Article" hspace=0 src="images/btn_edit.jpg" vspace=0 border=0></A>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -75,6 +75,5 @@ table.sr td {
 	<A href="Master.jsp?action=guides_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_guides.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_guides.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_guides.jpg" vspace=0 border=0></A>
 	</div></div>
 	<div class="List_End"></div>	
-</div>		
 </div>		
 		

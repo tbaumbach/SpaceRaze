@@ -10,7 +10,7 @@
  			<td class='MenuRedTop' colspan=3><img src='/images/space.gif' width='4' height='4'></td>
  		</tr>
  		<tr>
- 			<td colspan='3' class='MenuRedTop' width='100%' class='useText3'><b>&nbsp;<%= errorType %>:</b></td>
+ 			<td colspan='3' class='MenuRedTop' width='100%' class='useText3'><b>&nbsp; <%=session.getAttribute("errorType")%>:</b></td>
  		</tr>
  		<tr>
  			<td colspan='3' class='MenuRedBorderLine' width='100%' class='useText3'><IMG height='1' src='spaceblack.gif' width='1'></td>
@@ -22,8 +22,8 @@
 			<td colspan='3' class='.MenuBorderLineBottom' width='100%' class='useText3'><IMG height='1' src='spaceblack.gif' width='1'></td>
 		</tr>
 		<tr class='TRMainREDRED'>
-			<td olspan=3 class='MenuRedMain' width='250'>
-				<%= errorMessage %>
+			<td colspan=3 class='MenuRedMain' width='250'>
+				<%=session.getAttribute("errorMessage")%>
 				<!--
 					<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr class='TRMainREDRED' onMouseOver=this.style.backgroundColor='#8f1414'; onMouseOut=this.style.backgroundColor=''; ><td class='MenuRedMain'>&nbsp;</td><td class='MenuRedMain'><u>Players</u></td><td class='MenuRedMain' align=right width=30><u>Won</u></td><td class='MenuRedMain' align=right width=40><u>Fraction</u></td><td class='MenuRedMain' align=right width=30><u>Lost</u></td><td class='MenuRedMain' align=right width=30><u>Points</u></td><td class='MenuRedMain'>&nbsp;</td></tr><tr class='TRMainREDRED' onMouseOver=this.style.backgroundColor='#8f1414'; onMouseOut=this.style.backgroundColor=''; ><td class='MenuRedMain'>&nbsp;</td><td class='MenuRedMain'>Nicklas</td><td class='MenuRedMain' align=right>10</td><td class='MenuRedMain' align=right>5</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>150</td><td class='MenuRedMain'>&nbsp;</td></tr><tr class='TRMainREDRED' onMouseOver=this.style.backgroundColor='#8f1414'; onMouseOut=this.style.backgroundColor=''; ><td class='MenuRedMain'>&nbsp;</td><td class='MenuRedMain'>Paul</td><td class='MenuRedMain' align=right>5</td><td class='MenuRedMain' align=right>5</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>75</td><td class='MenuRedMain'>&nbsp;</td></tr><tr class='TRMainREDRED' onMouseOver=this.style.backgroundColor='#8f1414'; onMouseOut=this.style.backgroundColor=''; ><td class='MenuRedMain'>&nbsp;</td><td class='MenuRedMain'>Pejao</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>10</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>10</td><td class='MenuRedMain'>&nbsp;</td></tr><tr class='TRMainREDRED' onMouseOver=this.style.backgroundColor='#8f1414'; onMouseOut=this.style.backgroundColor=''; ><td class='MenuRedMain'>&nbsp;</td><td class='MenuRedMain'>Tobbe</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain' align=right>15</td><td class='MenuRedMain' align=right>0</td><td class='MenuRedMain'>&nbsp;</td></tr></table>
 				-->

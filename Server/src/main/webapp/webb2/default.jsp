@@ -274,8 +274,8 @@ function MoveOrigo(event)
 <%
 	if ((action != null) && (action.equals("login"))){
 		if ((message != null) && (!message.equals("ok"))){
-			String errorType = "Login Error";
-			String errorMessage = message;
+			session.setAttribute("errorType", "Login Error");
+			session.setAttribute("errorMessage", message);
 %>
 <!-- login error message -->
 <%@ include file="pages/error_message_box.jsp" %>
@@ -326,7 +326,7 @@ function MoveOrigo(event)
 			<tr>
 				<td align="center">
 					<font style="font-size:9px;FONT-FAMILY: Tahoma, Verdana, Arial;COLOR: #00fe23">
-						Copyleft&nbsp;&nbsp;&nbsp;Hosted by Amarantin&nbsp;&nbsp;&nbsp;Version: <%= SR_Server.version %>
+						Copyleft&nbsp;&nbsp;&nbsp;&nbsp;Version: <%= SR_Server.version %>
 					</font>
 				</td>
 			</tr>

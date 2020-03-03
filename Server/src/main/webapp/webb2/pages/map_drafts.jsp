@@ -1,5 +1,4 @@
 <%@ page import="sr.webb.*"%>
-<%@ page import="sr.mapeditor.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.server.map.*"%>
 <%@ page import="sr.server.properties.*"%>
@@ -42,7 +41,7 @@ The list below show all your saved drafts of maps.
 <hr color="#FFBF00">
 
 
-<table border="0" cellspacing="0" cellpadding="0" class="MainMenu">
+<table class="ListTable">
 <tr>
 <td width="120">Name</td>
 <td width="120"># Planets</td>

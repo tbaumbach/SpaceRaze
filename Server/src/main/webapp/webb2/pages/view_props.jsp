@@ -22,6 +22,6 @@
 <p>
 <%= proptext %>
 <p>
-<a href="edit_props.jsp?propname=<%= filename %>"><%= it.getTagAndImage("Edit file") %></a>
+<a href="edit_props.jsp?propname=<%= filename %>">Edit file</a>
 </body>
 </html>

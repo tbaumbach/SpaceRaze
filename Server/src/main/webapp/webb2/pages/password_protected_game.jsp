@@ -46,10 +46,10 @@
 <input type="hidden" name="returnto" value="<%= returnPage %>">
 
 <div style="left: 129px;width: 450px;position: absolute;top: 89px;padding-bottom:20px;">	
-	<div class="Form_name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:450"><div class="SolidText"><b>Game Protected by password</b></div></div>
 	<div class="Form_Text" style="width:450"><div class="SolidText">
-<table width="440" border="0" cellpadding="0" cellspacing="0">
+<table class="ListTable">
 <tr>
 <td>
 <h2>Enter game password</h2>
@@ -84,8 +84,8 @@ This game is protected, please enter the game's password and press Join.
 </tr>
 </table>
 </div></div>
-	<div class="Form_header" ALIGN=RIGHT>
-					<div class="SolidText"><A  href="#" id="nas" name="nas" onclick='document.forms["passiform"].submit();'><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_continue.jpg" vspace=0 border=0></A></div>
+	<div class="Form_Header" ALIGN=RIGHT>
+					<div class="SolidText"><A  href="#" id="nas" onclick='document.forms["passiform"].submit();'><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_continue.jpg" vspace=0 border=0></A></div>
 	</div>
 	<div class="List_End"></div>		
 			

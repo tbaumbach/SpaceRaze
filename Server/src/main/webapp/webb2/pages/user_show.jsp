@@ -20,8 +20,8 @@
 %>
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;">
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
-		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Admin Users</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Admin Users</b></div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText"><h2>Choose User to edit</h2> <br> This page allows administrators to choose which user to edit.<p><br>
 
 <h2>View User Data</h2>
@@ -69,7 +69,7 @@ This page allows administrators to view the data of a user.
 <p>
 <a href="pages/user_list.jsp">Back to User List</a>
 <!--/form-->
-</div></div>
+</div></div></div>
 
 		<div class="List_End"></div>	
 <br><br><br><br><br>	

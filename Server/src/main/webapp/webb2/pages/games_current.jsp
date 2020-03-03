@@ -10,20 +10,7 @@
 	// get PageURL
 	String PageURL = request.getParameter("action"); 
 	
-	User theUser = null;
-	User tmpUser = null;
-	if (theUser == null){
-		theUser = UserHandler.getUser(session,request,response);
-		if (theUser.isGuest()){
-			// try to check if player is logged in using the session object
-			tmpUser = (User)session.getAttribute("user");
-			if (tmpUser != null){ 
-				// user is logged in using the session object
-				System.out.println("User logged in using session: " + tmpUser);
-				theUser = tmpUser;
-			}
-		}
-	}
+	User userGamesCurrent = session.getAttribute("user") != null ? (User)session.getAttribute("user") : UserHandler.getUser(session,request,response);
 
 
 %>
@@ -58,21 +45,18 @@
 
 
 <h2>Your Current Games</h2>
-<%= shz.getCurrentPlayingGamesList(tmpUser) %><p>
+<%= shz.getCurrentPlayingGamesList(userGamesCurrent) %><p>
 <h2>Games starting up</h2>
 </div>
 
 <div class=TextHead710><b>Game List</b></div>
 <div class=TextArea710>
 
-<%if (theUser.isGuest()){%>
+<%if (userGamesCurrent.isGuest()){%>
 	<%= shz.getCurrentPlayingGamesListNoUser()%><p>
 <%}else{%>
-	<%= shz.getCurrentGamesList(tmpUser) %><p>
+	<%= shz.getCurrentGamesList(userGamesCurrent) %><p>
 <%}%>
-
-<%= it2.getTagAndImage("Refresh") %>
-
 </div>
 
 <!-- End games_current.jsp fragment -->

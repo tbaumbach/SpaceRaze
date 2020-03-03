@@ -8,7 +8,7 @@
 
 <body background="images/spaze.gif">
 <div style="left: 132px;width: 450px;position: absolute;top: 90px;">	
-	<div class="Form_name">SpaceRaze</div>
+	<div class="Form_Name">SpaceRaze</div>
 	<div class="Form_Header"><b>Beginners Guide</b></div>
 	<div class="Form_Text" style="width:450">
 This page helps new SpaceRaze players getting started.
@@ -80,6 +80,7 @@ out exactly what size of fleet you need to be certain to win against the neutral
         already, attack the enemy players. Your main battle utits are usually 
         the biggest &quot;large&quot; ship you can build. You can also use long 
         ranged ships to attack behind enemy lines where his defence are weaker.
+</div>
 </div>
 </body>
 </html>

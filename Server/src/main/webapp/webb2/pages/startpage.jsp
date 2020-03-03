@@ -12,6 +12,7 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" HREF="styles.css" type="text/css">
 </head>
+<%// TODO Not in used, only used from ServerHandler creating HTML list of games. Should remove all both the HTML lists and this JSP page. %>
 <%@ include file="checklogin2.jsp" %>
 <%
 	// check if a ServerHandler exists
@@ -51,17 +52,17 @@
 <%= sh.getCurrentPlayingGamesList(tmpUser) %><p>
 <h2>Games starting up</h2>
 <%= sh.getCurrentOpenGamesList(tmpUser) %><p>
-<a href="startpage.jsp"><%= it.getTagAndImage("Refresh Lists") %></a>
+<a href="startpage.jsp">Refresh Lists</a>
 <h2>Latest News</h2>
 <% 
-	List allNews = nh.getAllNews();
+	List<NewsArticle> allNews = nh.getAllNews();
 	int showNr = allNews.size();
 	if (allNews.size() > 5){
 		showNr = 5;
 	}
 	if (showNr > 0){
 		for (int i = 0; i < showNr; i++){
-			NewsArticle na = (NewsArticle)allNews.get(i);
+			NewsArticle na = allNews.get(i);
 %>
 <%= nh.getNewsArticleHTML(na.getId()) %>
 <%

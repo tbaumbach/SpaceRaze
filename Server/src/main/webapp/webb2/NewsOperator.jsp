@@ -26,7 +26,7 @@
 
 	// get news handler
 	NewsHandler nh = (NewsHandler)application.getAttribute("newshandler");
-	List allNews = nh.getAllNews();
+	List<NewsArticle> allNews = nh.getAllNews();
 
 	// handle different action
 	String action = request.getParameter("newsaction");

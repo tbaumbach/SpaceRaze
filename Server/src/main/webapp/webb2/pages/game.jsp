@@ -51,27 +51,6 @@ Game is password-protected
 <p>
 Turn number is <%= aServer.getTurn() %>
 <p>
-<%
-	if (aServer.getLastUpdateComplete()){
-		if (aServer.getTurn() == 0){
-			if (!aServer.isPlayerParticipating(tmpUser) | (autoUser.equals("false"))){
-%>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=current_game.jsp"  target="_top">Login to Game</a>
-<p>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=close.jsp"  target="new_window">Login to Game (open in separate window)</a>
-<p>
-<%
-			}
-		}else{
-%>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=current_game.jsp" target="_top">Login to Game</a>
-<p>
-<a href="../applet/SpaceRaze_client.jsp?port=<%= port %>&autouser=<%= autoUser %>&returnto=close.jsp"  target="new_window">Login to Game (open in separate window)</a>
-<p>
-<%
-		}
-	}
-%>
 Last updated:&nbsp;<%= aServer.getLastUpdatedString() %>
 <p>
 <%= ServerStatus.getStartingText(aServer.getGalaxy()) %>
@@ -86,6 +65,5 @@ Game could not complete last turn due to an error.<p>
 <% }%>
 <%= ServerStatus.getPlayerList(aServer.getGalaxy(),autoUser) %>
 <br>
-<%= it.getTagAndImage("Refresh List") %>
 </body>
 </html>

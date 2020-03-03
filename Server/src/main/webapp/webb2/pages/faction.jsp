@@ -69,7 +69,7 @@ This faction can not build Space Stations.
 <p>
 <h3>Spaceship Types</h3>
 <!-- Spaceships list -->
-<table border="0" cellspacing="4" cellpadding="0" class="sr">
+<table class='ListTextRow' class="sr">
   <%= new FactionHelper(f).getSpaceshipTypesTableContentHTML() %>
 </table>
 <p>

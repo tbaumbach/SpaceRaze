@@ -1,7 +1,6 @@
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>
-<%@ page import="sr.general.logging.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>

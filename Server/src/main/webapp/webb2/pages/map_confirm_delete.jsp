@@ -1,5 +1,4 @@
 <%@ page import="sr.webb.*"%>
-<%@ page import="sr.mapeditor.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.server.map.*"%>

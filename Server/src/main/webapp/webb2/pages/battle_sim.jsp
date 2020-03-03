@@ -17,11 +17,13 @@
 </head>
 <%@ include file="checklogin2.jsp" %>
 <%
+	//TODO 2020-02-27 Den här ska inte vara tillgänlig för vanliga användare, finns det behov för admin?  I så fall fixa den.
+
 	// maybe perform simulation 
 	String todoStr = request.getParameter("todo");
 	String gameWorldName = request.getParameter("gameworld");
 	GameWorld gameWorld = GameWorldHandler.getGameWorld(gameWorldName);
-	List viptypes = gameWorld.getBattleVIPtypes();
+	List<VIPType> viptypes = gameWorld.getBattleVIPtypes();
 	BattleSim bs = null;
 	String ships1 = gameWorld.getBattleSimDefaultShips1();
 	String ships2 = gameWorld.getBattleSimDefaultShips2();
@@ -36,7 +38,8 @@
 	if ((todoStr != null) && (todoStr.equals("Start Sim"))){
 		ships1 = request.getParameter("ships1");
 		ships2 = request.getParameter("ships2");
-		bs = BattleSim.simulateBattles(ships1,ships2,iterations,maxShips,sleepTime,gameWorldName);
+		//TODO 2020-02-29 Ta bort den här sidan helt o hållet?
+		//bs = BattleSim.simulateBattles(ships1,ships2,iterations,maxShips,sleepTime,gameWorldName);
 	}
 %>
 
@@ -164,7 +167,7 @@
 <body background="images/spaze.gif" onload="init();">
 
 <div style="left:130px;width:718px;position: absolute;top: 89px;">
- <div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+ <div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
  <div class="Form_Header" style="width:718"><div class="SolidText"><b>SpaceRaze Battle Simulator: <%= gameWorld.getFullName() %></b>&nbsp;</div></div>
  <div class="Form_Text" style="width:718"><div class="SolidText">
 						Battle Simulator - Select ships for a battle simulator scenario
@@ -188,7 +191,7 @@ Message from BattleSim:<br>
 <form action="Master.jsp">
   <input type="hidden" name="gameworld" value="<%= gameWorldName %>">
   <input type="hidden" name="action" value="battle_sim">
-		<table cellpadding="0" cellspacing="0" border="0" width=680>
+		<table class="ListTable" style="width:680px">
 			<tr>
 				<td width="5"><img src="px.gix" width="5" height="1"></td>
 				<td>Ship types</td>
@@ -319,12 +322,12 @@ Message from BattleSim:<br>
 			</tr>
 		</table>
 <br>
-<table width=663>
+<table style="width:663px">
 <tr>
 	<td align=left>
 Ships in Side A
 <% if ((bs != null) && (bs.getMessage() == null)){%>
-	<font color="#00FF00">&nbsp;&nbsp;&nbsp;[wins: <%= bs.getTf1wins() %> %] - [cost (build/supply): <%= bs.getTf1CostBuy() %>/<%= bs.getTf1CostSupply() %>]</font>
+	<font color="#00FF00">&nbsp;&nbsp;&nbsp;[wins: <%= bs.getTf1wins() %> %] - [cost (build/supply): <!--%= bs.getTf1CostBuy() %-->/<!-- %= bs.getTf1CostSupply() %-->]</font>
 <% } %>
 <br>
 <textarea name="ships1" cols="70" rows="3"><%= ships1 %></textarea><p>
@@ -339,7 +342,7 @@ Ships in Side A
 	<td align=left>
 Ships in Side B
 <% if ((bs != null) && (bs.getMessage() == null)){%>
-	<font color="#00FF00">&nbsp;&nbsp;&nbsp;[wins: <%= bs.getTf2wins() %> %] - [cost (build/supply): <%= bs.getTf2CostBuy() %>/<%= bs.getTf2CostSupply() %>]</font>
+	<font color="#00FF00">&nbsp;&nbsp;&nbsp;[wins: <%= bs.getTf2wins() %> %] - [cost (build/supply): <!-- %= bs.getTf2CostBuy() %-->/<!-- %= bs.getTf2CostSupply() %-->]</font>
 <% } %>
 <br>
 <textarea name="ships2" cols="70" rows="3"><%= ships2 %></textarea><p>
@@ -352,7 +355,7 @@ Ships in Side B
 </table>
 <p>
 Tip 1: you can type the ships of side A & B manually in the textareas if you wish<br>
-Tip 2: use long or short shiptype names from the spaceship list for the selected GameWorld</a>.<br>
+Tip 2: use long or short shiptype names from the spaceship list for the selected GameWorld.<br>
 Tip 3: any blank in a shiptype name (in the beginning, end or anywhere except inside a (long) name) will cause error.<br> 
 Tip 4: always use semicolon as separator between ships<br>
 Tip 5: use [x] as prefix to set number of a shiptype, where x is an integer<br>
@@ -360,7 +363,7 @@ Tip 6: use (s,t:y,x1,x2...) as suffix where "s" for screened, x1 etc is short VI
 
 </form>
 </div></div>
-<div class="Form_header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>
+<div class="Form_Header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>
 			<div class="SolidText"></div>
 		</div>
 		<div class="List_End"></div>	

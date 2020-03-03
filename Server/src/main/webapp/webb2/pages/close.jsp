@@ -12,7 +12,7 @@ function closenow(){
 </head>
 
 <body background="images/spaze.gif" onload="closenow();">
-<table width="550" border="0" cellpadding="0" cellspacing="0">
+<table class='ListTable'>
 <tr>
 <td>
 <h2>Close this window</h2>

@@ -70,12 +70,11 @@
 <p>
 Server message: 
 <% if (message.equalsIgnoreCase("Game started")){ %>
-<font color="#00FF00">
+<font color="#00FF00"><%= message %></font>
 <% }else{ %>
-<font color="#FF0000">
+<font color="#FF0000"><%= message %></font>
 <% } %>
-<%= message %>
-</font>
+
 <br>
 <p>
 
@@ -83,7 +82,7 @@ Server message:
 
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;">
-	<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:718"><div class="SolidText"><b>Start a new game - Step 2</b></div></div>
 	<div class="Form_Text"  style="width:718"><div class="SolidText">
 
@@ -333,7 +332,7 @@ Server message:
 </form>
 
 </div></div>
-	<div class="Form_header" ALIGN=RIGHT style="width:718"><div class="SolidText"><A href="#" onclick="document.forms['form3'].submit();"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A></div></div>
+	<div class="Form_Header" ALIGN=RIGHT style="width:718"><div class="SolidText"><A href="#" onclick="document.forms['form3'].submit();"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A></div></div>
 	<div class="Form_End"></div>
 
 </div>

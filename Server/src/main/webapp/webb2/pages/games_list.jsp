@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Startpage</title>
+<title>Games</title>
 <meta charset="UTF-8">
 <link REL="STYLESHEET" HREF="CSS/style.css">
 
@@ -51,7 +51,7 @@
 <div style="left: 130px;width: 718px;position: absolute;top: 88px;">	
 
 <%if(!theUser.isGuest()){%>
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
 		<div class="Form_Header" style="width:718;"><div class="SolidText"><b>Your Current Games</b></div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 			Your Active games			
@@ -60,27 +60,11 @@
 		<div class="List" style="width:718;">
 			<%= sh.getCurrentPlayingGamesListNO(theUser) %>
 		</div>
-		<div class="Form_header" ALIGN="RIGHT" style="width:718;padding-bottom:4px;"><div class="SolidText">&nbsp;</div></div>		
+		<div class="Form_Header" ALIGN="RIGHT" style="width:718;padding-bottom:4px;"><div class="SolidText">&nbsp;</div></div>		
 		<div class="List_End"></div>
 		<br>
 
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze - Single Player Game List</div></div>
-		<div class='Form_Header' style="width:718"><div class="SolidText"><b>Your Single Player Games</b></div></div>
-		<div class="Form_Text" style="width:718"><div class="SolidText">
-			Single Games
-		</div></div>
-		
-		<div class="List" style="width:718;">
-			<%= sh.getCurrentPlayingGamesListNOSingle(theUser) %>
-		</div>
-
-		<div class="Form_header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>
-			<div class="SolidText"><A href="Master.jsp?action=games_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_refreshlist.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_refreshlist.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_refreshlist.jpg" vspace=0 border=0></A></div>
-		</div>
-		<div class="List_End"></div>	
-<br>
-
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
 		<div class='Form_Header' style="width:718"><div class="SolidText"><b>Games starting up</b></div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 			Games that you have joined, but not yet started
@@ -89,7 +73,7 @@
 		<div class="List" style="width:718;">
 			<%= sh.getCurrentOpenGamesListNO(theUser) %>
 		</div>
-		<div class="Form_header" ALIGN="RIGHT" style="width:718;padding-bottom:7px;"><div class="SolidText"></div></div>
+		<div class="Form_Header" ALIGN="RIGHT" style="width:718;padding-bottom:7px;"><div class="SolidText"></div></div>
 		<div class="List_End"></div>
 		<br>
 <%}%>
@@ -97,7 +81,7 @@
 
 
 
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze - Game List</div></div>
 		<div class='Form_Header' style="width:718"><div class="SolidText"><b>All Ongoing games</b></div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 			All Active games
@@ -107,7 +91,7 @@
 			<%= sh.getCurrentGamesListNO(theUser) %>
 		</div>
 
-		<div class="Form_header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>
+		<div class="Form_Header" ALIGN="RIGHT" style="width:718"><div class="SolidText"></div>
 			<div class="SolidText"><A href="Master.jsp?action=games_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_refreshlist.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_refreshlist.jpg','Refresh: Update page','GuideArea');" alt="Refresh" hspace=0 src="images/btn_refreshlist.jpg" vspace=0 border=0></A></div>
 		</div>
 		<div class="List_End"></div>	

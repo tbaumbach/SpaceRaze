@@ -8,12 +8,12 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
 
-
+<!DOCTYPE html>
 <html>
 <head>
 <title></title>
-<link REL="STYLESHEET" HREF="CSS/style.css">
-<script type="text/javascript" src="JS/tiny_mce/tiny_mce.js"></script>
+<link rel="stylesheet" type="text/css" href="CSS/style.css">
+</head>
 
 <script type="text/javascript">
 	var x=0
@@ -116,7 +116,6 @@
 	}
 	
 </script>
-</head>
 
 <%
 	// get PageURL
@@ -128,7 +127,7 @@
 	if (PageURL != null){
 		if (PageURL.equals("login")){
 			// log in player
-			message = UserHandler.loginUser(request,response);		
+			message = UserHandler.loginUser(request, response);		
 
 			if (message.equals("ok")){
 		
@@ -136,9 +135,8 @@
 				// get a User instance
 				String lgn = request.getParameter("login");
 				String pwd = request.getParameter("password");
-				theUser = UserHandler.getUser(lgn,pwd);
 				// also log in player by using session object
-				session.setAttribute("user",theUser);
+				session.setAttribute("user", UserHandler.getUser(lgn,pwd));
 			}
 		}else
 		if (PageURL.equals("logout")){
@@ -150,7 +148,7 @@
 		}
 	}
 	if (theUser == null){
-		theUser = UserHandler.getUser(session,request,response);
+		theUser = UserHandler.getUser(session, request, response);
 		if (theUser.isGuest()){
 			// try to check if player is logged in using the session object
 			User tmpUser = (User)session.getAttribute("user");
@@ -160,7 +158,7 @@
 				theUser = tmpUser;
 			}
 		}
-	}
+	}	
 
 
 %>
@@ -280,40 +278,33 @@ return;
 	
 	<input type="hidden" value="login" id="action" name="action"  >
 		<div id="LoginDiv" style="left: 575px;width: 200px;position: absolute;top: 25px;z-index:99;">
-			    <table>
+			    <table class="ListTable">
 				<tr>
-				    <td></td>
 				    <td class="LoginText">UserID:</td>
-				    <td></td>
 				    <td><input tabindex="1" class="LoginInputText" id="login" name="login" type=text value=""/></td>
-				    <td class="Text"></td>
+				    <td colspan="2"></td>
 				</tr>
 				<tr>
-				    <td></td>
 				    <td class="LoginText">Password:</td>
-				    <td></td>
 				    <td><input tabindex="2" class="LoginInputText" id="password" name="password" type="password" value=""/></td>
 				    <td></td>
 				    <td align="right">
 						<A href="#" onclick='document.forms["form1"].submit();' tabindex="3"><IMG onmouseout="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_login.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_ImageWarning(this,'images/btn_Blue_Over_login.jpg','Login: Enter SpaceRaze Acoount name and password.','GuideArea');" height=21 alt="Login" hspace=0 src="images/btn_Blue_login.jpg" width=85 vspace=0 border=0></A><BR>
 				    </td>
-				    <td class="Text"></td>
 				</tr>
 				</table>
 		</div>
 	<%}else{%>
-		<div id="LoginDiv" style="left: 575px;width: 200px;position: absolute;top: 25px;z-index:99;">
-			    <table>
+		<div id="LoginDiv" style="left: 575px;width: 272px;position: absolute;top: 25px;z-index:99;">
+			    <table class="ListTable" style="width: 100%">
 				<tr>
-				    <td></td>
 				    <td class="LoginText">UserID:</td>
-				    <td></td>
 				    <td><input class="LoginInputText" id="login" name="login" type=text value="<%=theUser.getName()%>" disabled="disabled"/></td>
+				    <td></td>
 				    <td class="Text"></td>
 				</tr>
 				<tr>
-				    <td></td>
-				    <td colspan="3">
+				    <td colspan="2">
 				    	<a class="Login" href="Master.jsp?action=settings">Settings</a>&nbsp;&nbsp;&nbsp;
 				    	<a class="Login" href="Master.jsp?action=change_password">Change Password</a>
 				    	<input class="InputText" id="password" name="password" type="hidden" value=""/>
@@ -322,7 +313,6 @@ return;
 				    <td align="right">
 						<A href="#" onclick="Logout()"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_logout.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_logout.jpg','Logout: Take care, Welcome back','GuideArea');" height=21 alt="Logout" hspace=0 src="images/btn_Blue_logout.jpg" width=85 vspace=0 border=0></A><BR>
 				    </td>
-				    <td class="Text"></td>
 				</tr>
 				</table>
 		</div>	
@@ -377,8 +367,7 @@ Logged in user name: <%= theUser.getName() %><br>
 <a href=Master.jsp?action=password_protected_game> password_protected_game</a><br> 
 <a href=Master.jsp?action=prop_files> prop_files</a><br> 
 <a href=Master.jsp?action=ranking> ranking</a><br> 
-<a href=Master.jsp?action=register> register</a><br> 
-<a href=Master.jsp?action=register_finished> register_finished</a><br> 
+<a href=Master.jsp?action=register> register</a><br>
 <a href=Master.jsp?action=requirements> requirements</a><br> 
 <a href=Master.jsp?action=save_files> save_files</a><br> 
 <a href=Master.jsp?action=server_admin> server_admin</a><br> 

@@ -48,16 +48,12 @@
 <% } %>
 
 <div style="left:130px;width:718px;position: absolute;top: 89px;">
- <div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
- <div class="Form_Header" style="width:718"><div class="SolidText"><b>Change Password:</b>&nbsp;</div></div>
- <div class="Form_Text" style="width:718"><div class="SolidText">
-				Change Password - 
-		</div></div>
+ <div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
  <div class="Form_Header" style="width:718"><div class="SolidText"><b>Change Password:</b>&nbsp;</div></div>
 <div class="Form_Text" style="width:718"><div class="SolidText">
 
 <!-- <%= ok %> -->
-<table width="95%" border="0" cellpadding="0" cellspacing="0">
+<table class='ListTextRow'>
 <tr>
 <td>
 <% if((ok != null) && (ok.equals("true"))){ %>
@@ -105,8 +101,6 @@
 </tr>
 <tr>
 <td colspan="2">
-<!-- <% it.createImage("Change"); %> -->
-<!--input type="image" src="images/Change.gif"-->
 </td>
 </tr>
 </table>
@@ -116,13 +110,14 @@
 </tr>
 </table>
 </div></div>
-		<div class="Form_header" ALIGN=RIGHT style="width:718"><div class="SolidText">
+		<div class="Form_Header" ALIGN=RIGHT style="width:718"><div class="SolidText">
 		<% if((ok != null) && (ok.equals("true"))){ %>
-			<A href="Master.jsp" onclick=""><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A></div></div>
+			<A href="Master.jsp" onclick=""><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A>
 
 		<% } else { %>
-			<A href="#" onclick="document.forms['chapassform'].submit();"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A></div></div>
-		<% } %>		
+			<A href="#" onclick="document.forms['chapassform'].submit();"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_continue.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_continue.jpg','Continue: Go to next step to create a new game.','GuideArea');" height=19 alt="Continue" hspace="3" src="images/btn_continue.jpg" width=83 vspace="3" border=0></A>
+		<% } %>
+		</div></div>	
 		<div class="List_End"></div>	
 </div>
 

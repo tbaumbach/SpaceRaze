@@ -44,7 +44,7 @@ function OnMouseOut(Control)
 
 <body background="images/spaze.gif">
 <div style="left: 130px;width: 718px;position: absolute;top: 88px;">	
-	<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:718"><div class="SolidText"><b>Gameworld <%= gw.getFullName() %></b></div></div>
 	<div class="Form_Text" style="width:718">
 		<div class="SolidText">

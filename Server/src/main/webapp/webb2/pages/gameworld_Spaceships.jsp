@@ -41,16 +41,16 @@ function OnMouseOut(Control)
 <body background="images/spaze.gif">
 
 <div style="left: 130px;width: 1650px;position: absolute;top: 88px;">	
-	<div class="Form_name" style="width:1650"><div class="SolidText">Spaceraze</div></div>
+	<div class="Form_Name" style="width:1650"><div class="SolidText">Spaceraze</div></div>
 	<div class="Form_Header" style="width:1650"><div class="SolidText"><b><%= gw.getFullName() %> - Spaceship Types</b></div></div>
 	<div class="Form_Text" style="width:1650">
 		<div class="SolidText">
 
 <!-- Spaceships list -->
-<table border="0" width="1650" cellspacing="1" cellpadding="1" class="MenuMain">
+<table  class="ListTable MenuMain">
   <% //= gw.getSpaceshipTypesTableContentHTMLNO() %>
   <tr class='ListMain' height='3'><td colspan='38'></td></tr>
-<tr class='ListHeadLeft' height='20'><td colspan='38'> <div class='ListHeadLeft' id="PageAction" name="PageAction"></div></td></tr>
+<tr class='ListHeadLeft' height='20'><td colspan='38'> <div class='ListHeadLeft' id="PageAction"></div></td></tr>
 </table>
 </div></div>
 <div class="List_End"></div>	

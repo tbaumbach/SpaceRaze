@@ -7,9 +7,11 @@
 <%@page import="sr.webb.news.NewsHandler"%>
 <%@page import="sr.webb.news.NewsArticle"%>
 <%
-	if (theUser.isGuest()){
+	User userRightPuff = session.getAttribute("user") != null ? (User)session.getAttribute("user") : UserHandler.getUser(session,request,response);
+
+	if (userRightPuff.isGuest()){
 %>
-	<div class="Form_name" style="width:250"><div class="SolidText">Register</div></div>
+	<div class="Form_Name" style="width:250"><div class="SolidText">Register</div></div>
 	<div class="Form_Header" style="width:250"><div class="SolidText"><b>New Player?</b></div></div>
 	<div class="Form_Text" style="width:250">
 		<div class="SolidText">
@@ -17,12 +19,12 @@
 			Click on the Register button below to go to the registration page.<br>
 		</div>
 	</div>
-	<div class="Form_header"  style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=register"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_register.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_register.jpg','Register: Create your SpaceRaze account','GuideArea');" height=21 alt="Register" hspace=0 src="images/btn_register.jpg" width=85 vspace=0 border=0></A><BR></div></div>
+	<div class="Form_Header"  style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=register"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_register.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_register.jpg','Register: Create your SpaceRaze account','GuideArea');" height=21 alt="Register" hspace=0 src="images/btn_register.jpg" width=85 vspace=0 border=0></A><BR></div></div>
 	<div class="List_End"></div>		
 <div style="height:6px;font-size: 6px;">&nbsp;</div>	
 <%
 	}
-		if (theUser.isPlayerOrAdmin()){
+		if (userRightPuff.isPlayerOrAdmin()){
 		
 			// check if a ServerHandler exists
 	//String found = ServerStatus.checkServerHandler(request,application);
@@ -44,13 +46,13 @@
 		
 %>
 
-	<div class="Form_name" style="width:250"><div class="SolidText">Your Games</div></div>
+	<div class="Form_Name" style="width:250"><div class="SolidText">Your Games</div></div>
 	<div class="Form_Header" style="width:250"><div class="SolidText"><b>Games List</b></div></div>
 
 		<div class="List" style="width:250;">
-			<%= shar.getCurrentPlayingGamesListNOShort(theUser) %>
+			<%= shar.getCurrentPlayingGamesListNOShort(userRightPuff) %>
 		</div>
-	<div class="Form_header"  style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=games_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_games.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_games.jpg','Register: Create your SpaceRaze account','GuideArea');" height=21 alt="Register" hspace=0 src="images/btn_games.jpg" width=85 vspace=0 border=0></A><BR></div></div>
+	<div class="Form_Header"  style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=games_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_games.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_games.jpg','Register: Create your SpaceRaze account','GuideArea');" height=21 alt="Register" hspace=0 src="images/btn_games.jpg" width=85 vspace=0 border=0></A><BR></div></div>
 	<div class="List_End"></div>		
 <div style="height:6px;font-size: 6px;">&nbsp;</div>	
 
@@ -65,11 +67,11 @@
 	RankedPlayer[] players = RankingHandler.getRanking();
 %>
 	
-	<div class="Form_name" style="width:250"><div class="SolidText">Ranking</div></div>
+	<div class="Form_Name" style="width:250"><div class="SolidText">Ranking</div></div>
 
 		<div class="List" style="width:250">
 
-			<table class="ListTable" cellspacing='0' cellpadding='0' width="100%">
+			<table class="ListTable" >
 				<tr class='ListheaderRow' height="16" style="width:250">
 					<td class='ListHeader'>&nbsp;</td>
 					<td class='ListHeader'><div class="SolidText">Players</div></td>
@@ -104,7 +106,7 @@
 				<% } %>
 			</table>
 		</div>
-		<div class="Form_header" style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=ranking"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_ranking.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_ranking.jpg','Ranking: Spaceraze player ranking','GuideArea');" alt="Ranking" hspace=0 src="images/btn_ranking.jpg" vspace=0 border=0></A></div></div>
+		<div class="Form_Header" style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=ranking"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_ranking.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_ranking.jpg','Ranking: Spaceraze player ranking','GuideArea');" alt="Ranking" hspace=0 src="images/btn_ranking.jpg" vspace=0 border=0></A></div></div>
 		<div class="List_End"></div>
 
 <div style="height:6px;font-size: 6px;">&nbsp;</div>	
@@ -122,9 +124,9 @@
 %>
 
 
-	<div class="Form_name" style="width:250"><div class="SolidText">Latest News</div></div>
+	<div class="Form_Name" style="width:250"><div class="SolidText">Latest News</div></div>
 	<div class="List" style="width:250">
-				<table width='100%' border='0' cellspacing='0' cellpadding='0'>
+				<table class="ListTable">
 <% 
 	for (int iRp = 0; iRp < allNewsRp.size(); iRp++){ 
 		NewsArticle naRp = (NewsArticle)allNewsRp.get(iRp);
@@ -168,25 +170,25 @@
 				</table>
 	</div>
 	
-	<div class="Form_header" style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=news_archive"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_newsarchive.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_newsarchive.jpg','Guide: How to play, good beginners guide!','GuideArea');" alt="How To Play" hspace=0 src="images/btn_newsarchive.jpg" vspace=0 border=0></A></div></div>
+	<div class="Form_Header" style="width:250" ALIGN=RIGHT><div class="SolidText"><A href="Master.jsp?action=news_archive"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_newsarchive.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Over_newsarchive.jpg','Guide: How to play, good beginners guide!','GuideArea');" alt="How To Play" hspace=0 src="images/btn_newsarchive.jpg" vspace=0 border=0></A></div></div>
 	<div class="List_End"></div>	
 	
 	<%
-		if (theUser.isPlayerOrAdmin()){
+		if (userRightPuff.isPlayerOrAdmin()){
 	%>
 	<div style="height:6px;font-size: 6px;">&nbsp;</div>
-		<div class="Form_name" style="width:250"><div class="SolidText">SpaceRaze notifier</div></div>	<div class="List" style="width:250">
-				<table width='100%' border='0' cellspacing='0' cellpadding='0'>
+		<div class="Form_Name" style="width:250"><div class="SolidText">SpaceRaze notifier</div></div>	<div class="List" style="width:250">
+				<table class="ListTable">
 	
 				<tr class='ListTextRow'>
 					<td class='ListText' width="5">&nbsp;</td>
-					<td colspan=2 class="ListText" width=240><div class="SolidText">The Spaceraze notifier vill tell you when you have an unfinished move in any of your games.<br><a href="notifier/userfiles/notifier_<%= theUser.getLogin() %>.jnlp">Download notifier</a></div></td>
+					<td colspan=2 class="ListText" width=240><div class="SolidText">The Spaceraze notifier vill tell you when you have an unfinished move in any of your games.<br><a href="notifier/userfiles/notifier_<%= userRightPuff.getLogin() %>.jnlp">Download notifier</a></div></td>
 					<td class='ListText' width="5">&nbsp;</td>
 				</tr>
 				</table>
 	</div>
 	
-	<div class="Form_header" style="width:250" ALIGN=RIGHT></div>
+	<div class="Form_Header" style="width:250" ALIGN=RIGHT></div>
 	<div class="List_End"></div>		
 	<%
 			}

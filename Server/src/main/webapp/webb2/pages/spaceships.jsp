@@ -12,7 +12,7 @@
 <h2>Spaceship Types</h2>
 This is a simplified list of all spaceship types in the SpaceRaze game.<br>
 A more detailed list of the different spaceship types can be found in the manual.<p>
-<table width="540" border="0" cellpadding="0">
+<table style="width:540px" class="ListTable">
   <tr>
     <td align="center"><img src="images/troops.gif"></td>
     <td>Troops</td>
@@ -37,7 +37,7 @@ A more detailed list of the different spaceship types can be found in the manual
 
 <br>
 
-<table width="700px" border="0" cellpadding="0">
+<table style="width:700px" class="ListTable">
   <tr>
     <td>Image</td>
     <td>Spaceship Type (abbr.)</td>

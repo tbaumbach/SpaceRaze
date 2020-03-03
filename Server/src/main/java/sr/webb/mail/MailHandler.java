@@ -88,6 +88,7 @@ public class MailHandler {
 			// encrypt password
 			byte[] passwordBytes = aUser.getPassword().getBytes();
 			String encPassword = Base64.encodeBytes(passwordBytes);
+			//TODO 2020-02-27  Lösen ord i länken är inte bra, även om det är kryperat, räcker det inte att enbart länka till sidan med användarnamn?
 			String completeloginurl = baseurl + "/webb2/Master.jsp?action=login&login=" + aUser.getLogin() + "&password=" + encPassword; 
 			content2 = content2 + "\n";
 			content2 = content2 + "Link to the SpaceRaze site:\n";
@@ -126,7 +127,7 @@ public class MailHandler {
 			title = aServer.getGameName() + " updated";
 			content = aServer.getGameName() + " has been updated to turn " + aServer.getTurn() + "\n";
 		}
-		if (time > 0){ // TODO (Paul) nullPointer om drag 0, ur inte skapad �n?
+		if (time > 0){ // TODO (Paul) nullPointer om drag 0, ur inte skapad än?
 			UpdateRunner ur = aServer.getUpdateRunner();
 			if (ur != null){
 				content = content + "Next automatic update: " + ur.getNextUpdate() + "\n";

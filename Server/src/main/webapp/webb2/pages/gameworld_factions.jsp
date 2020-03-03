@@ -41,14 +41,14 @@ function OnMouseOut(Control)
 
 <body background="images/spaze.gif">
 <div style="left: 130px;width: 718px;position: absolute;top: 88px;">	
-	<div class="Form_name" style="width:718"><div class="SolidText">Spaceraze</div></div>
+	<div class="Form_Name" style="width:718"><div class="SolidText">Spaceraze</div></div>
 	<div class="Form_Header" style="width:718"><div class="SolidText"><b><%= gw.getFullName() %> - Factions</b></div></div>
 	<div class="Form_Text" style="width:718">
 		<div class="SolidText">
 <B>	Factions</B>
 	</div></div>
 		<div class="List" style="width:718">
-<table border="0" width="716" cellspacing="0" cellpadding="0" class="">
+<table class="ListTable">
 	<%String factionTable = new GameWorldHelper(gw).getFactionsTableContentHTMLNO(); %>
   <%= factionTable%>
 </table>

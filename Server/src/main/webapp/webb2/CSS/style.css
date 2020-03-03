@@ -108,11 +108,10 @@
 	border-right: #00fe23 1px solid;
 	border-top: #00fe23 1px solid;
 	border-left: #00fe23 1px solid;
-	border-bottom: #00fe23 1px solid;
 	font-family: Arial;
 	color: #00fe23;
 	background-color: #003902;
-	FONT-SIZE: 9px;	
+	font-size: 14px;	
 	height: 20px;
 	filter:alpha(opacity=70);
 }
@@ -330,6 +329,11 @@ td
 .ListLine
 {
 	background-color: #003902;
+}
+
+.ListTable{
+	border-collapse: collapse;
+	width: 100%;
 }
 
 .ListHeader 

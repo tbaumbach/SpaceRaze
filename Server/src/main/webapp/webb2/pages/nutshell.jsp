@@ -132,7 +132,7 @@ Other VIPs include admirals, spies, assassins and expert engineers.
 If a player control at least 60% of the total production in a game the player has won, and if a factions players together control at least 70% of the production the players of that faction wins a cooperative victory.
 </div>
 
-<table width="450" border="0" cellpadding="0" cellspacing="0">
+<table class="ListTable">
 <tr>
 <td>
 <h3>And the winner is...</h3>

@@ -42,16 +42,16 @@
 <body background="images/spaze.gif">
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;padding-bottom:20px;">
-	<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:718"><div class="SolidText"><b>Screenshots</b></div></div>
 	<div class="Form_Text" style="width:718;">
 	<div class="SolidText">
-<table width="698" border="0" cellpadding="0" cellspacing="0">
+<table class="ListTable">
 <tr>
 <td>
 
 <p>
-<a href="pages/screenshotsAlone.jsp" border=0><img src="images/screenshot.gif" width="700"></a>
+<a href="pages/screenshotsAlone.jsp" style="border:0"><img src="images/screenshot.gif" width="700"></a>
 <br>
 Ingame Screenshot. (Click on image to enlarge)<br>
 

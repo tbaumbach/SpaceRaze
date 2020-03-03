@@ -17,11 +17,11 @@
 <body bgcolor="#000000" background=../images/SpacerazeBG.jpg style="background-repeat: no-repeat;margin-top: 0px;margin-left: 0px;" >
 
 <div style="left:130px;width:1215px;position: absolute;top: 88px;padding-bottom:20px;">
-	<div class="Form_name" style="width:1215"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:1215"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:1215"><div class="SolidText"><b>Screenshots</b></div></div>
 	<div class="Form_Text" style="width:1215;">
 	<div class="SolidText">
-<table width="1200" border="0" cellpadding="0" cellspacing="0">
+<table style="width:1200px" class="ListTable">
 <tr>
 <td>
 

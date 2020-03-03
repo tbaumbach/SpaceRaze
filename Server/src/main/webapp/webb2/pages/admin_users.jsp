@@ -12,8 +12,8 @@
 <body background="images/spaze.gif">
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;">
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
-		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Admin Users</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Admin Users</b></div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText"><h2>Choose User to edit</h2> <br> This page allows administrators to choose which user to edit.<p></div></div>
 		
 

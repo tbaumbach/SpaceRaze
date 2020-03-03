@@ -1,5 +1,4 @@
 <%@ page import="sr.webb.*"%>
-<%@ page import="sr.mapeditor.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.server.map.*"%>
 <%@ page import="sr.server.properties.*"%>
@@ -51,7 +50,7 @@ table.sr td {
 <body background="images/spaze.gif">
 
 <div style="left:130px;width:718px;position: absolute;top:89px;">
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Maps</b>&nbsp;</div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 
@@ -65,9 +64,9 @@ table.sr td {
 		</div></div>
 
 		<div class="List" style="width:718px">
-			<table border="0" width="716" cellspacing="0" cellpadding="0" class="MenuMain">
+			<table class="ListTable">
 			<tr height=1 class='ListLine'><td colspan=8></td></tr>
-			<tr class='ListheaderRow' 'height=16'>
+			<tr class='ListheaderRow' height="16">
 				<td class='ListHeader' WIDTH='10'></td>
 				<td class='ListHeader'><div class="SolidText">Name</div></td>
 				<td class='ListHeader'><div class="SolidText">Filename</div></td>
@@ -85,7 +84,7 @@ table.sr td {
 
 			</table>
 		</div>
-		<div class="Form_header" ALIGN="RIGHT" style="width:718">
+		<div class="Form_Header" ALIGN="RIGHT" style="width:718">
 			<div class="SolidText">
 				<%if (!theUserNO.isGuest()){%>
 				<%	}%>	
@@ -96,7 +95,7 @@ table.sr td {
 <%if(!theUserNO.isGuest()){%>		
 		<BR>
 		
-		<div class="Form_name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
+		<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
 		<div class="Form_Header" style="width:718"><div class="SolidText"><b>Map Drafts</b>&nbsp;</div></div>
 		<div class="Form_Text" style="width:718"><div class="SolidText">
 		<br>
@@ -106,8 +105,8 @@ table.sr td {
 		</div></div>
 		
 		<div class="List" style="width:718">
-		<table border="0" cellspacing="0" cellpadding="0" class="MenuMain" width="716">
-		<tr class='ListheaderRow' 'height=16'>
+		<table class="ListTable">
+		<tr class='ListheaderRow' height="16">
 			<td class='ListHeader' WIDTH='10'></td>
 			<td class='ListHeader'><div class="SolidText">Name</div></td>
 			<td class='ListHeader'><div class="SolidText">Filename</div></td>
@@ -124,7 +123,7 @@ table.sr td {
 		<%	}%>
 		</table>
 		</div>
-			<div class="Form_header" ALIGN="RIGHT" style="width:718">
+			<div class="Form_Header" ALIGN="RIGHT" style="width:718">
 			<div class="SolidText">
 			</div>
 		</div>

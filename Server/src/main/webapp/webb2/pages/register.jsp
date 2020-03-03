@@ -10,47 +10,33 @@
 <%@ page import="java.util.*"%>
 
 
-
-
-
-
 <%
-	// get action
-	String action = request.getParameter("action");
 	// handle session/login/logout
-	String message = "";
-	User theUser = null;
-	if (action != null){
-		if (action.equals("login")){
-			// log in player
-			message = UserHandler.loginUser(request,response);		
-			if (message.equals("ok")){
-				// user loggrd in
-				// get a User instance
-				String lgn = request.getParameter("login");
-				String pwd = request.getParameter("password");
-				theUser = UserHandler.getUser(lgn,pwd);
-				// also log in player by using session object
-				session.setAttribute("user",theUser);
-			}
-		}else
-		if (action.equals("logout")){
-			// log out player 
-			// remove any session handled by cookies
-			message = UserHandler.logoutUser(request,response);		
-			// remove any session handled by session object
-			session.removeAttribute("user");
+	if ("login".equals(request.getParameter("action"))){
+		// log in player
+		if ("ok".equals(UserHandler.loginUser(request, response))){
+			// user loggrd in
+			// get a User instance
+			String lgn = request.getParameter("login");
+			String pwd = request.getParameter("password");
+			session.setAttribute("user", UserHandler.getUser(lgn,pwd));
 		}
+	}else
+	if ("logout".equals(request.getParameter("action"))){
+		// log out player 
+		// remove any session handled by cookies
+		UserHandler.logoutUser(request,response);		
+		// remove any session handled by session object
+		session.removeAttribute("user");
 	}
-	if (theUser == null){
-		theUser = UserHandler.getUser(session,request,response);
-		if (theUser.isGuest()){
+	if (session.getAttribute("user") == null){
+		User user = UserHandler.getUser(session, request, response);
+		if (user.isGuest()){
 			// try to check if player is logged in using the session object
 			User tmpUser = (User)session.getAttribute("user");
 			if (tmpUser != null){ 
 				// user is logged in using the session object
 				System.out.println("User logged in using session: " + tmpUser);
-				theUser = tmpUser;
 			}
 		}
 	}
@@ -94,7 +80,7 @@
 </head>
 
 <div style="left: 132px;width: 450px;position: absolute;top: 90px;">	
-	<div class="Form_name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
 	<div class="Form_Header" style="width:450"><div class="SolidText"><b>Register - Create a player account</b></div></div>
 	<div class="Form_Text" style="width:450"><div class="SolidText">
 <%
@@ -118,11 +104,13 @@
 <br>
 <%
 	if (!userMessage.equals("")){
-		String errorType = "Registration Error";
-		String errorMessage = userMessage;
+		session.setAttribute("errorType", "Registration Error");
+		session.setAttribute("errorMessage", userMessage);
 %>
 <!-- register error message -->
 <%@ include file="error_message_box.jsp" %>
+
+
 <br><br>
 <%
 	}

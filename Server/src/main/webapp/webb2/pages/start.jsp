@@ -4,8 +4,10 @@
 <div style="left: 132px;width: 450px;position: absolute;top: 90px;">
 	
 	
-		<% if (!theUser.isGuest()){ %>
-		<div class="Form_name" style="width:450"><div class="SolidText">Welcome to SpaceRaze</div></div>
+		<% 
+		User userStart =  session.getAttribute("user") != null ? (User)session.getAttribute("user") : UserHandler.getUser(session,request,response);
+		if (!userStart.isGuest()){ %>
+		<div class="Form_Name" style="width:450"><div class="SolidText">Welcome to SpaceRaze</div></div>
 		<div class="Form_Header" style="width:450"><div class="SolidText"><b>New features:</b></div></div>
 		<div class="Form_Text" style="width:450">
 		<div class="SolidText">
@@ -24,7 +26,7 @@
 
 		<%}else{%>
 
-	<div class="Form_name" style="width:450"><div class="SolidText">SpaceRaze introduction</div></div>
+	<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze introduction</div></div>
 		<div class="Form_Header" style="width:450"><div class="SolidText"><b>Welcome to SpaceRaze</b></div></div>
 		<div class="Form_Text" style="width:450">
 		<div class="SolidText">
