@@ -3,7 +3,6 @@ package sr.servlet;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,11 +18,11 @@ import sr.server.ServerHandler;
 public class JSONAndHTMLServlet extends HttpServlet{
 	
 	
-	public void doGet( HttpServletRequest request,HttpServletResponse response )throws ServletException, IOException {
+	public void doGet( HttpServletRequest request,HttpServletResponse response )throws IOException {
 		doPost(request, response);
 	}
 	
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		response.setContentType("application/json");
 		
@@ -61,11 +60,11 @@ public class JSONAndHTMLServlet extends HttpServlet{
 		
 		//mapper.writeValue(new File("c:\\gameworld.json"), aGame.getGalaxy().getPlanets().get(8));
 		
-		System.out.println(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(new Integer(planet))));
+		System.out.println(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(Integer.parseInt(planet))));
 		
 		
 		// TODO fel när vi retunerar hela listan. fungerar när det bara är planet 8
-		response.getWriter().print(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(new Integer(planet))));
+		response.getWriter().print(mapper.writeValueAsString(aGame.getGalaxy().getPlanets().get(Integer.parseInt(planet))));
 		
 		//request.getAttribute("");
 		

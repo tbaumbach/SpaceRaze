@@ -39,7 +39,7 @@ public class TestService {
 	@GET
 	@Path("/verify")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response verifyRESTService(InputStream incomingData) {
+	public Response verifyRESTService() {
 		String result = "CrunchifyRESTService Successfully started..";
  
 		// return HTTP response 200 in case of success

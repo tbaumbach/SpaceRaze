@@ -13,36 +13,32 @@
 		
 	User theUser = null;
 	User tmpUser = null;
-	if (theUser == null){
 		theUser = UserHandler.getUser(session,request,response);
 		if (theUser.isGuest()){
 			// try to check if player is logged in using the session object
 			tmpUser = (User)session.getAttribute("user");
-		}
-		else
+		} else
 		{ 
 				// user is logged in using the session object
 				theUser = tmpUser;
 		}
-	}
-
 
 %>
 <!DOCTYPE html>
 <html>
-<link REL="STYLESHEET" HREF="CSS/style.css">
-<link REL="STYLESHEET" HREF="CSS/styleDiv.css">
+<link REL="STYLESHEET" HREF="../CSS/style.css">
+<link REL="STYLESHEET" HREF="../CSS/styleDiv.css">
 <head>
 <title>SpaceRaze Change Log</title>
 <meta charset="UTF-8">
 
 </head>
-<body background="images/spaze.gif">
+<body background="../images/spaze.gif">
 
 <div style="left:130px;width:718px;position: absolute;top: 88px;padding-bottom:20px;">
-	<div class="Form_Name" style="width:718"><div class="SolidText">SpaceRaze</div></div>
-	<div class="Form_Header" style="width:718"><div class="SolidText"><b>Versions</b></div></div>
-	<div class="Form_Text" style="width:718">
+	<div class="Form_Name" style="width:718px"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Header" style="width:718px"><div class="SolidText"><b>Versions</b></div></div>
+	<div class="Form_Text" style="width:718px">
 	<div class="SolidText">
 <table class="ListTable">
 <tr>

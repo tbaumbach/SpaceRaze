@@ -27,21 +27,21 @@
 	// check if a ServerHandler exists
 	//String found = ServerStatus.checkServerHandler(request,application);
 	Object foundz = application.getAttribute("serverhandler");
-	String message = "";
+	String messagGamecurrent = "";
 	ServerHandler shz = null;
 	if (foundz == null){
 		// if not, create it and store it in the application scope
 		// create a new serverhandler
 		shz = new ServerHandler();
 		application.setAttribute("serverhandler",shz);
-		message = "New ServerHandler created";
+		messagGamecurrent = "New ServerHandler created";
 	}else{
 		// if it does, retrieve it
-		message = "ServerHandler already exists";
+		messagGamecurrent = "ServerHandler already exists";
 		shz = (ServerHandler)foundz;
 	}
 %>
-<!--<%= message %><br>-->
+<!--<%= messagGamecurrent %><br>-->
 
 
 <h2>Your Current Games</h2>
