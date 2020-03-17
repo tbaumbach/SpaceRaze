@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import sr.server.properties.PropertiesHandler;
+import spaceraze.util.properties.PropertiesHandler;
 import sr.webb.users.User;
 
 /**

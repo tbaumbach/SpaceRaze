@@ -1,9 +1,4 @@
-<%@ page import="sr.webb.*"%>
-<%@ page import="sr.server.*"%>
 <%@ page import="sr.server.map.*"%>
-<%@ page import="sr.server.properties.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="java.io.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,7 +17,7 @@ table.sr td {
 </head>
 <%@ include file="checklogin2.jsp" %>
 <%
-	// denna del används inte???
+	// denna del anvï¿½nds inte???
 	String message = "";
 	// maybe reload maps 
 	String reloadMaps = request.getParameter("reload");

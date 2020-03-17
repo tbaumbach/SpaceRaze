@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.CanBeLostInSpace;
 import spaceraze.world.Faction;
 import spaceraze.world.Highlight;
@@ -23,7 +24,6 @@ import spaceraze.world.Report;
 import spaceraze.world.spacebattle.ReportLevel;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
-import sr.server.properties.PropertiesHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
 
@@ -198,9 +198,6 @@ public class MailHandler {
 	  /**
 	   * Returns a list with all LiS from a certain faction.
 	   * Same as in HighlightPanel.
-	   * @param allShips
-	   * @param aFaction
-	   * @return
 	   */
 	private static List<CanBeLostInSpace> getLostInSpace(List<CanBeLostInSpace> allLostInSpace, String aFactionName){
 		List<CanBeLostInSpace> lisList = new LinkedList<CanBeLostInSpace>();
@@ -351,53 +348,6 @@ public class MailHandler {
 		// send the mail
 		sendSocket(smtpServer,eMailAddress,from,subject,content,login,password);
 	}
-	
-	/**
-    * "send" method to send the message.
-	public static void sendJava(String smtpServer, String to, String from, String subject, String body, String login, String password){
-		LoggingHandler.info("Send, smtp: " + smtpServer + " Subject: " + subject + " To: " + to + " From: " + from + " login: " + login + " password: " + password);
-		try{
-			Properties props = System.getProperties();
-			
-			// -- Attaching to default Session, or we could start a new one --
-			props.put("mail.smtp.host", smtpServer);
-			props.put("mail.smtp.auth","true");
-			
-			Authenticator mailAuth = new MailAuthenticator(login,password); 
-//			Session session = Session.getDefaultInstance(props, loAuthenticator);
-			Session session = Session.getDefaultInstance(props, mailAuth);
-			
-			session.setDebug(true);
-			
-			LoggingHandler.info("setauth");
-//			session.setPasswordAuthentication(new URLName(smtpServer),new PasswordAuthentication(login,password));
-
-			// -- Create a new message --
-			LoggingHandler.info("create message");
-			Message msg = new MimeMessage(session);
-			
-			// -- Set the FROM and TO fields --
-			msg.setFrom(new InternetAddress(from));
-			msg.setRecipients(Message.RecipientType.TO,InternetAddress.parse(to, false));
-			
-			// -- Set the subject and body text --
-			msg.setSubject(subject);
-			msg.setText(body);
-			
-			// -- Set some other header information --
-//			msg.setHeader("X-Mailer", "IntergalacticEmailService");
-			msg.setSentDate(new Date());
-			
-			// -- Send the message --
-			Transport.send(msg);
-			
-			System.out.println("Message sent OK.");
-	    }
-	    catch (Exception ex){
-	    	ex.printStackTrace();
-	    }
-	}
-    */
 
 	/**
 	    * "send" method to send the message.

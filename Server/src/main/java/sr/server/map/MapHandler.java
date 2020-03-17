@@ -15,11 +15,11 @@ import java.util.List;
 import spaceraze.servlethelper.map.MapImageCreator;
 import spaceraze.servlethelper.map.TransferWrapper;
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
+import spaceraze.util.properties.PropertiesReader;
 import spaceraze.world.Map;
 import sr.server.MapFileNameFilter;
 import sr.server.persistence.PHash;
-import sr.server.properties.PropertiesHandler;
-import sr.server.properties.PropertiesReader;
 import sr.webb.users.User;
 
 /**

@@ -22,7 +22,7 @@ import spaceraze.util.general.Logger;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
-import sr.server.ranking.RankingHandler;
+import spaceraze.util.properties.RankingHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
 

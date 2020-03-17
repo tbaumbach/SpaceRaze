@@ -3,13 +3,13 @@
  */
 package sr.webb;
 
+import spaceraze.util.properties.PropertiesHandler;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
-
-import sr.server.properties.PropertiesHandler;
 
 /**
  * @author WMPABOD

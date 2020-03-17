@@ -1,6 +1,6 @@
-<%@page import="spaceraze.servlethelper.RankedPlayer"%>
+<%@page import="spaceraze.util.general.RankedPlayer"%>
 <%@page import="sr.webb.users.User"%>
-<%@page import="sr.server.ranking.RankingHandler"%>
+<%@page import="spaceraze.util.properties.RankingHandler"%>
 <%@page import="sr.server.ServerHandler"%>
 <%@page import="sr.webb.users.UserHandler"%>
 <%@page import="java.util.LinkedList"%>
@@ -159,7 +159,7 @@
 				</tr>
 				<tr class='ListTextRow'>
 					<td class='ListText' width="5">&nbsp;</td>
-					<td colspan=2 class="ListText" width=240 align="right" style="padding-bottom:5px"><div class="SolidText"><a href="Master.jsp?action=news_archive">Läs Mer >></a></div></td>
+					<td colspan=2 class="ListText" width=240 align="right" style="padding-bottom:5px"><div class="SolidText"><a href="Master.jsp?action=news_archive">Lï¿½s Mer >></a></div></td>
 					<td class='ListText' width="5">&nbsp;</td>
 				</tr>
 				

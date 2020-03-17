@@ -23,9 +23,9 @@ import javax.servlet.http.HttpSession;
 
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
 import sr.notifier.JnlpHandler;
 import sr.server.ServerHandler;
-import sr.server.properties.PropertiesHandler;
 import sr.webb.mail.MailHandler;
 
 /**
@@ -649,7 +649,7 @@ public class UserHandler {
 			prop.put(key, bundle.getObject(key));
 		}
 */
-		Properties prop = PropertiesHandler.getInstance("users." + file);
+		Properties prop = PropertiesHandler.getInstance("users\\" + file);
 		return prop;
 	}
 	

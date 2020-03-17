@@ -42,14 +42,13 @@ import spaceraze.world.diplomacy.DiplomacyLevel;
 import spaceraze.world.diplomacy.DiplomacyState;
 import spaceraze.world.enums.DiplomacyGameType;
 import spaceraze.world.enums.HighlightType;
-import spaceraze.world.landbattle.report.LandBattleReport;
 import spaceraze.world.orders.Orders;
 import spaceraze.world.report.PlanetReport;
 import spaceraze.world.report.PlayerReport;
 import spaceraze.world.spacebattle.TaskForce;
 import sr.message.MessageDatabase;
 import sr.server.persistence.PHash;
-import sr.server.ranking.RankingHandler;
+import spaceraze.util.properties.RankingHandler;
 import sr.webb.mail.MailHandler;
 
 public class GalaxyUpdater {
@@ -1533,7 +1532,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
   }
 
   public void troopsJoinGovenor(Planet joiningPlanet, VIP dip){
-	  List<Troop> allTroops = Functions.cloneList(g.getTroops());
+	  List<Troop> allTroops = g.getTroops().stream().collect(Collectors.toList());
 	  List<Troop> removeTroops = new LinkedList<Troop>();
 	  for (Troop aTroop : allTroops) {
 		  if ((aTroop.getPlanetLocation() == joiningPlanet) & (aTroop.getOwner() == null)){ // 

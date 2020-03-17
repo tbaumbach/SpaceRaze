@@ -13,6 +13,7 @@ import spaceraze.servlethelper.GameListData;
 import spaceraze.servlethelper.ReturnGames;
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.Faction;
 import spaceraze.world.Galaxy;
 import spaceraze.world.GameWorld;
@@ -22,7 +23,6 @@ import spaceraze.world.StatisticGameType;
 import spaceraze.world.enums.DiplomacyGameType;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
-import sr.server.properties.PropertiesHandler;
 import sr.webb.mail.MailHandler;
 import sr.webb.users.User;
 

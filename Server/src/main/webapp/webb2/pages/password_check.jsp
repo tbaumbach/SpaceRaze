@@ -1,9 +1,4 @@
-<%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
-<%@ page import="sr.server.properties.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="java.io.*"%>
-<%@ page import="com.amarantin.imagepack.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,9 +23,9 @@
 	if (showErrorPage){
 %>
 <div style="left: 129px;width: 450px;position: absolute;top: 89px;padding-bottom:20px;">	
-	<div class="Form_Name" style="width:450"><div class="SolidText">SpaceRaze</div></div>
-	<div class="Form_Header" style="width:450"><div class="SolidText"><b>Game Protected by password</b></div></div>
-	<div class="Form_Text" style="width:450"><div class="SolidText">
+	<div class="Form_Name" style="width:450px"><div class="SolidText">SpaceRaze</div></div>
+	<div class="Form_Header" style="width:450px"><div class="SolidText"><b>Game Protected by password</b></div></div>
+	<div class="Form_Text" style="width:450px"><div class="SolidText">
 <table class="ListTable">
 <tr>
 <td>

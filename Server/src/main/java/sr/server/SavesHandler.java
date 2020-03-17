@@ -6,7 +6,7 @@ package sr.server;
 import java.io.File;
 
 import spaceraze.util.general.Logger;
-import sr.server.properties.PropertiesHandler;
+import spaceraze.util.properties.PropertiesHandler;
 
 /**
  * @author wmpabod

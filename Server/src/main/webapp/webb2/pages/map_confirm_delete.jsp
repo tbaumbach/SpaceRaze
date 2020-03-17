@@ -1,10 +1,5 @@
-<%@ page import="sr.webb.*"%>
-<%@ page import="sr.server.*"%>
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.server.map.*"%>
-<%@ page import="sr.server.properties.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="java.io.*"%>
 <!DOCTYPE html>
 <html>
 <head>

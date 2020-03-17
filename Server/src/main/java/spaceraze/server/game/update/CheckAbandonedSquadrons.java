@@ -151,7 +151,7 @@ public class CheckAbandonedSquadrons {
 	private void checkAbandonedSquadrons(Player aPlayer){
 	  	  Logger.finest("checkAbandonedSquadron called, player: " + aPlayer.getName());
 	  	  boolean sqdSurvive = galaxy.getGameWorld().isSquadronsSurviveOutsideCarriers();
-	  	  List<Spaceship> playerSpaceships = Functions.cloneList(galaxy.getPlayersSpaceships(aPlayer));
+	  	  List<Spaceship> playerSpaceships = galaxy.getPlayersSpaceships(aPlayer).stream().collect(Collectors.toList());
 	  	  Collections.shuffle(playerSpaceships);
 	  	  List<Spaceship> removeShips = new LinkedList<Spaceship>();
 	  	  boolean addSpace = false;

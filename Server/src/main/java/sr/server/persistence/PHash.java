@@ -15,7 +15,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import spaceraze.util.general.Logger;
-import sr.server.properties.PropertiesHandler;
+import spaceraze.util.properties.PropertiesHandler;
 
 /**
  * Own implementation of a simple persistent hashtable. 

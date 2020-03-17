@@ -5,7 +5,7 @@ import java.util.List;
 
 import spaceraze.servlethelper.CreateNewGameData;
 import spaceraze.servlethelper.GameListData;
-import spaceraze.servlethelper.RankedPlayer;
+import spaceraze.util.general.RankedPlayer;
 import spaceraze.servlethelper.ReturnGames;
 import spaceraze.world.Map;
 

@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import spaceraze.servlethelper.map.TransferWrapper;
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.Map;
 import sr.server.map.MapHandler;
-import sr.server.properties.PropertiesHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
 

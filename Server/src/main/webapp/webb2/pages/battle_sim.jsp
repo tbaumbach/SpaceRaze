@@ -1,13 +1,8 @@
 <%@page import="spaceraze.battlehandler.spacebattle.simulation.BattleSim"%>
 <%@page import="spaceraze.servlethelper.handlers.GameWorldHandler"%>
 <%@page import="spaceraze.webb.support.world.GameWorldHelper"%>
-<%@ page import="sr.webb.*"%>
-<%@ page import="sr.server.*"%>
 <%@ page import="spaceraze.world.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
-<%@ page import="sr.server.properties.*"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +12,7 @@
 </head>
 <%@ include file="checklogin2.jsp" %>
 <%
-	//TODO 2020-02-27 Den här ska inte vara tillgänlig för vanliga användare, finns det behov för admin?  I så fall fixa den.
+	//TODO 2020-02-27 Den hï¿½r ska inte vara tillgï¿½nlig fï¿½r vanliga anvï¿½ndare, finns det behov fï¿½r admin?  I sï¿½ fall fixa den.
 
 	// maybe perform simulation 
 	String todoStr = request.getParameter("todo");
@@ -38,7 +33,7 @@
 	if ((todoStr != null) && (todoStr.equals("Start Sim"))){
 		ships1 = request.getParameter("ships1");
 		ships2 = request.getParameter("ships2");
-		//TODO 2020-02-29 Ta bort den här sidan helt o hållet?
+		//TODO 2020-02-29 Ta bort den hï¿½r sidan helt o hï¿½llet?
 		//bs = BattleSim.simulateBattles(ships1,ships2,iterations,maxShips,sleepTime,gameWorldName);
 	}
 %>
@@ -55,7 +50,7 @@
 	}
 
 	function AddShips(){
-	  //Kontrollera för vilken sida
+	  //Kontrollera fï¿½r vilken sida
 	  //Skriv ut Skepp, Ledare, Expert Engineer, Screened, Antal
 	  //[4]Stc(AES)
 

@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.util.zip.GZIPOutputStream;
 
 import spaceraze.util.general.Logger;
+import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.Galaxy;
-import sr.server.properties.PropertiesHandler;
 
 public class GalaxySaver{ 
 

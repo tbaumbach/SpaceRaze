@@ -1,8 +1,4 @@
-<%@ page import="sr.webb.*"%>
-<%@ page import="sr.server.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="java.io.*"%>
-<%@ page import="sr.server.properties.*"%>
+<%@ page import="spaceraze.util.properties.PropertiesHandler" %>
 <!DOCTYPE html>
 <html>
 <head>

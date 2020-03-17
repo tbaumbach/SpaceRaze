@@ -1,5 +1,5 @@
-<%@page import="sr.server.ranking.RankingHandler"%>
-<%@page import="spaceraze.servlethelper.RankedPlayer"%>
+<%@page import="spaceraze.util.properties.RankingHandler"%>
+<%@page import="spaceraze.util.general.RankedPlayer"%>
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>

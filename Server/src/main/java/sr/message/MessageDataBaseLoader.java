@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.util.zip.GZIPInputStream;
 
 import spaceraze.util.general.Logger;
-import sr.server.properties.PropertiesHandler;
+import spaceraze.util.properties.PropertiesHandler;
 
 public class MessageDataBaseLoader{
 	MessageDatabase aMessageDatabase;

@@ -1,8 +1,4 @@
 package sr.server;
-/**
-    av Paul S. Bodin, juli -98
-    WM-data Education
-*/
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,7 +37,7 @@ public class Connection implements Runnable{
         try{
             oos = new ObjectOutputStream(client.getOutputStream());
             ois = new ObjectInputStream(client.getInputStream());
-            oos.writeObject(new Integer(s.getTurn()));
+            oos.writeObject(s.getTurn());
             String message = (String)ois.readObject();
             if (!message.equals("checkStatus")){
             	System.out.println("Mottar meddelande: " + message);
@@ -54,7 +50,6 @@ public class Connection implements Runnable{
         }
         catch(IOException e){
             try{client.close();}catch(IOException e2){}
-            return;
         }
         catch(ClassNotFoundException cnfe){
             System.out.println("Class not found...\n");

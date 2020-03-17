@@ -1,14 +1,4 @@
 <!-- Start register.jsp fragment -->
-<%@ page import="com.amarantin.imagepack.*"%>
-<%@ page import="sr.server.*"%>
-<%@ page import="sr.server.properties.*"%>
-<%@ page import="sr.server.map.*"%>
-<%@ page import="sr.server.ranking.*"%>
-<%@ page import="sr.webb.users.*"%>
-<%@ page import="sr.webb.news.*"%>
-<%@ page import="java.io.*"%>
-<%@ page import="java.util.*"%>
-
 
 <%
 	// handle session/login/logout
@@ -25,7 +15,7 @@
 	if ("logout".equals(request.getParameter("action"))){
 		// log out player 
 		// remove any session handled by cookies
-		UserHandler.logoutUser(request,response);		
+		UserHandler.logoutUser(request,response);
 		// remove any session handled by session object
 		session.removeAttribute("user");
 	}
