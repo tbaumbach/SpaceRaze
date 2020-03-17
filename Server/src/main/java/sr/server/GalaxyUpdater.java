@@ -2871,12 +2871,6 @@ protected void rankingLoss(String playerLogin, boolean survived){
     		Sedan utförs alla strider/attacker i utslumpad ordning. Om en trupp inte längre har en motståndare så gör den inget mer i denna strid.
     		För varje nytt drag görs en helt ny uppställning. 
 
-     * @param defendingPlayer
-     * @param defendingTroops	
-     * @param attackingPlayer
-     * @param attackingTroops
-     * @param attackingTaskForce
-     * @param aPlanet
      */
     
     
@@ -2885,12 +2879,16 @@ protected void rankingLoss(String playerLogin, boolean survived){
     	
     	LandBattle battle = new LandBattle(defendingTroops, attackingTroops, aPlanet.getName(), aPlanet.getResistance(), g.getTurn());
     	battle.performBattle();
-    	    	
-    	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
-    	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
-    	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
-    	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
-    	    	
+
+    	if(attackingPlayer!= null) {
+			battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
+			battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
+		}
+    	if(defendingPlayer != null) {
+			battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
+			battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
+		}
+
     	// Om en VIP var på en troop ska den då dö? eller görs det senare i koden när VIPar gås igenom?
     	battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> g.removeTroop(troop));
     	battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> g.removeTroop(troop));

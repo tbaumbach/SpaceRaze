@@ -142,14 +142,6 @@ public class SpaceRazeTunnel extends HttpServlet{
 			        }
 
 					Logger.finest("autobalance: " + aServer.getAutoBalance());
-					if (tw.isAndroid()){ // om klient �r droid, �ndra s� att returnobjekt �r factionnames
-						List<String> factionNames = new LinkedList<String>();
-						for (Faction aFaction : aServer.getOpenSelectableFactions()) {
-							factionNames.add(aFaction.getName());
-						}
-						tw.setReturnObject(factionNames);
-						Logger.finest("droid tw openFactions names set: ");
-					}else
 					if ((turn == 0) & aServer.getAutoBalance()){
 						tw.setReturnObject(aServer.getOpenSelectableFactions());
 						Logger.finest("tw openFactions set: " + tw.getReturnObject().toString());
@@ -164,11 +156,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 					}else{
 						tw.setMessage("choosefaction");
 					}
-					
-					// set gameWorld
-					if (!tw.isAndroid()){ // is client is android, gw should not be included
-						tw.setGameWorld(aServer.getGalaxy().getGameWorld());
-					}
+					tw.setGameWorld(aServer.getGalaxy().getGameWorld());
 				}else if(tw.getMessage().equals("setMessagesRead")){
 					List<Message> newMessages = setMessagesRead(tw, sh);
 					tw.setReturnObject(newMessages);
@@ -188,12 +176,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 					// client logging in
 					String message = tw.getMessage();
 					Logger.fine(message);
-					//tw.setReturnObject(getPlayer(message,tw.getPort()));
 					tmpPlayer = getPlayer2(message,tw.getPort(),sh);
-					/* Old Android client is not longer supported
-					if (tw.isAndroid()){ // is client is android, remove some unnessesary stuff from the player and galaxy objects
-						tmpPlayer = prunePlayer(tmpPlayer);
-					}*/
 					tw.setReturnObject(tmpPlayer);
 				}else{
 					// client saving a turn/player

@@ -98,21 +98,6 @@ public class GameWorldHelper {
 		sb.append("</tr>\n");
 		return sb.toString();
 	}
-	  
-	public String getHTMLTableRow(){
-		StringBuffer sb = new StringBuffer();
-		sb.append("<tr>");
-		sb.append("<td><a href=\"gameworld.jsp?gameworldfilename=" + gameWorld.getFileName() + "\">" + gameWorld.getFullName() + "</a></td>");
-		sb.append("<td>" + gameWorld.getFileName() + "</td>");
-		sb.append("<td>" + gameWorld.getFactions().size() + "</td>");
-		sb.append("<td>" + gameWorld.getShipTypes().size() + "</td>");
-		sb.append("<td>" + gameWorld.getVipTypes().size() + "</td>");
-		sb.append("<td>" + gameWorld.getCreatedByUser() + "</td>");
-		sb.append("<td>" + gameWorld.getCreatedDate() + "</td>");
-		sb.append("<td>" + gameWorld.getChangedDate() + "</td>");
-		sb.append("</tr>\n");
-		return sb.toString();
-	}
 
 	public static String getHTMLHeaderRowNO(){
 		StringBuffer sb = new StringBuffer();
@@ -133,24 +118,6 @@ public class GameWorldHelper {
 		
 			return sb.toString();
 	}
-	  
-	public String getHTMLTableRowNO_BattleSim(int i, String RowName){
-		StringBuffer sb = new StringBuffer();
-		sb.append("<tr class='ListTextRow' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',10,1);\" onMouseOut=\"TranparentRow('" + RowName + "',10,0);\">");
-		sb.append("<td id='" + RowName + "1' width='3' class='ListText'></td>");
-		sb.append("<td id='" + RowName + "2' class='ListText'><div class='SolidText' style='padding-left:5px;'><a href=\"Master.jsp?action=battle_sim&gameworld=" + gameWorld.getFileName() + "\">" + gameWorld.getFullName() + "</a></div></td>");
-		sb.append("<td id='" + RowName + "3' class='ListText'><div class='SolidText'>" + gameWorld.getFileName() + "</div></td>");
-		sb.append("<td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gameWorld.getFactions() + "</div></td>");
-		sb.append("<td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + gameWorld.getShipTypes() + "</div></td>");
-		sb.append("<td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + gameWorld.getVipTypes().size() + "</div></td>");
-		//sb.append("<td id='" + RowName + "7' class='ListText'><div class='SolidText'> Todo </div></td>");
-		sb.append("<td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + gameWorld.getCreatedByUser() + "</div></td>");
-		sb.append("<td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + gameWorld.getCreatedDate() + "</div></td>");
-		sb.append("<td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + gameWorld.getChangedDate() + "</div></td>");
-		sb.append("<td id='" + RowName + "10' width='3' class='ListText'></td>");
-		sb.append("</tr>\n");
-		return sb.toString();
-	}
 	
 	public String getHTMLTableRowNO(int i, String RowName){
 		StringBuffer sb = new StringBuffer();
@@ -161,24 +128,12 @@ public class GameWorldHelper {
 		sb.append("<td id='" + RowName + "4' class='ListText'><div class='SolidText'>" + gameWorld.getFactions() + "</div></td>");
 		sb.append("<td id='" + RowName + "5' class='ListText'><div class='SolidText'>" + gameWorld.getShipTypes() + "</div></td>");
 		sb.append("<td id='" + RowName + "6' class='ListText'><div class='SolidText'>" + gameWorld.getVipTypes().size() + "</div></td>");
-		//sb.append("<td id='" + RowName + "7' class='ListText'><div class='SolidText'> Todo </div></td>");
 		sb.append("<td id='" + RowName + "7' class='ListText'><div class='SolidText'>" + gameWorld.getCreatedByUser() + "</div></td>");
 		sb.append("<td id='" + RowName + "8' class='ListText'><div class='SolidText'>" + gameWorld.getCreatedDate() + "</div></td>");
 		sb.append("<td id='" + RowName + "9' class='ListText'><div class='SolidText'>" + gameWorld.getChangedDate() + "</div></td>");
 		sb.append("<td id='" + RowName + "10' width='3' class='ListText'></td>");
 		sb.append("</tr>\n");
 		return sb.toString();
-	}
-	
-	public static String getGameWorldsTableContentHTML(){
-		StringBuffer retHTML = new StringBuffer();
-		List<GameWorld> allGameWorlds = GameWorldHandler.getGameWorldTypes();
-		Logger.finest("gw size " + allGameWorlds.size());
-		retHTML.append(GameWorldHelper.getHTMLHeaderRow());
-		for (GameWorld tmpgw : allGameWorlds) {
-			retHTML.append(new GameWorldHelper(tmpgw).getHTMLTableRow());
-		}
-		return retHTML.toString();
 	}
 
 	public static String getGameWorldsTableContentHTMLNO(){
@@ -189,22 +144,8 @@ public class GameWorldHelper {
 		int i = 0;
 		for (GameWorld tmpgw : allGameWorlds) {
 			i = i + 1;
-			String RowName = i + "GameWorldListRow";			
-			retHTML.append(new GameWorldHelper(tmpgw).getHTMLTableRowNO(i,RowName));
-		}
-		return retHTML.toString();
-	}
-
-	public static String getGameWorldsTableContentHTMLNO_BattleSim(){
-		StringBuffer retHTML = new StringBuffer();
-		List<GameWorld> allGameWorlds = GameWorldHandler.getGameWorldTypes();
-		Logger.finest("gw size " + allGameWorlds.size());
-		retHTML.append(GameWorldHelper.getHTMLHeaderRowNO());
-		int i = 0;
-		for (GameWorld tmpgw : allGameWorlds) {
-			i = i + 1;
-			String RowName = i + "GameWorldListRow";
-			retHTML.append(new GameWorldHelper(tmpgw).getHTMLTableRowNO_BattleSim(i,RowName));
+			String rowName = i + "GameWorldListRow";
+			retHTML.append(new GameWorldHelper(tmpgw).getHTMLTableRowNO(i,rowName));
 		}
 		return retHTML.toString();
 	}

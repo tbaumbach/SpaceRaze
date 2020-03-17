@@ -76,14 +76,8 @@ public class NotifierTunnel extends HttpServlet{
 						tmpGameName = cngd.getGameName(); 
 					}
 					int winLimit = 75;
-					if (transferWrapper.isAndroid()){
-						winLimit = 66;
-					}
 					String status = sh.startNewGame(cngd.getGameWorldFileName(), tmpGameName, cngd.getMapName(), String.valueOf(steps), cngd.getAutoBalanceString(), cngd.getTimeString(), cngd.getEmailPlayers(), cngd.getMaxNrPlayers(), cngd.getUserLogin(), cngd.getGamePassword(), cngd.getGroupFaction(), cngd.getSelectableFactionNames(), cngd.getRandomFactionString(), cngd.getDiplomacy(), false, "yes", winLimit, winLimit, cngd.getEndTurn(), cngd.getNumberOfStartPlanet(), cngd.getStatisticGameType());
-					if (transferWrapper.isAndroid()){
-						int gameId = sh.findGame(tmpGameName).getId();
-						transferWrapper.setGameId(gameId);
-					}
+
 					if (status.equalsIgnoreCase("game started") & cngd.getGameName().equals("?")){
 						status += " " + tmpGameName; 
 					}
@@ -137,13 +131,7 @@ public class NotifierTunnel extends HttpServlet{
 						}
 						// maybe include games data
 						if (transferWrapper.getReturnGames() != ReturnGames.NONE){
-							transferWrapper.setGameListData(sh.getGamesData(aUser,transferWrapper.getReturnGames(),transferWrapper.isAndroid()));
-						}
-						// maybe return rankingData to Android client
-						Logger.info("transferWrapper.isAndroid(): " + transferWrapper.isAndroid());
-						if (transferWrapper.isAndroid()){
-							PHash.incCounter("notifier.android." + transferWrapper.getUserLogin());
-							transferWrapper.setRankingData(RankingHandler.findPlayerRanking(transferWrapper.getUserLogin()));
+							transferWrapper.setGameListData(sh.getGamesData(aUser,transferWrapper.getReturnGames()));
 						}
 					}
 				}

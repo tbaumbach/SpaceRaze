@@ -580,27 +580,27 @@ public class ServerHandler {
 		return hasTurn;
 	}
 
-	public GameListData getGamesData(User aUser, ReturnGames returnGames, boolean isAndroid){
+	public GameListData getGamesData(User aUser, ReturnGames returnGames){
 		GameListData gameListData = new GameListData();
 		SR_Server[] allSerArr = getServers();
 		if (allSerArr.length > 0){
 			for (int i = 0; i < allSerArr.length; i++) {
 				SR_Server aServer = allSerArr[i];
 				if (returnGames == ReturnGames.ALL){
-					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+					gameListData.addGame(getGameData(aServer,aUser));
 				}else
 				if (((returnGames == ReturnGames.OWN) | (returnGames == ReturnGames.OWN_AND_OPEN)) & aServer.isPlayerParticipating(aUser)){
-					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+					gameListData.addGame(getGameData(aServer,aUser));
 				}else
 				if (((returnGames == ReturnGames.OPEN) | (returnGames == ReturnGames.OWN_AND_OPEN)) & !aServer.isPlayerParticipating(aUser) & (aServer.getTurn() == 0)){
-					gameListData.addGame(getGameData(aServer,aUser,isAndroid));
+					gameListData.addGame(getGameData(aServer,aUser));
 				}
 			}
 		}
 		return gameListData;
 	}
 
-	private GameData getGameData(SR_Server aServer, User aUser, boolean isAndroid){
+	private GameData getGameData(SR_Server aServer, User aUser){
 		GameData gameData = new GameData();
 		gameData.setGameId((int)aServer.getId());
 		Logger.finer("aServer.getGameId(): " + aServer.getId());
@@ -639,7 +639,7 @@ public class ServerHandler {
 		}
 		gameData.setTurn(aServer.getTurn());
 		gameData.setUpdatesWeek(UpdateRunner.getShortDescription(aServer.getGalaxy().getTime()));
-		gameData.setPlayers(aServer.getGalaxy().getPlayers(),isAndroid);
+		gameData.setPlayers(aServer.getGalaxy().getPlayers());
 		gameData.setPassword(aServer.getGalaxy().getPassword());
 		return gameData;
 	}
