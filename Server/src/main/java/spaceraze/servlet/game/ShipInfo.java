@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spaceraze.world.Spaceship;
+import spaceraze.world.enums.SpaceShipSize;
 
 public class ShipInfo {
 
@@ -11,7 +12,8 @@ public class ShipInfo {
 	// behövs eller inte, framtiden får visa vägen.
 
 	private String type, name, shortName, carrierLocation;
-	private int kills, currentHP, currentShield, techWhenBuilt, shields, size, id;
+	private int kills, currentHP, currentShield, techWhenBuilt, shields, id;
+	private SpaceShipSize size;
 	private int weaponsSmall, weaponsMedium, weaponsLarge, weaponsHuge, weaponsSquadron;
 	private int weaponsSalvoesMedium, weaponsSalvoesLarge, weaponsSalvoesHuge;
 	private double armorSmall, armorMedium, armorLarge, armorHuge;
@@ -26,7 +28,7 @@ public class ShipInfo {
 		type = aShip.getTypeName();
 		name = aShip.getUniqueName();
 		shortName = aShip.getShortName();
-		size = aShip.getSize();
+		size = aShip.getType().getSize();
 		kills = aShip.getKills();
 		currentHP = aShip.getCurrentDc();
 		retreating = aShip.isRetreating();
@@ -68,7 +70,7 @@ public class ShipInfo {
 		return shortName;
 	}
 	
-	public int getSize() {
+	public SpaceShipSize getSize() {
 		return size;
 	}
 

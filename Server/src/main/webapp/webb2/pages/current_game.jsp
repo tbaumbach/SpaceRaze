@@ -126,12 +126,6 @@
 	<td><%= aServer.getGalaxy().getranked() %></td>
 </tr>
 
-
-<tr>
-	<td>SinglePlayer Game:</td>
-	<td><%= aServer.getGalaxy().getsinglePlayer() %></td>
-</tr>
-
 <tr>
 	<td>Gameworld:</td>
 	<td><%= aServer.getGalaxy().getGameWorld().getFullName() %></td>

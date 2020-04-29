@@ -56,7 +56,7 @@ public class SpaceShipHelper {
 		sb.append("<tr>");
 		sb.append("<td>" + spaceshipType.getName() + "</td>");
 		sb.append("<td>" + spaceshipType.getShortName() + "</td>");
-		sb.append("<td>" + spaceshipType.getSizeString() + "</td>");
+		sb.append("<td>" + spaceshipType.getSize().getName() + "</td>");
 		if (spaceshipType.isSquadron()) {
 			sb.append("<td>Squadron</td>");
 		} else {
@@ -95,7 +95,7 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.getPsychWarfare() + "</td>");
 		sb.append("<td>" + spaceshipType.getSquadronCapacity() + "</td>");
 		sb.append("<td>" + spaceshipType.getNoRetreat() + "</td>");
-		sb.append("<td>" + spaceshipType.getSupply() + "</td>");
+		sb.append("<td>" + spaceshipType.getSupply().getName() + "</td>");
 		sb.append("<td>" + spaceshipType.isPlanetarySurvey() + "</td>");
 		sb.append("<td>" + spaceshipType.isCanAppearOnBlackMarket() + "</td>");
 		sb.append("<td>" + spaceshipType.isCanAttackScreenedShips() + "</td>");

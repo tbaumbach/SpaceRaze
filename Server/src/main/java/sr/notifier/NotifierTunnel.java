@@ -76,7 +76,7 @@ public class NotifierTunnel extends HttpServlet{
 						tmpGameName = cngd.getGameName(); 
 					}
 					int winLimit = 75;
-					String status = sh.startNewGame(cngd.getGameWorldFileName(), tmpGameName, cngd.getMapName(), String.valueOf(steps), cngd.getAutoBalanceString(), cngd.getTimeString(), cngd.getEmailPlayers(), cngd.getMaxNrPlayers(), cngd.getUserLogin(), cngd.getGamePassword(), cngd.getGroupFaction(), cngd.getSelectableFactionNames(), cngd.getRandomFactionString(), cngd.getDiplomacy(), false, "yes", winLimit, winLimit, cngd.getEndTurn(), cngd.getNumberOfStartPlanet(), cngd.getStatisticGameType());
+					String status = sh.startNewGame(cngd.getGameWorldFileName(), tmpGameName, cngd.getMapName(), String.valueOf(steps), cngd.getAutoBalanceString(), cngd.getTimeString(), cngd.getEmailPlayers(), cngd.getMaxNrPlayers(), cngd.getUserLogin(), cngd.getGamePassword(), cngd.getGroupFaction(), cngd.getSelectableFactionNames(), cngd.getRandomFactionString(), cngd.getDiplomacy(), "yes", winLimit, winLimit, cngd.getEndTurn(), cngd.getNumberOfStartPlanet(), cngd.getStatisticGameType());
 
 					if (status.equalsIgnoreCase("game started") & cngd.getGameName().equals("?")){
 						status += " " + tmpGameName; 

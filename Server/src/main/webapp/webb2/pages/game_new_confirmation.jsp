@@ -88,7 +88,7 @@ Login	=	<%=theUser.getLogin()%>
 				selectableFactions.add(tmpFaction.getName());
 			}
 		}		
-		message = sh.startNewGame(gameWorld, gameName, mapName, stepsNr, autoBalance, time, emailPlayers, nrPlayers, login, gamePassword, groupFaction, selectableFactions, randomFaction, diplomacy,false,ranked, factionWin, soloWin, nrTurns, startingplanets, statisticGameType);	
+		message = sh.startNewGame(gameWorld, gameName, mapName, stepsNr, autoBalance, time, emailPlayers, nrPlayers, login, gamePassword, groupFaction, selectableFactions, randomFaction, diplomacy, ranked, factionWin, soloWin, nrTurns, startingplanets, statisticGameType);
 	
 	}
 %>

@@ -50,7 +50,6 @@ public class SR_Server {
 	private int id;
 	private int steps;
 	// private int maxPlayers;
-	private boolean singlePlayer = false;
 	// private boolean ranked = false;
 	private ServerHandler sh;
 	private MessageDatabase messageDatabase;
@@ -59,32 +58,26 @@ public class SR_Server {
 	/**
 	 * Only used to load old games. Always use auto update. steps is not used when
 	 * loading, set to -1 maxPlayers is not used when loading, set to -1
-	 * 
-	 * @param nameOfGame
-	 * @param port
+	 *
 	 */
 	public SR_Server(String nameOfGame, int port, ServerHandler sh) {
 		this("load", null, nameOfGame, "not used when loading", port, 0, true, -1, false, -1, null, null, false, false,
-				null, sh, null, false, false, 0, 0, 0, 0, null);
+				null, sh, null, false, 0, 0, 0, 0, null);
 	}
 
 	/**
 	 * Use this to start a new game that updates when a set time has passed. Game
 	 * will also update when all players are done with their turn.
-	 * 
-	 * @param command
-	 * @param nameOfGame
-	 * @param port
-	 * @param time
+	 *
 	 */
 	public SR_Server(String command, GameWorld aGameWorld, String nameOfGame, String nameOfMap, int id, int steps,
 			boolean autoBalance, long time, int maxPlayers, String startedByPlayer, String gamePassword,
 			boolean groupFaction, boolean randomGame, List<String> selectableFactionNames, ServerHandler sh,
-			DiplomacyGameType diplomacyGameType, boolean bSinglePlayer, boolean bRanked, int singleVictory,
+			DiplomacyGameType diplomacyGameType, boolean bRanked, int singleVictory,
 			int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType) {
 		this(command, aGameWorld, nameOfGame, nameOfMap, id, time, true, steps, autoBalance, maxPlayers,
 				startedByPlayer, gamePassword, groupFaction, randomGame, selectableFactionNames, sh, diplomacyGameType,
-				bSinglePlayer, bRanked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType);
+				bRanked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType);
 	}
 
 	/**
@@ -125,10 +118,6 @@ public class SR_Server {
 		g.setStartedByPlayer(startedByPlayer);
 	}
 
-	public void setSingle(Boolean Single) {
-		singlePlayer = Single;
-	}
-
 	public String getMapFileName() {
 		return g.getMapFileName();
 	}
@@ -158,22 +147,10 @@ public class SR_Server {
 		return found;
 	}
 
-	public boolean isSinglePlayersGame(User aUser) {
-		boolean found = false;
-		Logger.finest("isPlayerParticipating - User: " + aUser.getLogin());
-		Logger.finest("isPlayerParticipating - startedByPlayer: " + g.getStartedByPlayer());
-
-		if (g.getStartedByPlayer().equals(aUser.getLogin())) {
-			found = true;
-		}
-
-		return found;
-	}
-
 	private SR_Server(String command, GameWorld aGameWorld, String nameOfGame, String nameOfMap, int id, long aTime,
 			boolean autoUpdate, int steps, boolean autoBalance, int maxPlayers, String startedByPlayer,
 			String gamePassword, boolean groupFaction, boolean randomGame, List<String> selectableFactionNames,
-			ServerHandler sh, DiplomacyGameType diplomacyGameType, boolean bSinglePlayer, boolean bRanked,
+			ServerHandler sh, DiplomacyGameType diplomacyGameType,boolean bRanked,
 			int singleVictory, int factionVictory, int endTurn, int numberOfStartPlanet,
 			StatisticGameType statisticGameType) {
 		Logger.finer("new SR_Server");
@@ -186,12 +163,11 @@ public class SR_Server {
 		this.steps = steps;
 		// this.maxPlayers = maxPlayers;
 		this.sh = sh;
-		this.singlePlayer = bSinglePlayer;
 		// this.ranked = bRanked;
 		// this.startedByPlayer = startedByPlayer;
 		Logger.finer("autoBalance: " + autoBalance);
 		parseCommand(autoBalance, maxPlayers, startedByPlayer, aGameWorld, gamePassword, groupFaction, randomGame,
-				selectableFactionNames, diplomacyGameType, bSinglePlayer, bRanked, singleVictory, factionVictory,
+				selectableFactionNames, diplomacyGameType, bRanked, singleVictory, factionVictory,
 				endTurn, numberOfStartPlanet, statisticGameType);
 	}
 
@@ -211,11 +187,11 @@ public class SR_Server {
 
 	private void parseCommand(boolean autoBalance, int maxPlayers, String startedByPlayer, GameWorld aGameWorld,
 			String gamePassword, boolean groupFaction, boolean randomGame, List<String> selectableFactionNames,
-			DiplomacyGameType diplomacyGameType, boolean singleplayer, boolean ranked, int singleVictory,
+			DiplomacyGameType diplomacyGameType, boolean ranked, int singleVictory,
 			int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType) {
 		if (command.equalsIgnoreCase("create")) {
 			createGalaxy(autoBalance, maxPlayers, startedByPlayer, aGameWorld, gamePassword, groupFaction, randomGame,
-					selectableFactionNames, diplomacyGameType, singleplayer, ranked, singleVictory, factionVictory,
+					selectableFactionNames, diplomacyGameType, ranked, singleVictory, factionVictory,
 					endTurn, numberOfStartPlanet, statisticGameType);
 			messageDatabase = new MessageDatabase(nameOfGame);
 			new MessageDataBaseSaver().saveMessageDataBase(nameOfGame, messageDatabase);
@@ -241,7 +217,7 @@ public class SR_Server {
 
 	private void createGalaxy(boolean autoBalance, int maxPlayers, String startedByPlayer, GameWorld aGameWorld,
 			String gamePassword, boolean groupFaction, boolean randomGame, List<String> selectableFactionNames,
-			DiplomacyGameType diplomacyGameType, boolean singleplayer, boolean ranked, int singleVictory,
+			DiplomacyGameType diplomacyGameType, boolean ranked, int singleVictory,
 			int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType) {
 		// when planetlist is in a file, send the filename as the second parameter
 		// filename can be a parameter to the .bat file
@@ -255,7 +231,6 @@ public class SR_Server {
 		Logger.finest("gamePassword: " + gamePassword);
 		g.setPassword(gamePassword);
 		g.setRandomFaction(randomGame);
-		g.setsinglePlayer(singleplayer);
 		g.setranked(ranked);
 		if (selectableFactionNames == null) {
 			// all factions should be selectable
@@ -460,62 +435,44 @@ public class SR_Server {
 			if (g.gameEnded) {
 				Logger.info("Game is ended, no update or mails will be performed.");
 			} else if (g.turn > 0) {
-
-				if (this.singlePlayer == true) {
-					updateGalaxy(true);
-				} else {
-
-					int nrActive = g.getNrActivePlayers();
-					int nrUpdated = g.getNrFinishedPlayers();
-					Logger.info(nrUpdated + "/" + nrActive + " players updated.");
-					if (nrActive == nrUpdated) {
-						// skriv ut i konsolen...
-						Logger.info("***************************************");
-						Logger.info("All players updated (at least once...).");
-						Logger.info("***************************************");
-						if (autoUpdate) {
-							updateGalaxy(true);
-							MailHandler.sendNewTurnMessage(this);
-						}
+				int nrActive = g.getNrActivePlayers();
+				int nrUpdated = g.getNrFinishedPlayers();
+				Logger.info(nrUpdated + "/" + nrActive + " players updated.");
+				if (nrActive == nrUpdated) {
+					// skriv ut i konsolen...
+					Logger.info("***************************************");
+					Logger.info("All players updated (at least once...).");
+					Logger.info("***************************************");
+					if (autoUpdate) {
+						updateGalaxy(true);
+						MailHandler.sendNewTurnMessage(this);
 					}
 				}
 			} else {
-				// ta reda p� antalet spelare
+				// ta reda på antalet spelare
 				int nrPlayers = g.getNrPlayers();
-				// ta reda p� max antalet spelare
+				// ta reda på max antalet spelare
 				int maxNrStartPlanets = g.getNrStartPlanets();
 				Logger.info(nrPlayers + "/" + maxNrStartPlanets + " players created.");
-				// om alla har skapat sina guven�rer..
-				if (this.singlePlayer == true) {
-					Player p2 = null;
-					List<Faction> openFactions = getOpenSelectableFactions();
-					int randomFactionIndex = Functions.getRandomInt(0, openFactions.size() - 1);
-					String factionName = openFactions.get(randomFactionIndex).getName();
-					p2 = (new StartGameHandler()).getNewPlayer("SpaceRaze", "EzarEcaps", "SpaceRaze", factionName, g);
-					g.replacePlayer(p2);
-					// String msg2 = g.replacePlayer(p2); vet inte vad msg2 skulle anv�ndas till?
-					gs.saveGalaxy(nameOfGame, "saves", g);
-					gs.saveGalaxy(nameOfGame + "_" + g.getTurn(), "saves/previous", g);
-					updateGalaxy(true);
-				} else {
-					if (nrPlayers == maxNrStartPlanets) {
-						Logger.info("********************");
-						Logger.info("All players created.");
-						Logger.info("********************");
-						boolean sendMail = false;
-						if (autoUpdate) {
-							updateGalaxy(true);
-							// g.setHasAutoUpdated(true);
-							sendMail = true;
-						}
-						if (time > 0) {
-							// start the update scheduler
-							Logger.fine("All players created, and time > 0, starting ur!");
-							startRunning();
-						}
-						if (sendMail) {
-							MailHandler.sendNewTurnMessage(this);
-						}
+				// om alla har skapat sina guvenörer..
+
+				if (nrPlayers == maxNrStartPlanets) {
+					Logger.info("********************");
+					Logger.info("All players created.");
+					Logger.info("********************");
+					boolean sendMail = false;
+					if (autoUpdate) {
+						updateGalaxy(true);
+						// g.setHasAutoUpdated(true);
+						sendMail = true;
+					}
+					if (time > 0) {
+						// start the update scheduler
+						Logger.fine("All players created, and time > 0, starting ur!");
+						startRunning();
+					}
+					if (sendMail) {
+						MailHandler.sendNewTurnMessage(this);
 					}
 				}
 			}
@@ -649,10 +606,6 @@ public class SR_Server {
 			passwordProtected = true;
 		}
 		return passwordProtected;
-	}
-
-	public boolean isSingle() {
-		return singlePlayer;
 	}
 
 	public int getSoloWin() {

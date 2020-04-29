@@ -69,7 +69,7 @@ public class GamesServlet{
 	 
 	 	for (SR_Server aServer : servers) {
 	 		
-	 		if (aServer.isPlayerParticipating(user)&& !aServer.getGalaxy().getsinglePlayer()){
+	 		if (aServer.isPlayerParticipating(user)){
 	 			Player tmpPlayer = aServer.getPlayer(user.getLogin(),user.getPassword());
 	 			String iconName = null;
 				
@@ -126,7 +126,7 @@ public class GamesServlet{
 		
 		 
 	 	for (SR_Server aServer : servers) {
-	 		if (aServer.getTurn() == 0 && !aServer.getGalaxy().getsinglePlayer()){
+	 		if (aServer.getTurn() == 0){
 	 			if (!aServer.isPlayerParticipating(user)){
 	 				games.add(new GameListObject(aServer));
 	 			}else{

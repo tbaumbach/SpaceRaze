@@ -27,7 +27,6 @@ public class GameParameters {
 	private List<String> selectableFactionNames;
 	private String randomFaction;
 	private String diplomacy;
-	private boolean singelPlayer;
 	private String ranked;
 	private int singleVictory;
 	private int factionVictory;
@@ -40,7 +39,7 @@ public class GameParameters {
 	public GameParameters(String gameWorldName, String gameName, int gameId, String mapName, String steps, String autoBalance, 
 			String time, String emailPlayers, String maxNrPlayers, String user, String gamePassword, 
 			String groupFaction, List<String> selectableFactionNames, String randomFaction, String diplomacy, 
-			boolean singelPlayer, String ranked, int singleVictory, int factionVictory, int endTurn, 
+			String ranked, int singleVictory, int factionVictory, int endTurn,
 			int numberOfStartPlanet, StatisticGameType statisticGameType){
 		
 		this.gameWorldName = gameWorldName;
@@ -58,7 +57,6 @@ public class GameParameters {
 		this.selectableFactionNames = selectableFactionNames;
 		this.randomFaction = randomFaction;
 		this.diplomacy = diplomacy;
-		this.singelPlayer = singelPlayer;
 		this.ranked = ranked;
 		this.singleVictory = singleVictory;
 		this.factionVictory = factionVictory;
@@ -142,11 +140,6 @@ public class GameParameters {
 
 	public String getDiplomacy() {
 		return diplomacy;
-	}
-
-	@JsonIgnore
-	public boolean isSingelPlayer() {
-		return singelPlayer;
 	}
 
 	public String getRanked() {
@@ -233,10 +226,6 @@ public class GameParameters {
 		this.diplomacy = diplomacy;
 	}
 
-	public void setSingelPlayer(boolean singelPlayer) {
-		this.singelPlayer = singelPlayer;
-	}
-
 	public void setRanked(String ranked) {
 		this.ranked = ranked;
 	}
@@ -267,7 +256,7 @@ public class GameParameters {
 				+ ", steps=" + steps + ", autoBalance=" + autoBalance + ", time=" + time + ", emailPlayers="
 				+ emailPlayers + ", maxNrPlayers=" + maxNrPlayers + ", user=" + user + ", gamePassword=" + gamePassword
 				+ ", groupFaction=" + groupFaction + ", selectableFactionNames=" + selectableFactionNames
-				+ ", randomFaction=" + randomFaction + ", diplomacy=" + diplomacy + ", singelPlayer=" + singelPlayer
+				+ ", randomFaction=" + randomFaction + ", diplomacy=" + diplomacy
 				+ ", ranked=" + ranked + ", singleVictory=" + singleVictory + ", factionVictory=" + factionVictory
 				+ ", endTurn=" + endTurn + ", numberOfStartPlanet=" + numberOfStartPlanet + ", statisticGameType="
 				+ statisticGameType + "]";

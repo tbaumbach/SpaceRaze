@@ -6,21 +6,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import spaceraze.world.Building;
-import spaceraze.world.BuildingType;
-import spaceraze.world.Faction;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Planet;
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.world.*;
 import spaceraze.server.world.comparator.PlanetRangeComparator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Player;
-import spaceraze.world.Spaceship;
-import spaceraze.world.SpaceshipType;
-import spaceraze.world.Troop;
-import spaceraze.world.TroopType;
-import spaceraze.world.VIP;
-import spaceraze.world.VIPType;
 import sr.server.GalaxyCreator;
 import sr.server.GalaxyUpdater;
 
@@ -211,17 +201,18 @@ public class StartGameHandler {
         //orbitalWharfs.add(new OrbitalWharf(p.getFaction().getStartingWharfSize(),homeplanet,this));
         //LoggingHandler.finer("Wharf added: " + p.getName() + " " + orbitalWharfs.size());
         // create all spaceshiptypes
-        addSpaceshipTypes(p);
-        p.addOtherShipTypes(galaxy.getGameWorld().getShipTypes());
+		addPlayerSpaceshipTypes(p);
+        //addSpaceshipTypes(p);
         // create all starting spaceships for the new player
         List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
-        for (SpaceshipType sstTemp1 : startTypes) {
-        	SpaceshipType sstTemp2 = p.findSpaceshipType(sstTemp1.getName());
-        	Spaceship ssTemp = sstTemp2.getShip(null,p.getFaction().getTechBonus(),0);
-        	ssTemp.setLocation(homeplanet);
-        	ssTemp.setOwner(p);
-        	galaxy.addSpaceship(ssTemp);
-        }
+
+		for (SpaceshipType sstTemp1 : startTypes) {
+			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, null, galaxy, p.getFaction().getTechBonus(),0, galaxy.getUniqueIdCounter("Ship").getUniqueId());
+			createdSpaceShip.setLocation(homeplanet);
+			createdSpaceShip.setOwner(p);
+			galaxy.addSpaceship(createdSpaceShip);
+		}
+
         // clone trooptypes in faction and add to new player
         addTroopTypes(p);
         addOtherTroopTypes(p, galaxy);
@@ -269,7 +260,12 @@ public class StartGameHandler {
 //		}
         return p;
     }
-    
+
+	private void addPlayerSpaceshipTypes(Player player){
+		player.getFaction().getSpaceshipTypes().stream()
+				.forEach(ship -> player.addPlayerSpaceshipType(new PlayerSpaceshipType(ship.getName(), ship.isAvailableToBuild())));
+	}
+    /*
     private void addSpaceshipTypes(Player p){
     	List<SpaceshipType> factionSpaceshipTypes = p.getFaction().getSpaceshipTypes();
         //Logger.finer("addSpaceshipTypes: " + p.getName());
@@ -277,7 +273,7 @@ public class StartGameHandler {
         	Logger.finer("i: " + i + " " + factionSpaceshipTypes.get(i));
         	p.addSpaceshipType(new SpaceshipType(factionSpaceshipTypes.get(i)));
         }
-    }
+    }*/
     
     private void addTroopTypes(Player p){
         List<TroopType> factionTroopTypes = p.getFaction().getTroopTypes();

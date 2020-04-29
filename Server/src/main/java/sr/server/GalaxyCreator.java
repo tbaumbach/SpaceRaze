@@ -3,6 +3,7 @@ package sr.server;
 import java.util.Collections;
 import java.util.List;
 
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Galaxy;
@@ -129,7 +130,7 @@ public class GalaxyCreator{
     }
 
     static private void addNeutralShip(Planet aPlanet,SpaceshipType sstTemp, Galaxy g){
-      Spaceship ssTemp = sstTemp.getShip(null,0,0);
+      Spaceship ssTemp = SpaceshipMutator.createSpaceShip(sstTemp, g);
       ssTemp.setLocation(aPlanet);
       g.getSpaceships().add(ssTemp);
     }

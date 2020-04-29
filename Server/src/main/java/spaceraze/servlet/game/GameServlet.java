@@ -205,7 +205,7 @@ public class GameServlet {
 		factions.add("USA");
 		
 		return new GameParameters("thelastgreatwar", "", -1, "wigge9", "10", "yes", "0", "no", "9", 
-				"", "", "yes", factions, "no", "faction", false, 
+				"", "", "yes", factions, "no", "faction",
 				"no", 60, 60, 0, 1, StatisticGameType.ALL);
 	
 	}

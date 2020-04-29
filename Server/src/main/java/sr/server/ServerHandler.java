@@ -51,9 +51,7 @@ public class ServerHandler {
 				Logger.finer("server created: " + aServer.getGameName());
 				Logger.finer("server created: " + aServer.getGameName() + " " + aServer.getMapFileName() + " " + aServer.getGalaxy().getNrStartPlanets());
 				allServers.add(aServer);
-	//			aServer.setStartedByPlayer() 
-	//			aServer.setSingle() = 
-	//			singlePlayer = aServer.getGalaxy().getSingle();
+	//			aServer.setStartedByPlayer()
 	//			startedByPlayer = aServer.getGalaxy()aServer.getStartedByPlayer();
 				curId++;
 			}
@@ -113,7 +111,7 @@ public class ServerHandler {
 				
 				SR_Server aServer = allSerArr[i];
 				
-				if (aServer.isPlayerParticipating(aUser)&& !aServer.getGalaxy().getsinglePlayer()){
+				if (aServer.isPlayerParticipating(aUser)){
 					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
 					String nextUpdate = "None";
 					UpdateRunner ur = aServer.getUpdateRunner();
@@ -304,7 +302,7 @@ public class ServerHandler {
 			String RowName = i + "CurrentListRow";
 				SR_Server aServer = allSerArr[i];
 				GameWorld gw = aServer.getGalaxy().getGameWorld();
-				if (aServer.getTurn() == 0 && !aServer.getGalaxy().getsinglePlayer()){
+				if (aServer.getTurn() == 0){
 					count++;
 					if (!aServer.isPlayerParticipating(aUser)){
 						if (aServer.isPasswordProtected()){
@@ -794,17 +792,15 @@ public class ServerHandler {
 				gameParameters.getSteps(), gameParameters.getAutoBalance(), 
 				gameParameters.getTime(), gameParameters.getEmailPlayers(), gameParameters.getMaxNrPlayers(), gameParameters.getUser(), 
 				gameParameters.getGamePassword(), gameParameters.getGroupFaction(), gameParameters.getSelectableFactionNames(), 
-				gameParameters.getRandomFaction(), gameParameters.getDiplomacy(), false, gameParameters.getRanked(), 
+				gameParameters.getRandomFaction(), gameParameters.getDiplomacy(), gameParameters.getRanked(),
 				gameParameters.getSingleVictory(), gameParameters.getFactionVictory(), gameParameters.getEndTurn(), 
 				gameParameters.getNumberOfStartPlanet(), gameParameters.getStatisticGameType());
 	}
 
 	/**
 	 * Create new game, initially it always update automatically
-	 * @param name
-	 * @return
 	 */
-	public String startNewGame(String gameWorldFileName, String gameName, String mapName, String stepsString, String autoBalanceString, String timeString, String emailPlayers, String maxNrPlayers, String userLogin, String gamePassword, String groupFaction, List<String> selectableFactionNames, String randomFactionString, String diplomacy, boolean singlePlayer, String ranked, int singleVictory, int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType){
+	public String startNewGame(String gameWorldFileName, String gameName, String mapName, String stepsString, String autoBalanceString, String timeString, String emailPlayers, String maxNrPlayers, String userLogin, String gamePassword, String groupFaction, List<String> selectableFactionNames, String randomFactionString, String diplomacy, String ranked, int singleVictory, int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType){
 		Logger.fine(gameWorldFileName);
 		Logger.fine(gameName);
 		Logger.fine(mapName);
@@ -860,7 +856,7 @@ public class ServerHandler {
 					Logger.finer("autoBalance set to true");
 				}
 				// create game instance
-				SR_Server newServer = new SR_Server("create",gw,gameName,mapName,tmpId,steps,autoBalance,time,maxPlayers,userLogin,gamePassword,groupFactionValue,randomFaction,selectableFactionNames,this, diplomacyType,singlePlayer,bRanked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType);
+				SR_Server newServer = new SR_Server("create",gw,gameName,mapName,tmpId,steps,autoBalance,time,maxPlayers,userLogin,gamePassword,groupFactionValue,randomFaction,selectableFactionNames,this, diplomacyType, bRanked, singleVictory, factionVictory, endTurn, numberOfStartPlanet, statisticGameType);
 				allServers.add(newServer);
 //				newServer.setStartedByPlayer(userLogin);
 /*

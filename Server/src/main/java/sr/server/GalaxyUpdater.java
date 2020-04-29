@@ -22,7 +22,12 @@ import spaceraze.battlehandler.landbattle.LandBattle;
 import spaceraze.battlehandler.landbattle.TaskForceTroop;
 import spaceraze.battlehandler.spacebattle.SpaceBattlePerformer;
 import spaceraze.server.game.StartGameHandler;
+import spaceraze.server.game.update.BlackMarketPerformer;
 import spaceraze.server.game.update.CheckAbandonedSquadrons;
+import spaceraze.server.game.update.OrdersPerformer;
+import spaceraze.servlethelper.game.expenses.ExpensePureFunction;
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Building;
@@ -42,6 +47,7 @@ import spaceraze.world.diplomacy.DiplomacyLevel;
 import spaceraze.world.diplomacy.DiplomacyState;
 import spaceraze.world.enums.DiplomacyGameType;
 import spaceraze.world.enums.HighlightType;
+import spaceraze.world.enums.SpaceShipSize;
 import spaceraze.world.orders.Orders;
 import spaceraze.world.report.PlanetReport;
 import spaceraze.world.report.PlayerReport;
@@ -873,7 +879,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
             int upkeepLostToCorr = aPlayer.getLostToCorruption(upkeepTmp);
             er.setCorruptionUpkeepShipsLastTurn(aPlayer.getLostToCorruption(upkeepLostToCorr));
             // expenses last turn
-            er.setExpensesLastTurn(aPlayer.getOrders().getExpensesCost(g));
+            er.setExpensesLastTurn(ExpensePureFunction.getExpensesCost(g, aPlayer));
             // actual income last turn
             int income = g.getPlayerIncomeWithoutCorruption(aPlayer,false);
             er.setIncomeLastTurn(income);
@@ -1177,7 +1183,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected void performBlackMarket(){
   	Logger.fine("performBlackMarket called");
     // perform all bids on current offers
-    g.performBlackMarket();
+	  BlackMarketPerformer.performBlackMarket(g.getBlackMarket(), g);
     // add new offers
     g.blackMarketNewTurn();
   }
@@ -1380,7 +1386,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 
   /**
    * Check if there are any hostile diplomats (other faction than aGov) on the neutral planet aPlanet
-   * @param aGov the gov on planet aPlanet
+   * @param aDip the gov on planet aPlanet
    * @param aPlanet a neutral planet where aGov are
    * @return true if there is at least one hostile gov on aPlanet
    */
@@ -1500,17 +1506,19 @@ protected void rankingLoss(String playerLogin, boolean survived){
 
   public void shipsJoinGovenor(Planet joiningPlanet, VIP dip){
     List<Spaceship> allss = g.getSpaceships();
-    List<Spaceship> removeShips = new LinkedList<Spaceship>();
-    List<Spaceship> addShips = new LinkedList<Spaceship>();
+    List<Spaceship> removeShips = new LinkedList<>();
+    List<Spaceship> addShips = new LinkedList<>();
     for (Spaceship ss : allss){
-      if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet �r neutralt och �r vid planeten
+      if ((ss.getLocation() == joiningPlanet) & (ss.getOwner() == null)){ // skeppet är neutralt och är vid planeten
           // add new ship instead of the neutral one
-          SpaceshipType sstTemp = dip.getBoss().findSpaceshipType(ss.getSpaceshipType().getName());
-          if(sstTemp == null){
-        	  sstTemp = g.findSpaceshipType(ss.getSpaceshipType().getName());
-          }
-          
-    	  Spaceship ssTemp = sstTemp.getShip(null,0,ss.getTechWhenBuilt());
+          //TODO 2020-04-22 No need to get players SpaceshipType(should not use the upgrades from the new owner), check why we are creating a nwe ship instead of just changing the owner. Possible name conflict?
+		  //SpaceshipType sstTemp = PlayerPureFunctions.findSpaceshipType(ss.getSpaceshipType().getName(), dip.getBoss(), g);
+          //if(sstTemp == null){
+		  SpaceshipType  sstTemp = g.findSpaceshipType(ss.getSpaceshipType().getName());
+          //}
+
+		  Spaceship ssTemp = SpaceshipMutator.createSpaceShip(dip.getBoss(), sstTemp, null, g, 0,  ss.getTechWhenBuilt(),g.getUniqueIdCounter("Ship").getUniqueId());
+    	  //Spaceship ssTemp = sstTemp.getShip(null,0,ss.getTechWhenBuilt());
     	  ssTemp.setCurrentDc(ss.getCurrentDc());
     	  ssTemp.setKills(ss.getKills());
     	  ssTemp.setLocation(joiningPlanet);
@@ -1821,14 +1829,12 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected void performShipRepairs(){
   	Logger.fine("performShipRepairs called");
     List<Spaceship> allss = g.getSpaceships();
-    for (Spaceship ss : allss){  // g� igenom alla rymdskepp
-      if (ss.getCurrentDc() < ss.getDamageCapacity()){  // skeppet �r skadat
+    for (Spaceship ss : allss){  // gå igenom alla rymdskepp
+      if (ss.getCurrentDc() < ss.getDamageCapacity()){  // skeppet är skadat
         Planet location = ss.getLocation();
-        if (location != null){  // skeppet �r ej p� flykt
-          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet �r vid en av spelarens planeter
-        	 // int maxResupplySize = location.getMaxWharfsSize();
-            int maxRepairTonnage = location.getMaxRepairTonnage();
-            if (ss.getTonnage() <= maxRepairTonnage){  // det finns ett skeppsvarv som �r tillr�ckligt stort f�r att reparera skeppet
+        if (location != null){  // skeppet är ej på flykt
+          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet är vid en av spelarens planeter
+            if (ss.getType().getSize().getSlots() <= location.getMaxWharfsSize()){  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
               ss.performRepairs();
             }
           }
@@ -1880,19 +1886,18 @@ protected void rankingLoss(String playerLogin, boolean survived){
   protected void performResupply(){ 
   	Logger.fine("performResupply called");
     List<Spaceship> allss = g.getSpaceships();
-    for (Spaceship ss : allss){  // g� igenom alla rymdskepp
-      if (ss.getNeedResupply()){  // skeppet �r skadat
+    for (Spaceship ss : allss){  // gå igenom alla rymdskepp
+      if (ss.getNeedResupply()){  // skeppet är skadat
         Planet location = ss.getLocation();
-        if (location != null){  // skeppet �r ej p� flykt
-          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet �r vid en av spelarens planeter
+        if (location != null){  // skeppet är ej på flykt
+          if (location.getPlayerInControl() == ss.getOwner()){  // skeppet är vid en av spelarens planeter
           	// max repair at wharfs is same as resupply level
             int maxResupplySize = location.getMaxWharfsSize();
-            ss.supplyWeapons(maxResupplySize);
+            ss.supplyWeapons(SpaceShipSize.createFromSlots(maxResupplySize));
           }
-          if (ss.getNeedResupply()){ // skeppet �r fortfarande i behov av resupply 
+          if (ss.getNeedResupply()){ // skeppet är fortfarande i behov av resupply
           	// kolla efter supplyships
-            int maxResupplySize = g.getMaxResupplyFromShip(location,ss.getOwner());
-            ss.supplyWeapons(maxResupplySize);          	
+            ss.supplyWeapons(g.getMaxResupplyFromShip(location,ss.getOwner()));
           }
         }
       }
@@ -2156,7 +2161,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     		Player temp = (Player)tempPlayers.get(random);
     		int genSize = temp.getTurnInfo().getGeneralSize();
     		if (!temp.isDefeated()){
-    			temp.performOrders();
+				OrdersPerformer.performOrders(temp.getOrders(), temp.getTurnInfo(), temp, g);
     		}
     		if (genSize < temp.getTurnInfo().getGeneralSize()){
     			temp.addToGeneral("");
@@ -2172,7 +2177,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     	for (Player aPlayer : g.players) {
     		int genSize = aPlayer.getTurnInfo().getGeneralSize();
     		if (!aPlayer.isDefeated()){
-    			aPlayer.performDiplomacyOrders();
+    			OrdersPerformer.performDiplomacyOrders(aPlayer.getOrders(), aPlayer);
     		}
     		if (genSize < aPlayer.getTurnInfo().getGeneralSize()){
     			aPlayer.addToGeneral("");
@@ -2589,14 +2594,12 @@ protected void rankingLoss(String playerLogin, boolean survived){
     			  // check if planet is razed
     			  boolean infectedByAlien = aPlanet.getInfectedByAlien();
 				  Logger.fine("1");
-    			  if (((aPlanet.getPopulation() < 1) & !infectedByAlien) | ((aPlanet.getResistance() < 1) & infectedByAlien)){ // planet razed
+    			  if ((aPlanet.getPopulation() < 1 && !infectedByAlien) || (aPlanet.getResistance() < 1 && infectedByAlien)){ // planet razed
     				  // remove player on planet and set planet as razed
     				  aPlanet.razed(g.getPlayerByGovenorName(firstTF.getPlayerName()));
     				  // check if defender have troops on planet
     				  if (g.getTroopsOnPlanet(aPlanet, aPlanet.getPlayerInControl()).size() == 0){
-    					  // TODO Ta bort alla troops. Hindra allts� m�jligheten att troops kan finnas p� en bel�grade planet. �r det inte risk att egna trupper d�r d�?
-    					  // remove defending troops
-    				 //     g.checkAbandonedTroops(aPlanet);
+    					  //TODO Remove defending troops, no troops can survive on razed planets
     				  }
     				  // check if attacker is alien
     				  if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()){
