@@ -28,6 +28,7 @@ import spaceraze.server.game.update.OrdersPerformer;
 import spaceraze.servlethelper.game.expenses.ExpensePureFunction;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Building;
@@ -218,7 +219,7 @@ public class GalaxyUpdater {
 						if (temp != winner){
 							Logger.info("Player defeated due to solo remaining player");
 							rankingLoss(temp.getName(),false);
-							temp.addToGeneralAt("Player " + winner.getName() + " (Governor " + winner.getGovenorName() + ") is the only player left and has won the game.",4);
+							temp.addToGeneralAt("Player " + winner.getName() + " (Governor " + winner.getGovernorName() + ") is the only player left and has won the game.",4);
 							temp.addToGeneralAt("Game have ended.",5);
 							temp.addToGeneralAt("",6);
 							temp.addToHighlights(winner.getName() + " have won the game!",HighlightType.TYPE_SPECIAL_1);
@@ -299,7 +300,7 @@ public class GalaxyUpdater {
 								rankingLoss(temp.getName(),!temp.isDefeated());
 								temp.setDefeated(true);
 								temp.addToGeneralAt("You have lost the game!",4);
-								temp.addToGeneralAt("Player " + winner.getName() + " (Governor " + winner.getGovenorName() + ") has control over more than " + g.getSingleVictory()+"% of all population in this sector and has won the game.",5);
+								temp.addToGeneralAt("Player " + winner.getName() + " (Governor " + winner.getGovernorName() + ") has control over more than " + g.getSingleVictory()+"% of all population in this sector and has won the game.",5);
 								temp.addToGeneralAt("Game have ended.",6);
 								temp.addToGeneralAt("",7);
 								temp.addToHighlights(winner.getName() + " have won the game!",HighlightType.TYPE_SPECIAL_1);
@@ -507,7 +508,7 @@ public class GalaxyUpdater {
 									rankingLoss(temp.getName(),!temp.isDefeated());
 									temp.setDefeated(true);
 									temp.addToGeneralAt("You have lost the game!",4);
-									temp.addToGeneralAt("The player " + winnerString + "(Governor " + winner.getGovenorName() + ") control most of the total population in this sector",5);
+									temp.addToGeneralAt("The player " + winnerString + "(Governor " + winner.getGovernorName() + ") control most of the total population in this sector",5);
 									temp.addToGeneralAt("and has won the game.",6);
 									temp.addToGeneralAt("Game have ended.",7);
 									temp.addToGeneralAt("",8);
@@ -822,19 +823,19 @@ protected void rankingLoss(String playerLogin, boolean survived){
   			if ((theGov != null) && theGov.onShip()){ // must check if theGov is null, because that can happen in single player tutorial
   				Spaceship tempShip = theGov.getShipLocation(); 
   				if (tempShip.isRetreating()){
-  					aPlayer.setRetreatingGovenor(true);
+  					aPlayer.setRetreatingGovernor(true);
   					aPlayer.addToHighlights(tempShip.getName(),HighlightType.TYPE_GOVENOR_RETREATING);
   					aPlayer.addToGeneral("Your governor is currently on a retreating ship (" + tempShip.getName() + ").");
   					aPlayer.addToGeneral("As long as your governor is on a retreating ship he cannot give any order to ships or VIPs.");
   					aPlayer.addToGeneral("");
   				}else{
-  					aPlayer.setRetreatingGovenor(false);
+  					aPlayer.setRetreatingGovernor(false);
   				}
   			}else{
-  				aPlayer.setRetreatingGovenor(false);
+  				aPlayer.setRetreatingGovernor(false);
   			}
   		}else{
-  			aPlayer.setRetreatingGovenor(false);
+  			aPlayer.setRetreatingGovernor(false);
   		}
   	}
   }
@@ -1086,7 +1087,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
  	aPlayer.addToGeneral("You have recieved a message from " + f.getName() + " Headquarters.");
  	aPlayer.addToGeneral("");
 
- 	tmpText = "Greetings, Governor " + aPlayer.getGovenorName();
+ 	tmpText = "Greetings, Governor " + aPlayer.getGovernorName();
 // 	aPlayer.addToGeneral(tmpText);
  	messageText += tmpText + "\n";
 
@@ -1185,7 +1186,9 @@ protected void rankingLoss(String playerLogin, boolean survived){
     // perform all bids on current offers
 	  BlackMarketPerformer.performBlackMarket(g.getBlackMarket(), g);
     // add new offers
-    g.blackMarketNewTurn();
+	  if(g.getTurn() > 0){
+		BlackMarketPerformer.newTurn(g, g.getBlackMarket());
+	  }
   }
 
   protected void checkVIPConflicts(){
@@ -1391,7 +1394,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
    * @return true if there is at least one hostile gov on aPlanet
    */
   protected List<VIP> getAllHostileDiplomatOnNeutral(VIP aDip, Planet aPlanet, List<VIP> allDips){
-  	Logger.finer("called: " + aDip.getBoss().getGovenorName() + " " + aPlanet.getName());
+  	Logger.finer("called: " + aDip.getBoss().getGovernorName() + " " + aPlanet.getName());
   	List<VIP> found = new LinkedList<VIP>();
     for (int i = 0; i < allDips.size(); i++){
       VIP tempVIP = (VIP)allDips.get(i);
@@ -1416,7 +1419,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
    * @return true if there is at least one other inf on aPlanet
    */
   protected List<VIP> getAllOtherInfestators(VIP anInf, Planet aPlanet, List<VIP> allInfs){
-  	Logger.fine("called: " + anInf.getBoss().getGovenorName() + " " + aPlanet.getName());
+  	Logger.fine("called: " + anInf.getBoss().getGovernorName() + " " + aPlanet.getName());
   	List<VIP> found = new LinkedList<VIP>();
   	for (VIP tempVIP : allInfs) {
   		if (tempVIP != anInf){ 
@@ -1439,7 +1442,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
    * @return
    */
   protected List<VIP> getAllOwnInfestators(VIP anInf, Planet aPlanet, List<VIP> allInfs){
-	  Logger.fine("called: " + anInf.getBoss().getGovenorName() + " " + aPlanet.getName());
+	  Logger.fine("called: " + anInf.getBoss().getGovernorName() + " " + aPlanet.getName());
 	  List<VIP> found = new LinkedList<VIP>();
 	  for (VIP tempVIP : allInfs) {
 		  if (tempVIP != anInf){ 
@@ -1461,7 +1464,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
    * @return true if there is at least one friemdly gov on aPlanet
    */
   protected List<VIP> getAllFriendlyDiplomatOnNeutral(VIP aDip, Planet aPlanet, List<VIP> allDips){
-  	Logger.finer("called: " + aDip.getBoss().getGovenorName() + " " + aPlanet.getName());
+  	Logger.finer("called: " + aDip.getBoss().getGovernorName() + " " + aPlanet.getName());
   	List<VIP> found = new LinkedList<VIP>();
     for (int i = 0; i < allDips.size(); i++){
         VIP tempVIP = (VIP)allDips.get(i);
@@ -1545,11 +1548,13 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	  for (Troop aTroop : allTroops) {
 		  if ((aTroop.getPlanetLocation() == joiningPlanet) & (aTroop.getOwner() == null)){ // 
 			  // add new troop instead of the neutral one
-			  TroopType ttTemp = dip.getBoss().findTroopType(aTroop.getTroopType().getUniqueName());
-			  if(ttTemp == null){
-				  ttTemp = g.findTroopType(aTroop.getTroopType().getUniqueName());
-			  }
-			  Troop troopTemp = ttTemp.getTroop(null,0,aTroop.getTechWhenBuilt());
+			  //TODO 2020-05-07 No need to get players TroopType(should not use the upgrades from the new owner), check why we are creating a nwe ship instead of just changing the owner. Possible name conflict?
+			  //TroopType ttTemp = PlayerPureFunctions.findOwnTroopType(aTroop.getTroopType().getUniqueName(), dip.getBoss(), g);
+			  //if(ttTemp == null){
+				//  ttTemp = g.findTroopType(aTroop.getTroopType().getUniqueName());
+			  //}
+			  TroopType ttTemp = g.findTroopType(aTroop.getTroopType().getUniqueName());
+			  Troop troopTemp = TroopMutator.createTroop(ttTemp, g);
 			  troopTemp.setCurrentDC(aTroop.getCurrentDC());
 			  troopTemp.setKills(aTroop.getKills());
 			  troopTemp.setPlanetLocation(joiningPlanet);
@@ -1911,7 +1916,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     		Player temp = (Player)g.players.get(x);
     		if (!temp.isDefeated()){
     			tempIncome = g.getPlayerIncome(temp,false);
-    			Logger.finer("Add to treasury: " + tempIncome + " for player " + temp.getGovenorName());
+    			Logger.finer("Add to treasury: " + tempIncome + " for player " + temp.getGovernorName());
     			temp.addToTreasury(tempIncome);
     		}
     	}
@@ -2432,7 +2437,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
     	}
     	boolean hostile = false;
     	if (tf.getPlayerName() != null && tf.canBesiege()){
-    		if (aPlanet.getPlayerInControl() == null || !tf.getPlayerName().equalsIgnoreCase(aPlanet.getPlayerInControl().getGovenorName())){
+    		if (aPlanet.getPlayerInControl() == null || !tf.getPlayerName().equalsIgnoreCase(aPlanet.getPlayerInControl().getGovernorName())){
     			Logger.finer("Planet does not belong to player: " + aPlanet.getName());
     			if (aPlanet.getPlayerInControl() == null){  // kolla om den är neutral
     				Logger.finer("Planet is neutral");
@@ -2704,7 +2709,7 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	        			List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet); //g.findTroopsOnPlanet(aPlanet,players.get(i));
 						
 	        			
-						Logger.finer("perform land battle between " + attacking.getGovenorName() + " and " + players.get(i).getGovenorName());
+						Logger.finer("perform land battle between " + attacking.getGovernorName() + " and " + players.get(i).getGovernorName());
 						performLandBattle(attacking, defendingTroops, players.get(i), attackingTroops, aPlanet);
 						defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet); //g.findTroopsOnPlanet(aPlanet,attacking);
 						attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet); //g.findTroopsOnPlanet(aPlanet,players.get(i));
@@ -2926,8 +2931,8 @@ protected void rankingLoss(String playerLogin, boolean survived){
 	    		String returnString = bombardedTroop.hit(g.getGameWorld().getBaseBombardmentDamage(), true, true, aPlanet.getResistance());
 	    		
 	    		if (defendingPlayer !=  null){
-	    			defendingPlayer.addToGeneral("While bombarding your planet " + aPlanet.getName() + " Governor " + attackingPlayer.getGovenorName() + "'s bombardment have attacked your troop " + bombardedTroop.getUniqueName() + " with the effect: " + returnString);
-	    			attackingPlayer.addToGeneral("While bombarding the planet " + aPlanet.getName() + " belonging to Governor " + defendingPlayer.getGovenorName() + " (" + defendingPlayer.getFaction().getName() + ") your bombardment have attacked his troop " + bombardedTroop.getTroopType().getUniqueName() + " with the effect: " + returnString);
+	    			defendingPlayer.addToGeneral("While bombarding your planet " + aPlanet.getName() + " Governor " + attackingPlayer.getGovernorName() + "'s bombardment have attacked your troop " + bombardedTroop.getUniqueName() + " with the effect: " + returnString);
+	    			attackingPlayer.addToGeneral("While bombarding the planet " + aPlanet.getName() + " belonging to Governor " + defendingPlayer.getGovernorName() + " (" + defendingPlayer.getFaction().getName() + ") your bombardment have attacked his troop " + bombardedTroop.getTroopType().getUniqueName() + " with the effect: " + returnString);
 	    		}else{
 	    			attackingPlayer.addToGeneral("While bombarding the neutral planet " + aPlanet.getName() + " your bombardment have attacked a troop " + bombardedTroop.getTroopType().getUniqueName() + " with the effect: " + returnString);
 	    		}

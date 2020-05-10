@@ -881,7 +881,7 @@ public class ServerHandler {
 */
 				// send e-mails about new game
 				if ((emailPlayers != null) && (emailPlayers.equals("yes"))){
-					MailHandler.sendNewGameMessage(newServer);
+				//TODO 2020-05-05 Old style, find some good solution	MailHandler.sendNewGameMessage(newServer);
 				}
 				// test
 				Logger.finer("Selectable factions: ");

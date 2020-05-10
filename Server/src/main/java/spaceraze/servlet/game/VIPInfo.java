@@ -14,14 +14,14 @@ public class VIPInfo {
 		if(aVip.getBoss() != null){
 			
 			if(player.getName().equals(aVip.getBoss().getName())){
-				owner = aVip.getBoss().getGovenorName();
+				owner = aVip.getBoss().getGovernorName();
 				name = aVip.getName();
 				shortName = aVip.getShortName();
 				id = aVip.getId();
 				kills = aVip.getKills();
 			}else if(player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, aVip.getBoss())){
 				// Ägaren till VIPen är en allierad vilket betyder att spelarn får veta vem som äger VIPen.
-				owner = aVip.getBoss().getGovenorName();
+				owner = aVip.getBoss().getGovernorName();
 			}
 		}
 		

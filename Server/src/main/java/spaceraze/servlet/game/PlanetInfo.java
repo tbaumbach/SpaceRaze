@@ -109,7 +109,7 @@ public class PlanetInfo {
 			if(open || shipInSystem || alliedShipsInSystem || isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
 				
 				if(planet.isPlayerPlanet()){
-					owner = planet.getPlayerInControl().getGovenorName();
+					owner = planet.getPlayerInControl().getGovernorName();
 				}else{
 					owner = "neutral";
 				}
@@ -163,7 +163,7 @@ public class PlanetInfo {
         		int shipSize = g.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer);
         		boolean civilianExists = !player.getGalaxy().getLargestShipSizeOnPlanet(planet,tempPlayer,true).equals("");
         		if ((shipSize > -1) | civilianExists){
-        			FleetInfo fleet = new FleetInfo(tempPlayer.getGovenorName(),shipSize,civilianExists);
+        			FleetInfo fleet = new FleetInfo(tempPlayer.getGovernorName(),shipSize,civilianExists);
         			fleets.add(fleet);
         		}
         	}
@@ -183,7 +183,7 @@ public class PlanetInfo {
         	if (tempPlayer != player){
         		List<Troop> troopsOnPlanet = g.getTroopsOnPlanet(planet, tempPlayer, showUnVisible);
         		if(troopsOnPlanet.size()> 0){
-        			armys.add(new ArmyInfo(tempPlayer.getGovenorName(),troopsOnPlanet.size()));
+        			armys.add(new ArmyInfo(tempPlayer.getGovernorName(),troopsOnPlanet.size()));
         		}
         	}
         }

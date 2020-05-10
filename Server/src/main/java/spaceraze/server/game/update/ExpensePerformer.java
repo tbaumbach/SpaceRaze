@@ -2,6 +2,7 @@ package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -153,7 +154,7 @@ public class ExpensePerformer {
             String uniqueBuildingString="";
             boolean buildTroop = true;
 
-            TroopType troopType = g.getPlayer(expense.getPlayerName()).findTroopType(expense.getTroopTypeName());
+            TroopType troopType = PlayerPureFunctions.findOwnTroopType(expense.getTroopTypeName(), g.getPlayer(expense.getPlayerName()), g);
 
             if(troopType.isWorldUnique()){
                 if(!troopType.isWorldUniqueBuild(p.getGalaxy())){
@@ -189,7 +190,7 @@ public class ExpensePerformer {
                 VIP tempVIP2 = p.getGalaxy().findVIPTechBonus(planet,p,o);
                 int factionTechBonus = p.getFaction().getTechBonus();
 
-                tempTroop = troopType.getTroop(tempVIP2,factionTechBonus,planet.getBuildingTechBonus());
+                tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), galaxy.getUniqueIdCounter("Trrop").getUniqueId());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
                 Logger.finest(" -buildship planet: " + tempTroop.getUniqueName());
                 tempTroop.setOwner(planet.getPlayerInControl());
@@ -276,9 +277,9 @@ public class ExpensePerformer {
 
             p.addToTreasury(-expense.getSum());
             playerToResive.addToTreasury(expense.getSum());
-            p.addToGeneral("You have given " + expense.getSum() + " money to Govenor " + playerToResive.getGovenorName() + ".");
-            playerToResive.addToGeneral("You have recieved " + expense.getSum() + " money from Govenor " + p.getGovenorName() + ".");
-            playerToResive.addToHighlights(p.getGovenorName() + ";" + expense.getSum(), HighlightType.TYPE_GIFT);
+            p.addToGeneral("You have given " + expense.getSum() + " money to Govenor " + playerToResive.getGovernorName() + ".");
+            playerToResive.addToGeneral("You have recieved " + expense.getSum() + " money from Govenor " + p.getGovernorName() + ".");
+            playerToResive.addToHighlights(p.getGovernorName() + ";" + expense.getSum(), HighlightType.TYPE_GIFT);
         }else
         if (expense.getType().equalsIgnoreCase("reconstruct")){
             planet.setProd(1);

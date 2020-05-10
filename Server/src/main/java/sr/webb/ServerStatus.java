@@ -81,13 +81,13 @@ public class ServerStatus {
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
         	String color = temp.getFaction().getColorHexValue();
-        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovenorName();
+        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
         	}
         	aPlayerStr = aPlayerStr + "</font><span></span>";
         	// pad with space
-        	for (int j = temp.getGovenorName().length(); j < (longestName + 3); j++){
+        	for (int j = temp.getGovernorName().length(); j < (longestName + 3); j++){
         		aPlayerStr = aPlayerStr + " ";
         	}
         	if (g.getTurn() > 0){
@@ -126,13 +126,13 @@ public class ServerStatus {
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
         	String color = temp.getFaction().getColorHexValue();
-        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovenorName();
+        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
         	}
         	aPlayerStr = aPlayerStr + "</font><span></span>";
         	// pad with space
-        	for (int j = temp.getGovenorName().length(); j < (longestName + 3); j++){
+        	for (int j = temp.getGovernorName().length(); j < (longestName + 3); j++){
         		aPlayerStr = aPlayerStr + " ";
         	}
         	if (g.getTurn() > 0){

@@ -73,9 +73,9 @@ public class CheckServer {
         	if (temp.getFaction().getName().equalsIgnoreCase("league")){
         		color = "#0000FF";
         	}
-        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovenorName() + "</font><span></span>";
+        	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName() + "</font><span></span>";
         	// pad with space
-        	for (int j = temp.getGovenorName().length(); j < (longestName + 3); j++){
+        	for (int j = temp.getGovernorName().length(); j < (longestName + 3); j++){
         		aPlayerStr = aPlayerStr + " ";
         	}
         	if (getTurn() > 0){

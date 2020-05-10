@@ -133,7 +133,7 @@ public class CheckAbandonedSquadrons {
 				if (controllingPlayer != aShip.getOwner()) {
 					if (aShip.getOwner() != null) {
 						controllingPlayer.addToGeneral(Functions.getDeterminedForm(aShip.getTypeName(), true) + " "
-								+ aShip.getTypeName() + " belonging to Governor " + aShip.getOwner().getGovenorName()
+								+ aShip.getTypeName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
 								+ " has been scuttled in the " + thePlanet.getName()
 								+ " system, due to lack of carrier.");
 					} else {

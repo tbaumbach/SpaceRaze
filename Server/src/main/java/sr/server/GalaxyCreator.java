@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Galaxy;
@@ -142,7 +143,7 @@ public class GalaxyCreator{
     }
     
     static private void addNeutralTroop(Planet aPlanet,TroopType ttTemp, Galaxy g){
-        Troop tTemp = ttTemp.getTroop(null,0,0);
+        Troop tTemp = TroopMutator.createTroop(ttTemp, g);
         tTemp.setPlanetLocation(aPlanet);
         g.addTroop(tTemp);
     }

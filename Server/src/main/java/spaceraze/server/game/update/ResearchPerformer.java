@@ -79,30 +79,16 @@ public class ResearchPerformer {
 
                 // adding troops to the player
                 for (TroopType aTroopType : researchAdvantage.getTroopTypes()) {
-                    p.findTroopType(aTroopType.getUniqueName()).setCanBuild(true);
+                    PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy).setCanBuild(true);
                     Logger.finer("adding a new troop type: " + aTroopType.getUniqueName());
                     researchInfoText += "A new troop type: " + aTroopType.getUniqueName() + ".\n";
                 }
 
                 //	removing old troop types from the player
                 for(TroopType aTroopType : researchAdvantage.getReplaceTroopTypes()){
-                    p.findTroopType(aTroopType.getUniqueName()).setCanBuild(false);
+                    PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy).setCanBuild(false);
                     Logger.finer("Removing old troop type : " + aTroopType.getUniqueName());
                     researchInfoText += "The troop type: " + aTroopType.getUniqueName() + " was removed.\n";
-                }
-
-                // adding VIPs to the player
-                for (VIPType aVIPType : researchAdvantage.getVIPTypes()) {
-                    p.findVIPType(aVIPType.getName()).setAvailableToBuild(true);
-                    Logger.finer("adding a new VIP type: " + aVIPType.getName());
-                    researchInfoText += "A new VIP type: " + aVIPType.getName() + ".\n";
-                }
-
-                //	removing old VIPs types from the player
-                for (VIPType aVIPType : researchAdvantage.getReplaceVIPTypes()) {
-                    p.findVIPType(aVIPType.getName()).setAvailableToBuild(false);
-                    Logger.finer("Removing old VIP type: " + aVIPType.getName());
-                    researchInfoText += "The VIP type: " + aVIPType.getName() + " was removed.\n";
                 }
 
                 //adding Buildings to the player
@@ -129,15 +115,13 @@ public class ResearchPerformer {
                 }
 
                 for(ResearchUpgradeShip researchUpgradeShip : researchAdvantage.getResearchUpgradeShip()){
-                    researchInfoText+= researchUpgradeShip.doResearch(PlayerPureFunctions.findOwnSpaceshipType(researchUpgradeShip.getTypeId(), p, galaxy));
+                    researchInfoText+= researchUpgradeShip.doResearch(PlayerPureFunctions.findSpaceshipImprovement(researchUpgradeShip.getTypeId(), p));
                 }
 
                 for (ResearchUpgradeTroop aResearchUpgradeTroop : researchAdvantage.getResearchUpgradeTroop()) {
-                    researchInfoText += aResearchUpgradeTroop.doResearch(p.findTroopType(aResearchUpgradeTroop.getName()));
+                    researchInfoText += aResearchUpgradeTroop.doResearch(PlayerPureFunctions.findTroopImprovement(aResearchUpgradeTroop.getTypeId(), p));
                 }
-                for (ResearchUpgradeVIP aResearchUpgradeVIP : researchAdvantage.getResearchUpgradeVIP()) {
-                    researchInfoText += aResearchUpgradeVIP.doResearch(p.findVIPType(aResearchUpgradeVIP.getName()));
-                }
+
                 for (ResearchUpgradeBuilding aResearchUpgradeBuilding : researchAdvantage.getResearchUpgradeBuilding()) {
                     researchInfoText += aResearchUpgradeBuilding.doResearch(p.findBuildingType(aResearchUpgradeBuilding.getName()));
                 }

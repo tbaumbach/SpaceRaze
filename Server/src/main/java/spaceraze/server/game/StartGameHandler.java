@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.world.*;
 import spaceraze.server.world.comparator.PlanetRangeComparator;
 import spaceraze.util.general.Functions;
@@ -157,7 +159,7 @@ public class StartGameHandler {
   private List<Planet> getStarPlanets(Galaxy galaxy) {
 	  LinkedList<Planet>  tempList = new LinkedList<Planet>();
 	  for (Planet aPlanet : galaxy.getPlanets()) {
-		  if(aPlanet.isPosssibleStartplanet()){
+		  if(aPlanet.isPossibleStartPlanet()){
 			  Logger.finer("Possible startplanet " + aPlanet.getName());
 			  tempList.add(aPlanet);
 		  }
@@ -201,7 +203,7 @@ public class StartGameHandler {
         //orbitalWharfs.add(new OrbitalWharf(p.getFaction().getStartingWharfSize(),homeplanet,this));
         //LoggingHandler.finer("Wharf added: " + p.getName() + " " + orbitalWharfs.size());
         // create all spaceshiptypes
-		addPlayerSpaceshipTypes(p);
+		addPlayerSpaceshipImprovements(p);
         //addSpaceshipTypes(p);
         // create all starting spaceships for the new player
         List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
@@ -214,15 +216,15 @@ public class StartGameHandler {
 		}
 
         // clone trooptypes in faction and add to new player
-        addTroopTypes(p);
-        addOtherTroopTypes(p, galaxy);
+		addPlayersTroopImprovements(p);
+		//addTroopTypes(p);
         // create all starting troops for this player
         List<TroopType> startTroopTypes = p.getFaction().getStartingTroops();
         for (TroopType aTroopType : startTroopTypes) {
         	// first get trooptype from player
-        	TroopType playerTroopType = p.findTroopType(aTroopType.getUniqueName());
+        	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy);
         	// then create new troop
-        	Troop aTroop = playerTroopType.getTroop(null, p.getFaction().getTechBonus(), 0);
+        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, galaxy.getUniqueIdCounter("Troop").getUniqueId());
         	aTroop.setPlanetLocation(homeplanet);
         	aTroop.setOwner(p);
         	galaxy.addTroop(aTroop);
@@ -261,40 +263,15 @@ public class StartGameHandler {
         return p;
     }
 
-	private void addPlayerSpaceshipTypes(Player player){
+	private void addPlayerSpaceshipImprovements(Player player){
 		player.getFaction().getSpaceshipTypes().stream()
-				.forEach(ship -> player.addPlayerSpaceshipType(new PlayerSpaceshipType(ship.getName(), ship.isAvailableToBuild())));
+				.forEach(type -> player.addSpaceshipImprovement(new PlayerSpaceshipImprovement(type.getName(), type.isAvailableToBuild())));
 	}
-    /*
-    private void addSpaceshipTypes(Player p){
-    	List<SpaceshipType> factionSpaceshipTypes = p.getFaction().getSpaceshipTypes();
-        //Logger.finer("addSpaceshipTypes: " + p.getName());
-        for (int i = 0; i < factionSpaceshipTypes.size(); i++){
-        	Logger.finer("i: " + i + " " + factionSpaceshipTypes.get(i));
-        	p.addSpaceshipType(new SpaceshipType(factionSpaceshipTypes.get(i)));
-        }
-    }*/
-    
-    private void addTroopTypes(Player p){
-        List<TroopType> factionTroopTypes = p.getFaction().getTroopTypes();
-        Logger.finer("addTroopTypes: " + p.getName());
-        for (TroopType aTroopType : factionTroopTypes) {
-        	  //Logger.finer("factionTroopTypes: " + aTroopType);
-        	  TroopType tmpTT = aTroopType.clone();
-          	  p.addTroopType(tmpTT);
-		}
-    }
-    
-    private void addOtherTroopTypes(Player p, Galaxy galaxy){
-        // add all other trooptypes that the player cannot build
-        for (TroopType galaxyTroopType : galaxy.getTroopTypes()) {
-			TroopType tmpPlayerTt = p.findTroopType(galaxyTroopType.getUniqueName());
-			if (tmpPlayerTt == null){ // player does not have trooptype already
-	        	  TroopType tmpTT = galaxyTroopType.clone();
-	          	  p.addOtherTroopType(tmpTT);
-			}
-		}
-    }
+
+    private void addPlayersTroopImprovements(Player player){
+		player.getFaction().getTroopTypes().stream()
+				.forEach(type -> player.addTroopImprovement(new PlayerTroopImprovement(type.getUniqueName(), type.isCanBuild())));
+	}
     
     /**
      * Sort the planet list so that the planets closest to startplanets for

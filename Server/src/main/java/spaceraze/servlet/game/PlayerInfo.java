@@ -7,7 +7,7 @@ public class PlayerInfo {
 	private String name, faction;
 	
 	PlayerInfo(Player player){
-		name = player.getGovenorName();
+		name = player.getGovernorName();
 		faction = player.getFaction().getName();
 	}
 
