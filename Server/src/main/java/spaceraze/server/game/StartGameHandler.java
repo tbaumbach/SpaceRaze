@@ -182,15 +182,16 @@ public class StartGameHandler {
         p.getTurnInfo().addToLatestGeneralReport("");
         // add res bonus to homeplanet
         homeplanet.setRes(homeplanet.getResistance() + p.getFaction().getResistanceBonus());
-        
+
+        addPlayerBuildingImprovements(p);
         // clone all buildings type to the player obj
-        p.setBuildings(Functions.deepClone(p.getFaction().getBuildings()));
+        //p.setBuildings(Functions.deepClone(p.getFaction().getBuildings()));
 //      create all starting buildings for the new player
         List<BuildingType> startBuildingTypes = p.getFaction().getStartingBuildings();
         for (Iterator<BuildingType> iter = startBuildingTypes.iterator(); iter.hasNext();) {
         	BuildingType buildingTemp1 = (BuildingType) iter.next();
         	Logger.info("buildingTemp1.getName(): " + buildingTemp1.getName());
-        	BuildingType buildingTemp2 = p.findBuildingType(buildingTemp1.getName());
+        	BuildingType buildingTemp2 = PlayerPureFunctions.findBuildingType(buildingTemp1.getName(), p);
         	Building buildingTemp = buildingTemp2.getBuilding(homeplanet, galaxy);
         	//buildingTemp.setLocation(homeplanet);
         	//buildingTemp.setOwner(p);
@@ -204,7 +205,6 @@ public class StartGameHandler {
         //LoggingHandler.finer("Wharf added: " + p.getName() + " " + orbitalWharfs.size());
         // create all spaceshiptypes
 		addPlayerSpaceshipImprovements(p);
-        //addSpaceshipTypes(p);
         // create all starting spaceships for the new player
         List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
 
@@ -262,6 +262,11 @@ public class StartGameHandler {
 //		}
         return p;
     }
+
+	private void addPlayerBuildingImprovements(Player player) {
+		player.getFaction().getBuildings().getBuildings().stream()
+				.forEach(type -> player.addBuildingImprovement(new PlayerBuildingImprovement(type.getName(), type.isDeveloped())));
+	}
 
 	private void addPlayerSpaceshipImprovements(Player player){
 		player.getFaction().getSpaceshipTypes().stream()

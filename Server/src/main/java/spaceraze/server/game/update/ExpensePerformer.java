@@ -1,5 +1,6 @@
 package spaceraze.server.game.update;
 
+import spaceraze.servlethelper.game.BuildingPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
@@ -36,7 +37,7 @@ public class ExpensePerformer {
         }else
         if (expense.getType().equalsIgnoreCase("building")){
 
-            BuildingType buildingType = g.getPlayer(expense.getPlayerName()).findBuildingType(expense.getBuildingTypeName());
+            BuildingType buildingType = PlayerPureFunctions.findOwnBuildingType(expense.getBuildingTypeName(), g.getPlayer(expense.getPlayerName()));
 
             String uniqueBuildingString="";
             boolean buildBuilding = true;
@@ -44,7 +45,7 @@ public class ExpensePerformer {
             VIP tempVIP = p.getGalaxy().findVIPBuildingBuildBonus(planet,p,o);
 
             if(buildingType.isWorldUnique()){
-                if(!buildingType.isWorldUniqueBuild(p.getGalaxy())){
+                if(!BuildingPureFunctions.isWorldUniqueBuild(p.getGalaxy(), buildingType)){
                     uniqueBuildingString = "Congratulations you have build the world unique " + buildingType.getName() + ".";
                 }else{// The building can't be build.
                     buildBuilding =  false;
@@ -52,7 +53,7 @@ public class ExpensePerformer {
                 }
             }else
             if(buildingType.isFactionUnique()){
-                if(!buildingType.isFactionUniqueBuild(p)){
+                if(!BuildingPureFunctions.isFactionUniqueBuild(p, galaxy, buildingType)){
                     uniqueBuildingString = "Congratulations you have build the faction unique " + buildingType.getName() + ".";
                 }else{// The building can't be build.
                     buildBuilding =  false;
@@ -60,7 +61,7 @@ public class ExpensePerformer {
                 }
             }else
             if(buildingType.isPlayerUnique()){
-                if(!buildingType.isPlayerUniqueBuild(p)){
+                if(!BuildingPureFunctions.isPlayerUniqueBuild(p, galaxy,buildingType)){
                     uniqueBuildingString = "You have build the player unique " + buildingType.getName() + " and you can not build more of this type.";
 
                 }else{// The building can't be build. Should never happend if the orders is checked then the select box is filled.
@@ -77,8 +78,8 @@ public class ExpensePerformer {
                 // add the building to the planet.
                 planet.addBuilding(tempBuilding);
                 // if the building have any parent building this is a upgrade and the parent building should be removed
-                if(tempBuilding.getBuildingType().getParentBuilding() != null){
-                    ti.addToLatestExpenseReport("You have upgraded a " + tempBuilding.getBuildingType().getParentBuilding().getName() + " to a " + tempBuilding.getBuildingType().getName() + " at the planet " + planet.getName() + ".");
+                if(tempBuilding.getBuildingType().getParentBuildingName() != null){
+                    ti.addToLatestExpenseReport("You have upgraded a " + tempBuilding.getBuildingType().getParentBuildingName() + " to a " + tempBuilding.getBuildingType().getName() + " at the planet " + planet.getName() + ".");
                     ti.addToLatestExpenseReport("Cost to upgrade " + tempBuilding.getBuildingType().getName() + ": " + buildingType.getBuildCost(tempVIP) + ".");
                     //planet.removeBuilding(tempBuilding.getBuildingType().getName());
                     planet.removeBuilding(expense.getCurrentBuildingId());
@@ -96,7 +97,7 @@ public class ExpensePerformer {
             String uniqueBuildingString="";
             boolean buildShip = true;
 
-            SpaceshipType sst = PlayerPureFunctions.findSpaceshipType(expense.getSpaceshipTypeName(), p, galaxy);
+            SpaceshipType sst = PlayerPureFunctions.findOwnSpaceshipType(expense.getSpaceshipTypeName(), p, galaxy);
 
             if(sst.isWorldUnique()){
                 if(!sst.isWorldUniqueBuild(p.getGalaxy())){

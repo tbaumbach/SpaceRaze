@@ -65,42 +65,42 @@ public class ResearchPerformer {
 
                 // adding ships to the player
                 for(int i=0;i < researchAdvantage.getShips().size();i++ ){
-                    PlayerPureFunctions.findOwnSpaceshipType(researchAdvantage.getShips().get(i).getName(), p, galaxy).setAvailableToBuild(true);
+                    PlayerPureFunctions.findSpaceshipImprovement(researchAdvantage.getShips().get(i).getName(), p).setAvailableToBuild(true);
                     Logger.finer("adding a new ship typ : " + researchAdvantage.getShips().get(i).getName());
                     researchInfoText+= "A new ship type: " + researchAdvantage.getShips().get(i).getName() + ".\n";
                 }
 
                 //	removing old ships models from the player
                 for(int i=0;i < researchAdvantage.getReplaceShips().size();i++ ){
-                    PlayerPureFunctions.findOwnSpaceshipType(researchAdvantage.getShips().get(i).getName(), p, galaxy).setAvailableToBuild(false);
+                    PlayerPureFunctions.findSpaceshipImprovement(researchAdvantage.getShips().get(i).getName(), p).setAvailableToBuild(false);
                     Logger.finer("Removing old ship typ : " + researchAdvantage.getReplaceShips().get(i).getName());
                     researchInfoText+= "The ship type: " + researchAdvantage.getReplaceShips().get(i).getName() + " was removed.\n";
                 }
 
                 // adding troops to the player
                 for (TroopType aTroopType : researchAdvantage.getTroopTypes()) {
-                    PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy).setCanBuild(true);
+                    PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(true);
                     Logger.finer("adding a new troop type: " + aTroopType.getUniqueName());
                     researchInfoText += "A new troop type: " + aTroopType.getUniqueName() + ".\n";
                 }
 
                 //	removing old troop types from the player
                 for(TroopType aTroopType : researchAdvantage.getReplaceTroopTypes()){
-                    PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy).setCanBuild(false);
+                    PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(false);
                     Logger.finer("Removing old troop type : " + aTroopType.getUniqueName());
                     researchInfoText += "The troop type: " + aTroopType.getUniqueName() + " was removed.\n";
                 }
 
                 //adding Buildings to the player
                 for (BuildingType aBuildingType : researchAdvantage.getBuildingTypes()) {
-                    p.findBuildingType(aBuildingType.getName()).setDeveloped(true);
+                    PlayerPureFunctions.findBuildingImprovement(aBuildingType.getName(), p).setDeveloped(true);
                     Logger.finer("adding a new building type: " + aBuildingType.getName());
                     researchInfoText += "A new building type: " + aBuildingType.getName() + ".\n";
                 }
 
                 //removing Buildings to the player
                 for (BuildingType aBuildingType : researchAdvantage.getReplaceBuildingTypes()) {
-                    p.findBuildingType(aBuildingType.getName()).setDeveloped(false);
+                    PlayerPureFunctions.findBuildingImprovement(aBuildingType.getName(), p).setDeveloped(false);
                     Logger.finer("Removing old building type: " + aBuildingType.getName());
                     researchInfoText += "The building type: " + aBuildingType.getName() + " was removed.\n";
                 }
@@ -123,7 +123,7 @@ public class ResearchPerformer {
                 }
 
                 for (ResearchUpgradeBuilding aResearchUpgradeBuilding : researchAdvantage.getResearchUpgradeBuilding()) {
-                    researchInfoText += aResearchUpgradeBuilding.doResearch(p.findBuildingType(aResearchUpgradeBuilding.getName()));
+                    researchInfoText += aResearchUpgradeBuilding.doResearch(PlayerPureFunctions.findBuildingImprovement(aResearchUpgradeBuilding.getName(), p));
                 }
                 p.addToHighlights(researchAdvantage.getName(), HighlightType.TYPE_RESEARCH_DONE);
             }
