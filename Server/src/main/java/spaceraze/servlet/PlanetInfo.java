@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import spaceraze.world.GameWorld;
 import spaceraze.world.Planet;
-import spaceraze.world.gameworlds.TheLastGreatWar;
+import spaceraze.servlethelper.gameworlds.TheLastGreatWar;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 

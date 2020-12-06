@@ -165,7 +165,7 @@
 </tr>	
 <tr>
 	<td>Statistics:</td>
-	<td><%= aServer.getGalaxy().getStatisticsHandler().getStatisticGameType().getText() %></td>
+	<td><%= aServer.getGalaxy().getStatisticGameType().getText() %></td>
 </tr>	
 
 <tr>

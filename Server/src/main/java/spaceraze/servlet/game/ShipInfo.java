@@ -12,7 +12,8 @@ public class ShipInfo {
 	// behövs eller inte, framtiden får visa vägen.
 
 	private String type, name, shortName, carrierLocation;
-	private int kills, currentHP, currentShield, techWhenBuilt, shields, id;
+	private String id;
+	private int kills, currentHP, currentShield, techWhenBuilt, shields;
 	private SpaceShipSize size;
 	private int weaponsSmall, weaponsMedium, weaponsLarge, weaponsHuge, weaponsSquadron;
 	private int weaponsSalvoesMedium, weaponsSalvoesLarge, weaponsSalvoesHuge;
@@ -24,7 +25,7 @@ public class ShipInfo {
 
 	ShipInfo(Spaceship aShip) {
 
-		id = aShip.getId();
+		id = aShip.getUniqueId();
 		type = aShip.getTypeName();
 		name = aShip.getUniqueName();
 		shortName = aShip.getShortName();
@@ -54,7 +55,7 @@ public class ShipInfo {
 		
 	}
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 

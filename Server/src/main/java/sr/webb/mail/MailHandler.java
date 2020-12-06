@@ -8,19 +8,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
-import spaceraze.world.CanBeLostInSpace;
-import spaceraze.world.Faction;
-import spaceraze.world.Highlight;
-import spaceraze.world.Player;
-import spaceraze.world.Report;
+import spaceraze.world.*;
 import spaceraze.world.spacebattle.ReportLevel;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
@@ -67,7 +63,6 @@ public class MailHandler {
 	public static void sendNewGameMessage(SR_Server aNewServer){
 		// get users who want new game mails
 		List<User> users = UserHandler.getUsers(User.WANT_EMAIL_GAME);
-		// TODO (Paul) snygga till själva meddelandet
 		String title = aNewServer.getGameName() + " is open to join";
 		String content = "A new game has been started and is open to join.\n"; 
 		content = content + "Game name is: " + aNewServer.getGameName() + "\n";
@@ -161,7 +156,7 @@ public class MailHandler {
 			content2 = content2 + "Lost In Space\n";
 			content2 = content2 + "-------------\n";
 			content2 = content2 + "\n";
-			content2 = content2 + getLostInSpace(aPlayer);
+			content2 = content2 + getLostInSpace(aPlayer, aServer.getGalaxy());
 			// add turn info to content
 			content2 = content2 + "\n";
 			content2 = content2 + "---------\n";
@@ -199,23 +194,23 @@ public class MailHandler {
 	   * Returns a list with all LiS from a certain faction.
 	   * Same as in HighlightPanel.
 	   */
-	private static List<CanBeLostInSpace> getLostInSpace(List<CanBeLostInSpace> allLostInSpace, String aFactionName){
-		List<CanBeLostInSpace> lisList = new LinkedList<CanBeLostInSpace>();
-		for (Iterator<CanBeLostInSpace> iter = allLostInSpace.iterator(); iter.hasNext();) {
-			CanBeLostInSpace aLis = iter.next();
-			if (aLis.getOwner() != null){
-				if (aLis.getOwner().getFaction().getName().equalsIgnoreCase(aFactionName)){
-					lisList.add(aLis);
-				}
-			}else
-				if (aFactionName == null){
-					lisList.add(aLis);
-				}
-		}
-		return lisList;
+	private static List<CanBeLostInSpace> getLostInSpaceByFaction(List<CanBeLostInSpace> allLostInSpace, String aFactionName, Galaxy galaxy){
+		return allLostInSpace.stream().filter(canBeLostInSpace -> isOwnedByFaction(canBeLostInSpace, aFactionName, galaxy)).collect(Collectors.toList());
 	}
-	
-	private static String getLostInSpace(Player aPlayer){
+
+	private static boolean isOwnedByFaction(CanBeLostInSpace canBeLostInSpace, String aFactionName, Galaxy galaxy) {
+		if (canBeLostInSpace.getOwner() != null){
+			if (galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFaction().getName().equalsIgnoreCase(aFactionName)){
+				return true;
+			}
+		}else
+		if (aFactionName == null){
+			return true;
+		}
+		return false;
+	}
+
+	private static String getLostInSpace(Player aPlayer, Galaxy galaxy){
 		StringBuffer sb = new StringBuffer();
 		boolean lisExist = false;
 		Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
@@ -223,37 +218,37 @@ public class MailHandler {
 		List<CanBeLostInSpace> lostTrops = lastReport.getLostTroops();
 		// print players own losses
   		String playerFactionName = aPlayer.getFaction().getName();
-  		List<CanBeLostInSpace> tmpList = getLostInSpace(lostShips,playerFactionName);
+  		List<CanBeLostInSpace> tmpList = getLostInSpaceByFaction(lostShips, playerFactionName, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own ships lost"));
   			lisExist = true;
   		}
-  		tmpList = getLostInSpace(lostTrops,playerFactionName);
+  		tmpList = getLostInSpaceByFaction(lostTrops, playerFactionName, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own troop lost"));
   			lisExist = true;
   		}
   		// print neutral ships destroyed
-  		tmpList = getLostInSpace(lostShips,null);
+  		tmpList = getLostInSpaceByFaction(lostShips,null, null);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral ships destroyed"));
   			lisExist = true;
   		}
-  		tmpList = getLostInSpace(lostTrops,null);
+  		tmpList = getLostInSpaceByFaction(lostTrops,null, null);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral troops destroyed"));
   			lisExist = true;
   		}
   		// print ships from other factions
-  		List<Faction> allFactions = aPlayer.getGalaxy().getActiveFactions(aPlayer.getFaction());
+  		List<Faction> allFactions = galaxy.getActiveFactions(aPlayer.getFaction());
   		for (Faction aFaction : allFactions) {
 
-  			tmpList = getLostInSpace(lostShips,aFaction.getName());
+  			tmpList = getLostInSpaceByFaction(lostShips,aFaction.getName(), galaxy);
   	  		if (tmpList.size() > 0){
   	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " ships destroyed"));
   	  			lisExist = true;
   	  		}
-  	  	tmpList = getLostInSpace(lostTrops,aFaction.getName());
+  	  	tmpList = getLostInSpaceByFaction(lostTrops,aFaction.getName(), galaxy);
 	  		if (tmpList.size() > 0){
 	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " troops destroyed"));
 	  			lisExist = true;
@@ -331,7 +326,8 @@ public class MailHandler {
 		if (!eMailAddresses.equals("")){
 			StringTokenizer st = new StringTokenizer(eMailAddresses);
 			while(st.hasMoreTokens()){
-				sendAMail(title,content,st.nextToken());
+				//TODO 2020-11-30 Test and activate this.
+				//sendAMail(title,content,st.nextToken());
 			}
 		}
 	}

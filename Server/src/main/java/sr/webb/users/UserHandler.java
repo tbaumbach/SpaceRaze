@@ -42,14 +42,12 @@ public class UserHandler {
 	private static final String COOKIE_TIMESTAMP = "sr_id";
 //	private static final String COOKIE_TEMP_LOGIN = "sr_temp_user";
 //	private static final String COOKIE_TEMP_TIMESTAMP = "sr_temp_id";
-	private static Map<String,Long> sessions = new HashMap<String,Long>();
+	private static Map<String,Long> sessions = new HashMap<>();
 	
 	/**
 	 * Reads login and password from request. If they match a user timestanp 
 	 * is created and set in cookie and hashmap. If incorrect errormessage is 
 	 * returned.
-	 * @param request
-	 * @param response
 	 * @return errormessage, "ok" if login is performed
 	 */
 	public static String loginUser(HttpServletRequest request, HttpServletResponse response){
@@ -61,8 +59,8 @@ public class UserHandler {
 	}
 	
 	public static String loginUser(String loginParam, String pwdParam, HttpServletResponse response){
-		String message = "";
-		String userExists = "";
+		String message;
+		String userExists;
 		System.out.println(loginParam + " " + pwdParam);
 		if ((loginParam != null) && (pwdParam != null)){
 			userExists = UserHandler.isUser(loginParam,pwdParam);
@@ -72,7 +70,7 @@ public class UserHandler {
 				System.out.println(loggedInUser.getName());
 				long timestamp = new Date().getTime();
 				System.out.println(timestamp);
-				sessions.put(loggedInUser.getLogin(),new Long(timestamp));
+				sessions.put(loggedInUser.getLogin(), timestamp);
 				Cookie userCookie = new Cookie(COOKIE_LOGIN,loggedInUser.getLogin());
 				userCookie.setMaxAge(60*60*24*365);
 				Cookie idCookie = new Cookie(COOKIE_TIMESTAMP,String.valueOf(timestamp));
@@ -97,9 +95,6 @@ public class UserHandler {
 	/**
 	 * Removes a user from the sessions map.
 	 * Cookies are left as they are.
-	 * @param request
-	 * @param response
-	 * @return
 	 */
 	public static String logoutUser(HttpServletRequest request, HttpServletResponse response){
 		String message = "";
@@ -288,7 +283,7 @@ public class UserHandler {
 		
 		if( userPassword == null){
 			
-			userPassword = new Integer(Functions.getRandomInt(0,9999999)).toString();
+			userPassword = Integer.valueOf(Functions.getRandomInt(0, 9999999)).toString();
 			
 		}
 		

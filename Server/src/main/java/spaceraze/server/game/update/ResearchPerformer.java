@@ -1,5 +1,6 @@
 package spaceraze.server.game.update;
 
+import spaceraze.servlethelper.game.ResearchPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -10,26 +11,27 @@ public class ResearchPerformer {
 
     private ResearchPerformer(){}
 
-    public static  void researchAdvantage(Research research, String advantageName, TurnInfo ti, Player p, Galaxy galaxy){
-        ResearchPerformer.research(research.getAdvantage(advantageName), ti, p, galaxy);
+    public static  void researchAdvantage(Faction faction, String advantageName, TurnInfo ti, Player p, Galaxy galaxy){
+        ResearchPerformer.research(ResearchPureFunctions.getAdvantage(faction, advantageName), ti, p, galaxy);
     }
 
     public static  void performResearch(ResearchOrder researchOrder, TurnInfo ti, Player p, Galaxy galaxy){
         Logger.finest( "performResearch: " + researchOrder.getAdvantageName() + " player: " + p.getName());
-        ResearchPerformer.researchAdvantage(p.getResearch(), researchOrder.getAdvantageName(), ti, p, galaxy);
+        ResearchPerformer.researchAdvantage(p.getFaction(), researchOrder.getAdvantageName(), ti, p, galaxy);
     }
 
     public static void research(ResearchAdvantage researchAdvantage, TurnInfo ti, Player p, Galaxy galaxy){
-        if(!researchAdvantage.isDeveloped()){
+        ResearchProgress researchProgress = p.getResearchProgress(researchAdvantage.getName());
+        if(!researchAdvantage.isDeveloped(p)){
             String researchInfoText="";
-            Logger.finer("count up researchedTurns from " + researchAdvantage.getResearchedTurns());
-            researchAdvantage.setResearchedTurns(researchAdvantage.getResearchedTurns() + 1);
+            Logger.finer("count up researchedTurns from " + researchProgress.getResearchedTurns());
+            researchProgress.setResearchedTurns(researchProgress.getResearchedTurns() + 1);
             // The research is done and it's time to add the results.
-            if(researchAdvantage.getResearchedTurns() >= researchAdvantage.getTimeToResearch()){
+            if(researchProgress.getResearchedTurns() >= researchAdvantage.getTimeToResearch()){
                 researchInfoText="The reaserch on " + researchAdvantage.getName() + " is fineshed and gives you this:\n";
                 // update Player with all new objects and bonus.
 
-                researchAdvantage.setDeveloped(true);
+                researchProgress.setDeveloped(true);
 
 
                 if(researchAdvantage.getOpenPlanetBonus() > 0){
@@ -57,10 +59,10 @@ public class ResearchPerformer {
                     p.setReconstructCostBase(p.getReconstructCostBase() - researchAdvantage.getReconstructCostBase());
                     researchInfoText+="Reconstruct cost base is now: " + p.getReconstructCostBase() + "\n";
                 }
-                if(researchAdvantage.getCorruption() != null){
+                if(researchAdvantage.getCorruptionPoint() != null){
 
-                    p.setCorruption(researchAdvantage.getCorruption());
-                    researchInfoText+="Corruption is now: " + p.getCorruptionDescription() + "\n";
+                    p.setCorruptionPoint(researchAdvantage.getCorruptionPoint());
+                    researchInfoText+="Corruption is now: " + p.getCorruptionPoint() != null ? p.getCorruptionPoint().getDescription() : "None" + "\n";
                 }
 
                 // adding ships to the player
@@ -108,7 +110,7 @@ public class ResearchPerformer {
                 // check if a childe researchAdvantage have timeToResearch = 0 and ready to be research().
 
                 for(ResearchAdvantage advantage : researchAdvantage.getChildren()){
-                    if(advantage.getTimeToResearch() == 0 && advantage.isReadyToBeResearchedOn()){
+                    if(advantage.getTimeToResearch() == 0 && advantage.isReadyToBeResearchedOn(p)){
                         //TODO (Tobbe) add researchText.
                         ResearchPerformer.research(advantage, ti, p, galaxy);
                     }

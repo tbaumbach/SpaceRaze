@@ -11,6 +11,7 @@ import spaceraze.world.Message;
 import spaceraze.world.Player;
 import spaceraze.world.UniqueIdCounter;
 
+//TODO 2020-11-25 Change this to an entity and save in the database, guess messages should be a stand alone application.
 public class MessageDatabase implements Serializable{
 	static final long serialVersionUID = 1L;
 	public UniqueIdCounter uniqueMessageIDCounter;

@@ -31,7 +31,7 @@ public class TroopInfo {
 		type = aTroop.getTroopType().getUniqueName();
 		name = aTroop.getUniqueName();
 		shortName = aTroop.getUniqueShortName();
-		id = aTroop.getId();
+		id = aTroop.getUniqueId();
 		typeOfTroop = aTroop.getTroopType().getTypeOfTroop(); 
 		kills = aTroop.getKills();
 		currentHP = aTroop.getCurrentDC();

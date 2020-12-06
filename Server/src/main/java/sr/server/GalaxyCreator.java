@@ -3,19 +3,17 @@ package sr.server;
 import java.util.Collections;
 import java.util.List;
 
+import spaceraze.servlethelper.game.GameWorldCreator;
+import spaceraze.servlethelper.game.StatisticsHandler;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.GameWorld;
-import spaceraze.world.Map;
-import spaceraze.world.Planet;
-import spaceraze.world.Spaceship;
-import spaceraze.world.SpaceshipType;
-import spaceraze.world.StatisticGameType;
-import spaceraze.world.Troop;
-import spaceraze.world.TroopType;
+import spaceraze.world.*;
+import spaceraze.world.diplomacy.DiplomacyRelation;
+import spaceraze.world.diplomacy.DiplomacyState;
+import spaceraze.world.diplomacy.GameDiplomacyRelation;
+import spaceraze.world.diplomacy.GameWorldDiplomacy;
 import sr.server.map.MapHandler;
 
 public class GalaxyCreator{
@@ -46,7 +44,9 @@ public class GalaxyCreator{
     public Galaxy createGalaxy(String nameOfGame, Map aMap, int steps, GameWorld aGameWorld, StatisticGameType statisticGameType){
     	Logger.fine("createGalaxy #2 called: " + nameOfGame + " " + aMap.getFileName());
 //    	Map theMap = MapHandler.getMap(nameOfMap);
-    	Galaxy g = new Galaxy(aMap,nameOfGame,steps,aGameWorld,statisticGameType);
+    	Galaxy g = new Galaxy(aMap,nameOfGame,steps,aGameWorld);
+        Logger.fine("statisticGameType: " + statisticGameType.toString());
+    	StatisticsHandler.createStatistics(g, statisticGameType);
     	// randomize planets order
     	Collections.shuffle(g.getPlanets());
     	// randomize planet data
@@ -55,16 +55,16 @@ public class GalaxyCreator{
         return g;
     }
 
-    static public void randomizeNeutralPlanets(List<Planet> allPlanets, Galaxy g, boolean couldBeRazed){
+    public static void randomizeNeutralPlanets(List<Planet> allPlanets, Galaxy g, boolean couldBeRazed){
       for (int i = 0; i < allPlanets.size(); i++){
         Planet tempp = (Planet)allPlanets.get(i);
         if (!tempp.isStartPlanet()){
           int tmpProd = Functions.getRandomInt(1,3) + Functions.getRandomInt(1,4) - 1;
           tempp.setProd(tmpProd,tmpProd);
           if (tempp.getPopulation() > 3){
-            tempp.setRes(Functions.getRandomInt(1,3) + Functions.getRandomInt(1,3));
+            tempp.setResistance(Functions.getRandomInt(1,3) + Functions.getRandomInt(1,3));
           }else{
-            tempp.setRes(Functions.getRandomInt(1,4));
+            tempp.setResistance(Functions.getRandomInt(1,4));
           }
           int temp = Functions.getRandomInt(1,100);
           if (temp <= g.getGameWorld().getClosedNeutralPlanetChance()){  // �ndrar s� att �ppna blir st�ngda
@@ -131,7 +131,7 @@ public class GalaxyCreator{
     }
 
     static private void addNeutralShip(Planet aPlanet,SpaceshipType sstTemp, Galaxy g){
-      Spaceship ssTemp = SpaceshipMutator.createSpaceShip(sstTemp, g);
+      Spaceship ssTemp = SpaceshipMutator.createSpaceShip(sstTemp);
       ssTemp.setLocation(aPlanet);
       g.getSpaceships().add(ssTemp);
     }
@@ -146,6 +146,24 @@ public class GalaxyCreator{
         Troop tTemp = TroopMutator.createTroop(ttTemp, g);
         tTemp.setPlanetLocation(aPlanet);
         g.addTroop(tTemp);
+    }
+
+    public static void createInitialDiplomaticRelations(Player p, GameWorld gw, Galaxy galaxy){
+        // create new diplomacy states to all other players (that have already joined this game)
+        GameWorldDiplomacy diplomacy = gw.getDiplomacy();
+        for (Player aPlayer : galaxy.getPlayers()) {
+            DiplomacyRelation tmpRelation = GameWorldCreator.getRelation(aPlayer.getFaction(), p.getFaction(), gw);
+            GameDiplomacyRelation gameDiplomacyRelation = GameDiplomacyRelation.builder()
+                    .faction1(tmpRelation.getFaction1())
+                    .faction2(tmpRelation.getFaction2())
+                    .lowestRelation(tmpRelation.getLowestRelation())
+                    .highestRelation(tmpRelation.getHighestRelation())
+                    .startRelation(tmpRelation.getStartRelation())
+                    .build();
+            DiplomacyState tmpState = new DiplomacyState(gameDiplomacyRelation,aPlayer,p);
+            galaxy.getDiplomacyStates().add(tmpState);
+        }
+
     }
     
 }

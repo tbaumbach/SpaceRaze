@@ -3,6 +3,10 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.DiplomacyPureFunctions;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.world.Building;
 import spaceraze.world.Galaxy;
 import spaceraze.world.Planet;
@@ -73,19 +77,19 @@ public class PlanetInfo {
 		// Frågan är då om notes här kommer bli orginalet? Annars är all information här hämtad från andra källor.
 		// Kanske enkelt att bara skapa en länkad list i player med planet name som nyckel. Vänta med att göra det tills det går att spela på siten.
 		// Vill inte förstöra möjligheten att använda spel körde i swing klienten.
-		notes = player.getPlanetInfos().getNotes(planet.getName());
+		notes = PlanetPureFunctions.findPlanetInfo(planet.getName(), player.getPlanetInformations()).getNotes();
 		
 		Galaxy galaxy = player.getGalaxy();
 		boolean haveSpy = (galaxy.findVIPSpy(planet,player) != null);
-		boolean alliedSpy = galaxy.isItAlliedSpyOnPlanet(player, planet);
-		boolean spy = haveSpy | alliedSpy;
+		boolean alliedSpy = PlanetPureFunctions.isItAlliedSpyOnPlanet(player, planet, galaxy);
+		boolean spy = haveSpy || alliedSpy;
 		boolean surveyShip = (galaxy.findSurveyShip(planet,player) != null);
-		boolean alliedSurveyShip = galaxy.isItAlliesSurveyShipsOnPlanet(player, planet);
+		boolean alliedSurveyShip = PlanetPureFunctions.isItAlliesSurveyShipsOnPlanet(player, planet, galaxy);
 		boolean surveyVIP = (galaxy.findSurveyVIPonShip(planet,player) != null);
-		boolean alliedSurveyVIP = galaxy.isItAlliesSurveyVipOnPlanet(player, planet);
-		boolean survey = surveyShip | alliedSurveyShip | surveyVIP | alliedSurveyVIP;
+		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy);
+		boolean survey = surveyShip || alliedSurveyShip || surveyVIP || alliedSurveyVIP;
 		boolean shipInSystem = (galaxy.playerHasShipsInSystem(player,planet));
-		boolean alliedShipsInSystem = galaxy.isItAlliedShipsInSystem(player, planet);
+		boolean alliedShipsInSystem = PlanetPureFunctions.isItAlliedShipsInSystem(player, planet, galaxy);
 		
 		
 		if(shipInSystem){
@@ -104,7 +108,7 @@ public class PlanetInfo {
 			
 			
 			//Checks if the planets owner is a allied = show all.
-			boolean isAllied = !planet.isEnemyOrNeutralPlanet(player);
+			boolean isAllied = !PlanetPureFunctions.isEnemyOrNeutralPlanet(player, planet, galaxy);
 			
 			if(open || shipInSystem || alliedShipsInSystem || isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
 				
@@ -114,7 +118,7 @@ public class PlanetInfo {
 					owner = "neutral";
 				}
 				
-				basePopulation = planet.getBasePop();
+				basePopulation = planet.getBasePopulation();
 				besieged = planet.isBesieged();
 				population = planet.getPopulation();
 				resistance = planet.getResistance();
@@ -197,7 +201,7 @@ public class PlanetInfo {
 		
 		for (VIP aVIP : galaxy.getAllVIPs()) {
 			if (aVIP.getPlanetLocation() == planet){
-				if(aVIP.getBoss() == player || player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, aVIP.getBoss())){
+				if(aVIP.getBoss() == player || DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVIP.getBoss(), galaxy)){
 					vips.add(new VIPInfo(aVIP, player));
 				}else if(open || isAllied ||haveSpy || survey || haveTroopsOnTheGround){ // VIPar som  tillhör fiender. Alltså VIPar som inte finns på spelarens eller dess allierades planeter. 
 					if (aVIP.getShowOnOpenPlanet()){
@@ -269,7 +273,7 @@ public class PlanetInfo {
 	//The owners ships.
 	private void addShips(Player player, Planet planet, Galaxy galaxy){
 		//TODO kolla upp att även squadroner som befinner sig i en carrier följer med i listan.
-		List<Spaceship> spaceShips = galaxy.getPlayersSpaceshipsOnPlanet(player, planet);
+		List<Spaceship> spaceShips = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(player, planet, galaxy.getSpaceships());
 		List<Spaceship> squdronsOnShip = new ArrayList<Spaceship>();
 		
 		//Add all ships to the planets
@@ -295,7 +299,7 @@ public class PlanetInfo {
 	
 	//The owners Troops.
 	private void addTroops(Player player, Planet planet, Galaxy galaxy){
-		List<Troop> troopsOnPlanet = galaxy.getPlayersTroopsOnPlanet(player, planet);
+		List<Troop> troopsOnPlanet = TroopPureFunctions.getPlayersTroopsOnPlanet(player, planet, galaxy.getTroops());
 		
 		for (Troop troop : troopsOnPlanet) {
 			if(troop.getShipLocation() != null){

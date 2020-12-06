@@ -1,10 +1,16 @@
 package spaceraze.server.game.update;
 
+import spaceraze.servlethelper.game.DiplomacyPureFunctions;
+import spaceraze.servlethelper.game.VipPureFunctions;
+import spaceraze.servlethelper.game.planet.PlanetMutator;
+import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.diplomacy.*;
 import spaceraze.world.enums.HighlightType;
 import spaceraze.world.orders.*;
+import sr.server.SpaceshipHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,13 +44,13 @@ public class OrdersPerformer {
         for (int i = 0; i < orders.getShipToCarrierMoves().size(); i++) {
             Logger.finest("shipMoves.size(): " + orders.getShipToCarrierMoves().size() + " i: " + i);
             ShipToCarrierMovement tempShipToCarrierMove = orders.getShipToCarrierMoves().get(i);
-            tempShipToCarrierMove.performMove(ti, galaxy);
+            SpaceshipHelper.performMove(tempShipToCarrierMove, ti, galaxy);
         }
         // perform spaceship moves
         for (int i = 0; i < orders.getShipMoves().size(); i++) {
             Logger.finest("shipMoves.size(): " + orders.getShipMoves().size() + " i: " + i);
             ShipMovement tempShipMove = orders.getShipMoves().get(i);
-            tempShipMove.performMove(ti, p.getGalaxy());
+            SpaceshipHelper.performMove(tempShipMove, ti, p.getGalaxy());
         }
         for (int i = 0; i < orders.getPlanetVisibilities().size(); i++) {
             Planet temp = galaxy.getPlanet(orders.getPlanetVisibilities().get(i));
@@ -59,24 +65,24 @@ public class OrdersPerformer {
         for (int i = 0; i < orders.getAbandonPlanets().size(); i++) {
             Planet tempPlanet = galaxy.getPlanet(orders.getAbandonPlanets().get(i));
             Player tempPlayer = tempPlanet.getPlayerInControl();
-            galaxy.checkVIPsOnAbandonedPlanet(tempPlanet, tempPlayer);
+            checkVIPsOnAbandonedPlanet(tempPlanet, tempPlayer, galaxy);
             tempPlanet.setPlayerInControl(null);
-            tempPlayer.getPlanetOrderStatuses().setAttackIfNeutral(false, tempPlanet.getName());
+            PlanetOrderStatusMutator.setAttackIfNeutral(false, tempPlanet.getName(), tempPlayer.getPlanetOrderStatuses());
             if (p.isAlien()) {
                 tempPlanet.setRazed();
                 galaxy.removeBuildingsOnPlanet(tempPlanet);
-                tempPlayer.getPlanetInfos().setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1);
-                tempPlayer.getPlanetInfos().setLastKnownProdRes(tempPlanet.getName(), 0, 0);
-                tempPlayer.getPlanetInfos().setRazed(true, tempPlanet.getName());
+                PlanetMutator.setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1, tempPlayer.getPlanetInformations());
+                PlanetMutator.setLastKnownProductionAndResistance(tempPlanet.getName(), 0, 0, tempPlayer.getPlanetInformations());
+                PlanetPureFunctions.findPlanetInfo(tempPlanet.getName(), tempPlayer.getPlanetInformations()).setRazed(true);
                 ti.addToLatestGeneralReport("You have abandoned " + tempPlanet.getName() + ". It is now razed and uninhabited.");
             } else {
-                tempPlayer.getPlanetInfos().setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1);
-                tempPlayer.getPlanetInfos().setLastKnownProdRes(tempPlanet.getName(), tempPlanet.getPopulation(), tempPlanet.getResistance());
+                PlanetMutator.setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1, tempPlayer.getPlanetInformations());
+                PlanetMutator.setLastKnownProductionAndResistance(tempPlanet.getName(), tempPlanet.getPopulation(), tempPlanet.getResistance(), tempPlayer.getPlanetInformations());
                 ti.addToLatestGeneralReport("You have abandoned " + tempPlanet.getName() + ". It is now neutral.");
             }
         }
         for (int i = 0; i < orders.getShipSelfDestructs().size(); i++) {
-            Spaceship tempss = galaxy.findSpaceship(orders.getShipSelfDestructs().get(i));
+            Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getShipSelfDestructs().get(i));
             Logger.finest("shipSelfDestructs: " + orders.getShipSelfDestructs().get(i));
             if (tempss != null) {
                 galaxy.removeShip(tempss);
@@ -105,7 +111,7 @@ public class OrdersPerformer {
         }
 
         for (int i = 0; i < orders.getScreenedShips().size(); i++) {
-            Spaceship tempss = galaxy.findSpaceship(orders.getScreenedShips().get(i));
+            Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getScreenedShips().get(i));
             //      Player tempPlayer = tempss.getOwner();
             if (tempss != null) {
                 tempss.setScreened(!tempss.getScreened());
@@ -129,18 +135,9 @@ public class OrdersPerformer {
             ResearchPerformer.performResearch(tempReserachOrder, ti, p, galaxy);
 //    	tempReserachOrder.addToHighlights(p,HighlightType.TYPE_RESEARCH_DONE);
         }
-
-        // perform tax changes
-        for (TaxChange aTaxChange : orders.getTaxChanges()) {
-            // first find the other player
-            Player vassal = galaxy.getPlayer(aTaxChange.getPlayerName());
-            // perform tax change
-            DiplomacyState state = galaxy.getDiplomacyState(vassal, p);
-            state.setTax(aTaxChange.getAmount());
-        }
         // perform new notes text changes
         for (PlanetNotesChange aPlanetNotesChange : orders.getPlanetNotesChanges()) {
-            aPlanetNotesChange.performPlanetNotes(p);
+            PlanetPureFunctions.findPlanetInfo(aPlanetNotesChange.getPlanetName(), p.getPlanetInformations()).setNotes(aPlanetNotesChange.getNotesText());
         }
 
     }
@@ -151,11 +148,11 @@ public class OrdersPerformer {
         Galaxy g = p.getGalaxy();
         // first sort changes so that lower (ex. ewar) comes before higher (ex. conf) levels
         Collections.sort(orders.getDiplomacyChanges(), new DiplomacyChangeLevelComparator<DiplomacyChange>());
-        List<Player> confPlayers = g.getDiplomacy().getConfederacyPlayers(p);
+        List<Player> confPlayers = DiplomacyPureFunctions.getConfederacyPlayers(p, g);
         for (DiplomacyChange aChange : orders.getDiplomacyChanges()) {
 //    	Player thePlayer = aChange.getThePlayer(g);
             Player otherPlayer = aChange.getOtherPlayer(g);
-            DiplomacyState aState = g.getDiplomacyState(p, otherPlayer);
+            DiplomacyState aState = DiplomacyPureFunctions.getDiplomacyState(p, otherPlayer, g.getDiplomacyStates());
             if (aState.isChangedThisTurn()) { // state have already changed due to conflicts, offer is no longer valid
                 aChange.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to the changed diplomatic state between you and Governor " + aChange.getOtherPlayer(g).getGovernorName() + " the change to " + aChange.getNewLevel() + " is no longer valid.");
                 aChange.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to the changed diplomatic state between you and Governor " + aChange.getThePlayer(g).getGovernorName() + " the change to " + aChange.getNewLevel() + " is no longer valid.");
@@ -180,7 +177,6 @@ public class OrdersPerformer {
                     aChange.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(aChange.getThePlayer(g).getGovernorName() + ";" + DiplomacyLevel.LORD, HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
                 } else if (aChange.getNewLevel() == DiplomacyLevel.CONFEDERACY) {
                     // check if p is in a confederacy
-//				List<Player> confPlayers = g.getDiplomacy().getConfederacyPlayers(p);
                     if (confPlayers.size() > 0) { // p is in a confederacy
                         // check (in Galaxy) if all other players in the confederacy also have a change with p
                         boolean allInConf = g.checkAllInConfederacyOrder(otherPlayer, confPlayers);
@@ -233,7 +229,7 @@ public class OrdersPerformer {
         // diplomacy offers
         for (DiplomacyOffer anOffer : orders.getDiplomacyOffers()) {
             Player otherPlayer = anOffer.getOtherPlayer(g);
-            DiplomacyState aState = g.getDiplomacyState(anOffer.getThePlayer(g), anOffer.getOtherPlayer(g));
+            DiplomacyState aState = DiplomacyPureFunctions.getDiplomacyState(anOffer.getThePlayer(g), anOffer.getOtherPlayer(g), g.getDiplomacyStates());
             if (aState.isChangedThisTurn()) { // state have already changed due to conflicts, offer is no longer valid
                 anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to the changed diplomatic state between you and Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " your offer for " + anOffer.getSuggestedLevel() + " is no longer valid.");
                 anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have made an offer for " + anOffer.getSuggestedLevel() + ", but it is no longer valid since the change in diplomatic state between you.");
@@ -267,7 +263,7 @@ public class OrdersPerformer {
                         }
                     } else {
                         if (anOffer.getSuggestedLevel() == otherPlayersOffer.getSuggestedLevel()) { // both players suggest the same non-lord/vassall diplomacy level
-                            List<Player> confPlayers2 = g.getDiplomacy().getConfederacyPlayers(otherPlayer);
+                            List<Player> confPlayers2 = DiplomacyPureFunctions.getConfederacyPlayers(otherPlayer, g);
                             if ((anOffer.getSuggestedLevel() == DiplomacyLevel.CONFEDERACY) & ((confPlayers.size() > 0) | (confPlayers2.size() > 0))) { // that both are in conf can not happen
                                 if (confPlayers.size() > 0) { // player is in a conf, check if all members of the conf have made offers
                                     boolean allOfferConf = g.checkAllInConfederacyOffer(otherPlayer, confPlayers);
@@ -343,7 +339,7 @@ public class OrdersPerformer {
                         anOffer.setOfferPerformed(true);
                     } else { // if there is no change
                         if (anOffer.getSuggestedLevel() == DiplomacyLevel.CONFEDERACY) {
-                            List<Player> confPlayers2 = g.getDiplomacy().getConfederacyPlayers(otherPlayer);
+                            List<Player> confPlayers2 = DiplomacyPureFunctions.getConfederacyPlayers(otherPlayer, g);
                             Logger.fine("confPlayers2: " + confPlayers2.size());
                             boolean otherConfOffer = false;
                             if (confPlayers2.size() > 0) {
@@ -414,4 +410,20 @@ public class OrdersPerformer {
         }
         return lordVassall;
     }
+
+    public static void checkVIPsOnAbandonedPlanet(Planet aPlanet, Player aPlayer, Galaxy galaxy) {
+        List<VIP> allVIPsOnPlanet = VipPureFunctions.findAllVIPsOnPlanet(aPlanet, galaxy);
+        for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
+            VIP tempVIP = allVIPsOnPlanet.get(i);
+            if (tempVIP.getBoss() == aPlayer) {
+                if (!tempVIP.canVisitNeutralPlanets()) {
+                    galaxy.getAllVIPs().remove(tempVIP);
+                    aPlayer.addToVIPReport("Your " + tempVIP.getName() + " has abandoned your cause when your planet "
+                            + aPlanet.getName() + " was abandoned.");
+                    aPlayer.addToHighlights(tempVIP.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                }
+            }
+        }
+    }
+
 }

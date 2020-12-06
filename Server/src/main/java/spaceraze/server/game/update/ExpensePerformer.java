@@ -1,6 +1,7 @@
 package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.BuildingPureFunctions;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
@@ -58,6 +59,12 @@ public class ExpensePerformer {
                 }else{// The building can't be build.
                     buildBuilding =  false;
                     uniqueBuildingString = "You can not build the faction unique " + buildingType.getName() + " building. Some other leader was faster then you.";
+                }
+            }else
+            if(buildingType.isPlanetUnique()){
+                if(buildingType.isPlanetUnique() && planet.hasBuilding(buildingType.getName())){
+                    buildBuilding =  false;
+                    uniqueBuildingString = "You can not build an already existing planet unique building: " + buildingType.getName() + ".";
                 }
             }else
             if(buildingType.isPlayerUnique()){
@@ -131,7 +138,7 @@ public class ExpensePerformer {
                 VIP tempVIP2 = p.getGalaxy().findVIPTechBonus(planet,p,o);
                 int factionTechBonus = p.getFaction().getTechBonus();
 
-                sstemp = SpaceshipMutator.createSpaceShip(p, sst, tempVIP2, g, factionTechBonus, planet.getBuildingTechBonus(), g.getUniqueIdCounter("Ship").getUniqueId());
+                sstemp = SpaceshipMutator.createSpaceShip(p, sst, tempVIP2, factionTechBonus, planet.getBuildingTechBonus());
                 //sstemp = sst.getShip(tempVIP2,factionTechBonus,planet.getBuildingTechBonus());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
                 Logger.finest(" -buildship planet: " + sstemp.getTypeName());
@@ -191,7 +198,7 @@ public class ExpensePerformer {
                 VIP tempVIP2 = p.getGalaxy().findVIPTechBonus(planet,p,o);
                 int factionTechBonus = p.getFaction().getTechBonus();
 
-                tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), galaxy.getUniqueIdCounter("Trrop").getUniqueId());
+                tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), galaxy.getUniqueIdCounter(CounterType.TROOP).getUniqueId());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
                 Logger.finest(" -buildship planet: " + tempTroop.getUniqueName());
                 tempTroop.setOwner(planet.getPlayerInControl());
@@ -284,9 +291,9 @@ public class ExpensePerformer {
         }else
         if (expense.getType().equalsIgnoreCase("reconstruct")){
             planet.setProd(1);
-            planet.setRes(1 + playerToResive.getFaction().getResistanceBonus());
+            planet.setResistance(1 + playerToResive.getFaction().getResistanceBonus());
             planet.setPlayerInControl(playerToResive);
-            playerToResive.getPlanetInfos().setRazed(false,planet.getName());
+            PlanetPureFunctions.findPlanetInfo(planet.getName(), p.getPlanetInformations()).setRazed(false);
             int cost = playerToResive.getFaction().getReconstructCostBase();
             p.removeFromTreasury(cost);
             playerToResive.addToGeneral("You have reconstructed the planet " + planet.getName() + " and it is now under your control with a production of 1.");
@@ -298,7 +305,7 @@ public class ExpensePerformer {
 
         }else if(expense.getBlackMarketBid() != null){
 //      aBid.addPlayer(player);
-            g.addBlackMarketBid(expense.getBlackMarketBid());
+            BlackMarketPerformer.addBlackMarketBid(expense.getBlackMarketBid(), g);
         }
     }
 }

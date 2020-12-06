@@ -77,7 +77,7 @@ public class GameParameters {
 		this.gameName = aServer.getGameName();
 		this.endTurn = aServer.getEndTurn();
 		this.mapName = aServer.getMapFileName();
-		this.statisticGameType = aServer.getGalaxy().getStatisticsHandler().getStatisticGameType();
+		this.statisticGameType = aServer.getGalaxy().getStatisticGameType();
 		
 	}
 

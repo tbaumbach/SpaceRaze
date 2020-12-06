@@ -411,7 +411,8 @@ public class SR_Server {
 			p = new Player("Player name or password missing.");
 		}
 		if (!autoUpdate) {
-			p.setNextUpdate(ur.getNextUpdate());
+
+			//TODO 2020-12-11 this value is never used, remove or shoudl we set this value in a other object? p.setNextUpdate(ur.getNextUpdate());
 		}
 		return p;
 	}

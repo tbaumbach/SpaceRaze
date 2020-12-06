@@ -11,7 +11,7 @@ import spaceraze.world.Galaxy;
 import spaceraze.world.Planet;
 import spaceraze.world.Player;
 import spaceraze.world.Spaceship;
-import spaceraze.world.spacebattle.TaskForce;
+import spaceraze.battlehandler.spacebattle.TaskForce;
 
 public class CheckAbandonedSquadrons {
 	

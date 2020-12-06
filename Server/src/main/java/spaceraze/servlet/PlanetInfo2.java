@@ -41,7 +41,7 @@ public class PlanetInfo2{
 		
 		//Planet planet1 = aGame.getGalaxy().getPlanets().get(0);
 		
-		return aGame.getGalaxy().getPlanets().get(new Integer(planet));
+		return aGame.getGalaxy().getPlanets().get(planet);
 	}
 	
 	@GET

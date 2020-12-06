@@ -10,7 +10,7 @@ public class BuildingInfo {
 	BuildingInfo(Building building){
 		type = building.getBuildingType().getName();
 		id = building.getUniqueId();
-		name = building.getUniqueName();
+		name = building.getName();
 	}
 
 	public String getName() {

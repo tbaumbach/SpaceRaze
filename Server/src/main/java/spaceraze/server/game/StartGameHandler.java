@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
@@ -73,7 +74,7 @@ public class StartGameHandler {
 	    			galaxyUpdater.removeNeutralShips(planet);
 	    			galaxy.checkTroopsOnInfestedPlanet(planet, randomPlayer);
 	    			planet.setProd(0);
-	    			planet.setRes(1 + randomPlayer.getFaction().getResistanceBonus());
+	    			planet.setResistance(1 + randomPlayer.getFaction().getResistanceBonus());
 	    			planet.setHasNeverSurrendered(false);
 	    			planet.setPlayerInControl(randomPlayer);
 	    		}else{
@@ -111,7 +112,7 @@ public class StartGameHandler {
             galaxy.removeNeutralShips(homeplanet);
             galaxy.removeNeutralTroops(homeplanet);
             Logger.finer("Galaxy.getNewPlayer3");
-            homeplanet.setHomeplanet(p.getFaction());
+            homeplanet.setHomePlanet(p.getFaction());
             Logger.finer("Galaxy.getNewPlayer4");
             galaxy.addPlayer(p);
             Logger.finer("Galaxy.getNewPlayer5");
@@ -170,7 +171,7 @@ public class StartGameHandler {
 	
 //  gissar att TurnInfo texten inte visas någon stan?  den är tok fel i alla fall.
     private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy){
-        Player p = new Player(name,password,galaxy, govenorName, factionName, homeplanet);
+		Player p = new Player(name,password,galaxy, govenorName, factionName, homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
         p.getTurnInfo().addToLatestGeneralReport("Welcome to this SpaceRaze Game.");
         p.getTurnInfo().addToLatestGeneralReport("You have 1 planet under your control - the planet " + homeplanet.getName() + ".");
         p.getTurnInfo().addToLatestGeneralReport("");
@@ -181,7 +182,7 @@ public class StartGameHandler {
         p.getTurnInfo().addToLatestGeneralReport("You start with 2 Corvettes, 1 Nebulon B Frigate, 1 medium orbital fort and 1 orbital wharf.");
         p.getTurnInfo().addToLatestGeneralReport("");
         // add res bonus to homeplanet
-        homeplanet.setRes(homeplanet.getResistance() + p.getFaction().getResistanceBonus());
+        homeplanet.setResistance(homeplanet.getResistance() + p.getFaction().getResistanceBonus());
 
         addPlayerBuildingImprovements(p);
         // clone all buildings type to the player obj
@@ -209,7 +210,7 @@ public class StartGameHandler {
         List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
 
 		for (SpaceshipType sstTemp1 : startTypes) {
-			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, null, galaxy, p.getFaction().getTechBonus(),0, galaxy.getUniqueIdCounter("Ship").getUniqueId());
+			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, null, p.getFaction().getTechBonus(),0);
 			createdSpaceShip.setLocation(homeplanet);
 			createdSpaceShip.setOwner(p);
 			galaxy.addSpaceship(createdSpaceShip);
@@ -224,7 +225,7 @@ public class StartGameHandler {
         	// first get trooptype from player
         	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy);
         	// then create new troop
-        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, galaxy.getUniqueIdCounter("Troop").getUniqueId());
+        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, galaxy.getUniqueIdCounter(CounterType.TROOP).getUniqueId());
         	aTroop.setPlanetLocation(homeplanet);
         	aTroop.setOwner(p);
         	galaxy.addTroop(aTroop);
@@ -252,7 +253,7 @@ public class StartGameHandler {
 	        galaxy.getAllVIPs().add(tempVip);
 		}        
         // create new diplomacy states to all other players (that have already joined this game)
-        galaxy.getDiplomacy().createInitialDiplomaticRelations(p, galaxy.getGameWorld());
+        GalaxyCreator.createInitialDiplomaticRelations(p, galaxy.getGameWorld(), galaxy);
 //        GameWorldDiplomacy diplomacy = gw.getDiplomacy();
 //        for (Iterator iter = players.iterator(); iter.hasNext();) {
 //			Player aPlayer = (Player) iter.next();
@@ -264,7 +265,7 @@ public class StartGameHandler {
     }
 
 	private void addPlayerBuildingImprovements(Player player) {
-		player.getFaction().getBuildings().getBuildings().stream()
+		player.getFaction().getBuildings().stream()
 				.forEach(type -> player.addBuildingImprovement(new PlayerBuildingImprovement(type.getName(), type.isDeveloped())));
 	}
 

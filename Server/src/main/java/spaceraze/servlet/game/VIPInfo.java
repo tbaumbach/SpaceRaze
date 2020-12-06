@@ -1,12 +1,14 @@
 package spaceraze.servlet.game;
 
+import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.world.Player;
 import spaceraze.world.VIP;
 
 public class VIPInfo {
 
 	private String type, owner, name, shortName;
-	private int id = -1, kills = -1;
+	private int kills = -1;
+	private String id;
 	
 	VIPInfo(VIP aVip, Player player){
 		type = aVip.getTypeName();
@@ -17,9 +19,9 @@ public class VIPInfo {
 				owner = aVip.getBoss().getGovernorName();
 				name = aVip.getName();
 				shortName = aVip.getShortName();
-				id = aVip.getId();
+				id = aVip.getUniqueId();
 				kills = aVip.getKills();
-			}else if(player.getGalaxy().getDiplomacy().checkAllianceWithAllInConfederacy(player, aVip.getBoss())){
+			}else if(DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVip.getBoss(), player.getGalaxy())){
 				// Ägaren till VIPen är en allierad vilket betyder att spelarn får veta vem som äger VIPen.
 				owner = aVip.getBoss().getGovernorName();
 			}
@@ -36,7 +38,7 @@ public class VIPInfo {
 		return owner;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 

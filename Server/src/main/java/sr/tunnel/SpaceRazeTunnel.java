@@ -286,7 +286,6 @@ public class SpaceRazeTunnel extends HttpServlet{
     			Logger.finest("Player Name: " + tw.getPlayerName());
     			Player tempPlayer = aServer.getGalaxy().getPlayer(tw.getPlayerName());
     			tempPlayer.setOrders(tw.getOrders());
-//    			tempPlayer.setPlanetInfos(tw.getPi()); // TODO Paul 100701: denna bör tas bort då alla orders ligger i Orders-objektet
     			tempPlayer.setPlanetOrderStatuses(tw.getPlanetOrderStatuses());
     			tempPlayer.setNotes(tw.getNotes());
     			tempPlayer.setFinishedThisTurn(tw.isFinishedThisTurn());
