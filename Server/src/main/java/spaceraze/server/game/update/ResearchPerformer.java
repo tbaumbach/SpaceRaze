@@ -80,28 +80,28 @@ public class ResearchPerformer {
                 }
 
                 // adding troops to the player
-                for (TroopType aTroopType : researchAdvantage.getTroopTypes()) {
+                for (TroopType aTroopType : researchAdvantage.getTroops()) {
                     PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(true);
                     Logger.finer("adding a new troop type: " + aTroopType.getUniqueName());
                     researchInfoText += "A new troop type: " + aTroopType.getUniqueName() + ".\n";
                 }
 
                 //	removing old troop types from the player
-                for(TroopType aTroopType : researchAdvantage.getReplaceTroopTypes()){
+                for(TroopType aTroopType : researchAdvantage.getReplaceTroops()){
                     PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(false);
                     Logger.finer("Removing old troop type : " + aTroopType.getUniqueName());
                     researchInfoText += "The troop type: " + aTroopType.getUniqueName() + " was removed.\n";
                 }
 
                 //adding Buildings to the player
-                for (BuildingType aBuildingType : researchAdvantage.getBuildingTypes()) {
+                for (BuildingType aBuildingType : researchAdvantage.getBuildings()) {
                     PlayerPureFunctions.findBuildingImprovement(aBuildingType.getName(), p).setDeveloped(true);
                     Logger.finer("adding a new building type: " + aBuildingType.getName());
                     researchInfoText += "A new building type: " + aBuildingType.getName() + ".\n";
                 }
 
                 //removing Buildings to the player
-                for (BuildingType aBuildingType : researchAdvantage.getReplaceBuildingTypes()) {
+                for (BuildingType aBuildingType : researchAdvantage.getReplaceBuildings()) {
                     PlayerPureFunctions.findBuildingImprovement(aBuildingType.getName(), p).setDeveloped(false);
                     Logger.finer("Removing old building type: " + aBuildingType.getName());
                     researchInfoText += "The building type: " + aBuildingType.getName() + " was removed.\n";

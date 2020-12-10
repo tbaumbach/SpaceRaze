@@ -22,11 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Planet;
-import spaceraze.world.StatisticGameType;
-import sr.server.SR_Server;
-import sr.server.ServerHandler;
-import sr.webb.users.User;
 
 @Path("/gameworlds")
 public class GameWorldServlet{
