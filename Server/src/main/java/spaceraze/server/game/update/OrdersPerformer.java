@@ -228,36 +228,36 @@ public class OrdersPerformer {
         }
         // diplomacy offers
         for (DiplomacyOffer anOffer : orders.getDiplomacyOffers()) {
-            Player otherPlayer = anOffer.getOtherPlayer(g);
-            DiplomacyState aState = DiplomacyPureFunctions.getDiplomacyState(anOffer.getThePlayer(g), anOffer.getOtherPlayer(g), g.getDiplomacyStates());
+            Player otherPlayer = g.getPlayer(anOffer.getOtherPlayerName());
+            DiplomacyState aState = DiplomacyPureFunctions.getDiplomacyState(g.getPlayer(anOffer.getThePlayerName()), g.getPlayer(anOffer.getOtherPlayerName()), g.getDiplomacyStates());
             if (aState.isChangedThisTurn()) { // state have already changed due to conflicts, offer is no longer valid
-                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to the changed diplomatic state between you and Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " your offer for " + anOffer.getSuggestedLevel() + " is no longer valid.");
-                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have made an offer for " + anOffer.getSuggestedLevel() + ", but it is no longer valid since the change in diplomatic state between you.");
+                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to the changed diplomatic state between you and Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " your offer for " + anOffer.getSuggestedLevel() + " is no longer valid.");
+                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have made an offer for " + anOffer.getSuggestedLevel() + ", but it is no longer valid since the change in diplomatic state between you.");
                 anOffer.setOfferPerformed(true);
             } else if (!anOffer.isOfferPerformed()) {
                 // first check if the other player also have made an offer
-                DiplomacyOffer otherPlayersOffer = anOffer.getOtherPlayer(g).getDiplomacyOffer(p);
+                DiplomacyOffer otherPlayersOffer = g.getPlayer(anOffer.getOtherPlayerName()).getDiplomacyOffer(p);
                 if (otherPlayersOffer != null) { // if there is an offer
                     boolean lordVassall = checkLordVassall(anOffer.getSuggestedLevel(), otherPlayersOffer.getSuggestedLevel());
                     if (lordVassall) { // players are now lord and vassall
                         if (anOffer.getSuggestedLevel() == DiplomacyLevel.LORD) {
                             Logger.fine("anOffer.getSuggestedLevel()" + anOffer.getSuggestedLevel());
                             aState.setCurrentLevel(anOffer.getSuggestedLevel());
-                            aState.setLord(anOffer.getThePlayer(g));
-                            anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " is now your vassal!");
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " is now your lord!");
-                            anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getOtherPlayer(g).getGovernorName() + ";" + otherPlayersOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
+                            aState.setLord(g.getPlayer(anOffer.getThePlayerName()));
+                            g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " is now your vassal!");
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " is now your lord!");
+                            g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + ";" + otherPlayersOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
                             anOffer.setOfferPerformed(true);
                             otherPlayersOffer.setOfferPerformed(true);
                         } else {
                             Logger.fine("anOffer.getSuggestedLevel()" + anOffer.getSuggestedLevel());
                             aState.setCurrentLevel(anOffer.getSuggestedLevel());
-                            aState.setLord(anOffer.getOtherPlayer(g));
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " is now your vassal!");
-                            anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " is now your lord!");
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
-                            anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getOtherPlayer(g).getGovernorName() + ";" + otherPlayersOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
+                            aState.setLord(g.getPlayer(anOffer.getOtherPlayerName()));
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " is now your vassal!");
+                            g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " is now your lord!");
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
+                            g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + ";" + otherPlayersOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_LORD_VASSAL);
                             anOffer.setOfferPerformed(true);
                             otherPlayersOffer.setOfferPerformed(true);
                         }
@@ -272,18 +272,18 @@ public class OrdersPerformer {
                                         Logger.fine("multiple anOffer.getSuggestedLevel(): " + anOffer.getSuggestedLevel());
 //    		    					aState.setCurrentLevel(anOffer.getSuggestedLevel());
                                         g.addPostConfList(aState);
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getOtherPlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getThePlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getOtherPlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
                                         anOffer.setOfferPerformed(true);
                                         otherPlayersOffer.setOfferPerformed(true);
                                     } else { // offer invalid
                                         // not all members in conf have made offers, offer is not performed
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You and governor " + otherPlayer.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of your confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("You and governor " + p.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of governor " + p.getGovernorName() + " confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(" with " + anOffer.getOtherPlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(" with " + anOffer.getThePlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You and governor " + otherPlayer.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of your confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("You and governor " + p.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of governor " + p.getGovernorName() + " confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(" with " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(" with " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
                                         anOffer.setOfferPerformed(true);
                                         otherPlayersOffer.setOfferPerformed(true);
                                     }
@@ -294,18 +294,18 @@ public class OrdersPerformer {
                                         Logger.fine("multiple anOffer.getSuggestedLevel(): " + anOffer.getSuggestedLevel());
 //    		    					aState.setCurrentLevel(anOffer.getSuggestedLevel());
                                         g.addPostConfList(aState);
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getOtherPlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getThePlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getOtherPlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
                                         anOffer.setOfferPerformed(true);
                                         otherPlayersOffer.setOfferPerformed(true);
                                     } else { // offer invalid
                                         // not all members in conf have made offers, offer is not performed
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You and governor " + otherPlayer.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of governor " + p.getGovernorName() + " confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("You and governor " + p.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of your confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
-                                        anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(" with " + anOffer.getOtherPlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
-                                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(" with " + anOffer.getThePlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You and governor " + otherPlayer.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of governor " + p.getGovernorName() + " confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("You and governor " + p.getGovernorName() + " have made simultaneous offers for confederacy, but since not all members of your confederacy have made offers for confederacy, the offers are invalid and no change is performed.");
+                                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(" with " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(" with " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
                                         anOffer.setOfferPerformed(true);
                                         otherPlayersOffer.setOfferPerformed(true);
                                     }
@@ -314,28 +314,28 @@ public class OrdersPerformer {
                                 // perform change
                                 Logger.fine("anOffer.getSuggestedLevel(): " + anOffer.getSuggestedLevel());
                                 aState.setCurrentLevel(anOffer.getSuggestedLevel());
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getOtherPlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + anOffer.getThePlayer(g).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getOtherPlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous offers you and governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " now have " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_BOTH);
                                 anOffer.setOfferPerformed(true);
                                 otherPlayersOffer.setOfferPerformed(true);
                             }
                         } else {
                             // different suggested levels, no change is performed
-                            anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous different offers no change is performed between you and governor " + anOffer.getOtherPlayer(g).getGovernorName());
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous different offers no change is performed between you and governor " + anOffer.getThePlayer(g).getGovernorName());
+                            g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous different offers no change is performed between you and governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName());
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to simultaneous different offers no change is performed between you and governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName());
                             anOffer.setOfferPerformed(true);
                             otherPlayersOffer.setOfferPerformed(true);
                         }
                     }
                 } else { // if there is only one offer
                     // check if the other player have made a change
-                    DiplomacyChange otherPlayersChange = anOffer.getOtherPlayer(g).getDiplomacyChange(p);
+                    DiplomacyChange otherPlayersChange = g.getPlayer(anOffer.getOtherPlayerName()).getDiplomacyChange(p);
                     if (otherPlayersChange != null) { // if there is a change
                         // the offer is not performed...
-                        anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("Due to governor " + anOffer.getOtherPlayer(g).getGovernorName() + " change in status to you your offer for " + anOffer.getSuggestedLevel() + " is no longer valid.");
-                        anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have made an offer for " + anOffer.getSuggestedLevel() + " but it is no longer valid since you have changed your status to him.");
+                        g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("Due to governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " change in status to you your offer for " + anOffer.getSuggestedLevel() + " is no longer valid.");
+                        g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have made an offer for " + anOffer.getSuggestedLevel() + " but it is no longer valid since you have changed your status to him.");
                         anOffer.setOfferPerformed(true);
                     } else { // if there is no change
                         if (anOffer.getSuggestedLevel() == DiplomacyLevel.CONFEDERACY) {
@@ -352,46 +352,46 @@ public class OrdersPerformer {
                                 boolean allInConf = g.checkAllInConfederacyOffer(otherPlayer, confPlayers);
                                 if (allInConf) { // all have change
                                     // add offer to other player
-                                    anOffer.getOtherPlayer(g).addDiplomacyOffer(anOffer);
-                                    anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
-                                    anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for " + anOffer.getSuggestedLevel());
-                                    anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
+                                    g.getPlayer(anOffer.getOtherPlayerName()).addDiplomacyOffer(anOffer);
+                                    g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
+                                    g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for " + anOffer.getSuggestedLevel());
+                                    g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
                                     anOffer.setOfferPerformed(true);
                                 } else {
                                     // offer incomplete
-                                    anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(" to " + anOffer.getOtherPlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
-                                    anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(" from " + anOffer.getThePlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
-                                    anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for " + anOffer.getSuggestedLevel() + ", but since not all members of your confederacy have done so the offer is incomplete and is discarded.");
-                                    anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel() + ", but since not all members of his confederacy have done so the offer is incomplete and is discarded.");
+                                    g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(" to " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                    g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(" from " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                    g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for " + anOffer.getSuggestedLevel() + ", but since not all members of your confederacy have done so the offer is incomplete and is discarded.");
+                                    g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel() + ", but since not all members of his confederacy have done so the offer is incomplete and is discarded.");
                                     anOffer.setOfferPerformed(true);
                                 }
                             } else if ((confPlayers2.size() > 0) & otherConfOffer) { // otherPlayer is in a confederacy and there exist at least one offer from another member of his conf
                                 // not all members in conf have made offers, offer is not performed
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have made an offer for confederacy to governor " + otherPlayer.getGovernorName() + " but since only some members of their confederacy have made offers to you, the offers are invalid and no change is performed.");
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + p.getGovernorName() + " have made an offer for confederacy to you, but since only some members of your confederacy have made offers to governor " + p.getGovernorName() + ", the offers are invalid and no change is performed.");
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestHighlights(" to " + anOffer.getOtherPlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(" from " + anOffer.getThePlayer(g).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have made an offer for confederacy to governor " + otherPlayer.getGovernorName() + " but since only some members of their confederacy have made offers to you, the offers are invalid and no change is performed.");
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + p.getGovernorName() + " have made an offer for confederacy to you, but since only some members of your confederacy have made offers to governor " + p.getGovernorName() + ", the offers are invalid and no change is performed.");
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestHighlights(" to " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(" from " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName(), HighlightType.TYPE_DIPLOMACY_INCOMPLETE_CONF_OFFER);
                                 anOffer.setOfferPerformed(true);
                             } else { // neither is in a conf, add offer
-                                anOffer.getOtherPlayer(g).addDiplomacyOffer(anOffer);
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for " + anOffer.getSuggestedLevel());
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getOtherPlayerName()).addDiplomacyOffer(anOffer);
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
                                 anOffer.setOfferPerformed(true);
                             }
                         } else {
                             // add offer to other player
-                            anOffer.getOtherPlayer(g).addDiplomacyOffer(anOffer);
-                            anOffer.getOtherPlayer(g).getTurnInfo().addToLatestHighlights(anOffer.getThePlayer(g).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
+                            g.getPlayer(anOffer.getOtherPlayerName()).addDiplomacyOffer(anOffer);
+                            g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestHighlights(g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + ";" + anOffer.getSuggestedLevel(), HighlightType.TYPE_DIPLOMACY_CHANGE_OFFER);
                             if (anOffer.getSuggestedLevel() == DiplomacyLevel.LORD) {
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for him to become your Lord and you his vassal");
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer to become his lord and he your vassal");
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for him to become your Lord and you his vassal");
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer to become his lord and he your vassal");
                             } else if (anOffer.getSuggestedLevel() == DiplomacyLevel.VASSAL) {
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for him to become your vassal and you his lord" + anOffer.getSuggestedLevel());
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer to become his vassal and he your lord");
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for him to become your vassal and you his lord" + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer to become his vassal and he your lord");
                             } else {
-                                anOffer.getThePlayer(g).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + anOffer.getOtherPlayer(g).getGovernorName() + " for " + anOffer.getSuggestedLevel());
-                                anOffer.getOtherPlayer(g).getTurnInfo().addToLatestDiplomacyReport("Governor " + anOffer.getThePlayer(g).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getThePlayerName()).getTurnInfo().addToLatestDiplomacyReport("You have sent an offer to Governor " + g.getPlayer(anOffer.getOtherPlayerName()).getGovernorName() + " for " + anOffer.getSuggestedLevel());
+                                g.getPlayer(anOffer.getOtherPlayerName()).getTurnInfo().addToLatestDiplomacyReport("Governor " + g.getPlayer(anOffer.getThePlayerName()).getGovernorName() + " have sent you an offer for " + anOffer.getSuggestedLevel());
                             }
                             anOffer.setOfferPerformed(true);
                         }
