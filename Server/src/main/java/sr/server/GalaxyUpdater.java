@@ -83,7 +83,6 @@ public class GalaxyUpdater {
                         //TODO 2020-12-01 addFirstTurnMessages should be put the message in to the PlayerReport
                         addFirstTurnMessages(player, aSR_Server.getMessageDatabase());
                         player.setPlanetInformations(PlanetMutator.createPlayerStartPlanetInformations(g.getPlanets(), player));
-                        player.resetDiplomacyOffers();
                         // add start income to income report
                         IncomePureFunctions.getPlayerIncomeWithoutCorruption(player, true, player.getGalaxy());
                     }
@@ -104,7 +103,6 @@ public class GalaxyUpdater {
                         player.setFinishedThisTurn(false);
                         player.addToGeneral("Game has been updated to turn " + (g.turn + 1) + ".");
                         player.addToGeneral("");
-                        player.resetDiplomacyOffers();
                     }
                     // add last turn economy data to economy report
                     updateEconomyReport1();
@@ -155,8 +153,6 @@ public class GalaxyUpdater {
                         (new CheckAbandonedSquadrons(g)).checkAbandonedSquadrons();
                         // check destruction of civilian ships
                         checkCivilianShips();
-                        // perform diplomacy orders
-                        performDiplomacyOrders();
                         // repair damaged ships
                         performShipRepairs();
                         // repair damaged troops
@@ -2167,23 +2163,6 @@ public class GalaxyUpdater {
             tempPlayers.remove(random);
         }
 
-    }
-
-    protected void performDiplomacyOrders() {
-        Logger.fine("performDiplomacyOrders called");
-        g.setPostConflicts(new LinkedList<DiplomacyState>());
-        for (Player aPlayer : g.players) {
-            int genSize = aPlayer.getTurnInfo().getGeneralSize();
-            if (!aPlayer.isDefeated()) {
-                OrdersPerformer.performDiplomacyOrders(aPlayer.getOrders(), aPlayer);
-            }
-            if (genSize < aPlayer.getTurnInfo().getGeneralSize()) {
-                aPlayer.addToGeneral("");
-            }
-        }
-        for (DiplomacyState aDiplomacyState : g.getPostConflicts()) {
-            aDiplomacyState.setCurrentLevel(DiplomacyLevel.CONFEDERACY);
-        }
     }
 
     public boolean allPlanetsRazedAndUninfected() {
