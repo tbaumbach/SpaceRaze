@@ -74,7 +74,7 @@ public class SpaceshipHelper {
                     if (spaceship.getOwner() != null) {
                         VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
                         galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
-                        addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo());
+                        addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
                     }
                     SpaceshipMutator.removeShip(spaceship, galaxy);
                 }else{ // there is a planet to retreat to
@@ -99,13 +99,13 @@ public class SpaceshipHelper {
         }
     }
 
-    public static void addToLatestShipsLostInSpace(Spaceship ss, TurnInfo turnInfo) {
+    public static void addToLatestShipsLostInSpace(Spaceship ss, TurnInfo turnInfo, GameWorld gameWorld) {
         Report r = turnInfo.getGeneralReports().get( turnInfo.getGeneralReports().size() - 1);
-        addShipLostInSpace(ss, r);
+        addShipLostInSpace(ss, r, gameWorld);
     }
 
-    private static void addShipLostInSpace(Spaceship ss, Report report) {
-        report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), ss.getOwner().getGalaxy().getGameWorld()).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
+    private static void addShipLostInSpace(Spaceship ss, Report report, GameWorld gameWorld) {
+        report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), gameWorld).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
     }
 
     public static void moveRetreatingSquadron(Spaceship spaceship, TurnInfo ti, Galaxy galaxy) {
@@ -123,7 +123,7 @@ public class SpaceshipHelper {
             if (spaceship.getOwner() != null) {
                 VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
                 galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
-                addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo());
+                addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
             }
             SpaceshipMutator.removeShip(spaceship, galaxy);
         } else if (spaceship.getCarrierLocation().isRetreating()) { // carrier is still

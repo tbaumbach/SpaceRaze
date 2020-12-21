@@ -8,7 +8,9 @@ import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
+import spaceraze.world.enums.BlackMarketFrequency;
 import spaceraze.world.enums.HighlightType;
+import spaceraze.world.enums.SpaceShipSize;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +55,7 @@ public class BlackMarketPerformer {
         int randomType = galaxy.hasTroops() ? Functions.getRandomInt(1,12) : Functions.getRandomInt(1,9);
         blackMarketOffer.setLastTurnAction(galaxy.getTurn());
         if (randomType <= shipIndex){ // ship
-            blackMarketOffer.setSpaceshipType(galaxy.getRandomCommonShiptype());
+            blackMarketOffer.setSpaceshipType(getRandomCommonSpaceshipType(galaxy));
         }else
         if (randomType <= hotStuffIndex){ // hot stuff
             blackMarketOffer.setHotStuffAmount(createHotStuffBid());
@@ -183,7 +185,7 @@ public class BlackMarketPerformer {
                 }
             }
             if (!allhaveType) {
-                if (aSpaceshipType.isBluePrintReadyToUseInBlackMarket(galaxy.getTurn())) {
+                if (isBluePrintReadyToUseInBlackMarket(aSpaceshipType, galaxy.getTurn())) {
                     possibleShipTypes.add(aSpaceshipType);
                 }
             }
@@ -220,5 +222,96 @@ public class BlackMarketPerformer {
             aOffer.addBid(aBid);
         }
 
+    }
+
+    public static  SpaceshipType getRandomCommonSpaceshipType(Galaxy galaxy) {
+        SpaceshipType returnType = null;
+        SpaceshipType tempShipType = null;
+        List<SpaceshipType> allAvailableTypes = getSpaceshipTypesToBlackMarket(galaxy);
+        int totalFrequencypoint = 0;
+        for (SpaceshipType spaceshipType : allAvailableTypes) {
+            totalFrequencypoint += spaceshipType.getBlackMarketFrequency().getFrequency();
+        }
+
+        int freqValue = Functions.getRandomInt(0, totalFrequencypoint - 1);
+        int counter = 0;
+        int tmpFreqSum = 0;
+        while (returnType == null) {
+            tempShipType = allAvailableTypes.get(counter);
+            tmpFreqSum = tmpFreqSum + tempShipType.getBlackMarketFrequency().getFrequency();
+            if (tmpFreqSum > freqValue) {
+                returnType = tempShipType;
+            }
+            counter++;
+        }
+        return returnType;
+    }
+
+    /**
+     * Searches through all sst lists for all factions, limited by the turn number
+     * (no medium+ on turn 1 etc)
+     *
+     * @return
+     */
+    private static List<SpaceshipType> getSpaceshipTypesToBlackMarket(Galaxy galaxy) {
+        Logger.fine("getSpaceshipTypesToBlackMarket() called");
+        List<SpaceshipType> ssTypes = new LinkedList<SpaceshipType>();
+        // LoggingHandler.fine("Faction: " + aFaction.getName(),this);
+        // LoggingHandler.fine("Ships nr: " + tmpSsTypes.size(),this);
+        for (SpaceshipType spaceshipType : galaxy.getGameWorld().getShipTypes()) {
+            if (isReadyToUseInBlackMarket(spaceshipType, galaxy)) {
+                ssTypes.add(spaceshipType);
+            }
+        }
+        return ssTypes;
+    }
+
+    private static boolean isReadyToUseInBlackMarket(SpaceshipType spaceshipType, Galaxy aGalaxy){
+        boolean constructible =  false;
+
+        if (aGalaxy.getTurn() >= spaceshipType.getBlackmarketFirstTurn()){
+            if (spaceshipType.getRange().canMove() || spaceshipType.getSize() == SpaceShipSize.SQUADRON){
+                if (spaceshipType.isCanAppearOnBlackMarket()){
+                    if(!spaceshipType.isPlayerUnique() && !spaceshipType.isFactionUnique()){
+                        if(spaceshipType.isWorldUnique() && !spaceshipType.isWorldUniqueBuild(aGalaxy)){
+                            boolean isAlreadyAoffer = false;
+                            for (BlackMarketOffer aBlackMarketOffer : aGalaxy.getCurrentOffers()) {
+                                if(aBlackMarketOffer.isShip() && aBlackMarketOffer.getSpaceshipType().getName().equals(spaceshipType.getName())){
+                                    isAlreadyAoffer = true;
+                                }
+                            }
+                            if(!isAlreadyAoffer){
+                                boolean haveBuildingOrder = false;
+                                for (Player tempPlayer : aGalaxy.getPlayers()) {
+                                    if(tempPlayer.getOrders().haveSpaceshipTypeBuildOrder(spaceshipType)){
+                                        haveBuildingOrder = true;
+                                    }
+                                }
+                                if(!haveBuildingOrder){
+                                    constructible =  true;
+                                }
+                            }
+                        }else{
+                            constructible = true;
+                        }
+                    }
+                }
+            }
+        }
+        return constructible;
+    }
+
+    public static boolean isBluePrintReadyToUseInBlackMarket(SpaceshipType spaceshipType, int turn){
+        boolean constructible =  false;
+
+        if (turn >= spaceshipType.getBluePrintFirstTurn()){
+            if (spaceshipType.getBluePrintFrequency() != BlackMarketFrequency.NEVER){
+                if(!spaceshipType.isPlayerUnique() && !spaceshipType.isFactionUnique() && !spaceshipType.isWorldUnique()){
+                    constructible = true;
+                }
+            }
+        }
+
+        return constructible;
     }
 }

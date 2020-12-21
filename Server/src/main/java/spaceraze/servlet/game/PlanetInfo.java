@@ -15,6 +15,7 @@ import spaceraze.world.Player;
 import spaceraze.world.Spaceship;
 import spaceraze.world.Troop;
 import spaceraze.world.VIP;
+import spaceraze.world.enums.SpaceShipSize;
 
 /*
  * Denna klass hanterar all information som en spelar ser om en planet under pågående drag.
@@ -279,7 +280,7 @@ public class PlanetInfo {
 		
 		//Add all ships to the planets
 		for (Spaceship spaceship : spaceShips) {
-			if(spaceship.isSquadron() && spaceship.getCarrierLocation() != null){
+			if(spaceship.getSize() == SpaceShipSize.SQUADRON && spaceship.getCarrierLocation() != null){
 				squdronsOnShip.add(spaceship);
 			}else{
 				ships.add(new ShipInfo(spaceship, galaxy.getGameWorld()));

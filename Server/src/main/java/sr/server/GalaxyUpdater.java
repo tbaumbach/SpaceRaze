@@ -673,12 +673,12 @@ public class GalaxyUpdater {
                                     } else { // civ ship is neutral
                                         player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
                                     }
-                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo());
+                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo(), g.getGameWorld());
                                     player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                                 }
                                 if (aSpaceship.getOwner() != null) {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been scuttled in the system " + aSpaceship.getLocation().getName() + " when it had nowhere to retreat to.");
-                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo());
+                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo(), g.getGameWorld());
                                     aSpaceship.getOwner().getTurnInfo().addToLatestHighlights(aSpaceship.getName(), HighlightType.TYPE_OWN_CIVILIAN_SHIP_DESTROYED);
                                     VipMutator.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner(), g);
                                     g.checkTroopsInDestroyedShips(aSpaceship, aSpaceship.getOwner());
@@ -693,7 +693,7 @@ public class GalaxyUpdater {
                                 } else {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been destroyed in the system " + aSpaceship.getLocation().getName() + ".");
                                 }
-                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo());
+                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo(), g.getGameWorld());
                                 aSpaceship.getOwner().getTurnInfo().addToLatestHighlights(aSpaceship.getName(), HighlightType.TYPE_OWN_CIVILIAN_SHIP_DESTROYED);
                             }
                             // add a general message to each enemy player about the destruction of the civilian ship
@@ -710,7 +710,7 @@ public class GalaxyUpdater {
                                 } else { // civ ship is neutral
                                     player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                 }
-                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo());
+                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo(), g.getGameWorld());
                                 player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                             }
                             // destroy the civilian ship
@@ -1737,9 +1737,17 @@ public class GalaxyUpdater {
         Logger.fine("updateSquadronsLocation called");
         List<Spaceship> allss = g.getSpaceships();
         for (Spaceship aSpaceship : allss) {
-            aSpaceship.updateSquadronLocation();
+            updateSquadronLocation(aSpaceship);
         }
 
+    }
+
+    private void updateSquadronLocation(Spaceship spaceship) {
+        if (spaceship.getSize() == SpaceShipSize.SQUADRON) {
+            if (spaceship.getCarrierLocation() != null) {
+                spaceship.setLocation(spaceship.getCarrierLocation().getLocation());
+            }
+        }
     }
 
     protected void moveRetreatingShips() {
@@ -2252,13 +2260,13 @@ public class GalaxyUpdater {
 
                 // 2019-12-26 Hantera detta, behöver vi detta? eller kan vi räkna ihop alla skepp nu när de ligger i SpaceBattleAttack. Får vara kvar ett tag till då enheter i listan används både av servern och klienten.
                 if (tf1.getPlayerName() != null) {
-                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo()));
-                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo()));
+                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo(), g.getGameWorld()));
+                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo(), g.getGameWorld()));
                 }
 
                 if (tf2.getPlayerName() != null) {
-                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo()));
-                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo()));
+                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo(), g.getGameWorld()));
+                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo(), g.getGameWorld()));
                 }
 
                 highlightsSpaceBattle(tf1.getTotalNrShips() > 0 ? tf1 : tf2, tf1.getTotalNrShips() > 0 ? tf2 : tf1, aPlanet);

@@ -13,6 +13,7 @@ import spaceraze.world.Planet;
 import spaceraze.world.Player;
 import spaceraze.world.Spaceship;
 import spaceraze.battlehandler.spacebattle.TaskForce;
+import spaceraze.world.enums.SpaceShipSize;
 import sr.server.SpaceshipHelper;
 
 public class CheckAbandonedSquadrons {
@@ -53,7 +54,7 @@ public class CheckAbandonedSquadrons {
 		List<Spaceship> removeShips = new LinkedList<Spaceship>();
 		boolean addSpace = false;
 		for (Spaceship aShip : tfSpaceships) {
-			if (aShip.isSquadron()) {
+			if (aShip.getSize() == SpaceShipSize.SQUADRON) {
 				if (aShip.getCarrierLocation() == null) { // sqd is not in a carrier
 					if (aShip.getLocation() == null) {
 						// should not happen (retreating squadrons??)
@@ -125,7 +126,7 @@ public class CheckAbandonedSquadrons {
 				owner.addToGeneral("Your sguadron " + aShip.getName()
 						+ " has been scuttled by it's crew because they had no supporting carrier in the system "
 						+ aShip.getLocation().getName() + ".");
-				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo());
+				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo(), galaxy.getGameWorld());
 				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy);
 			}
 			Player controllingPlayer = thePlanet.getPlayerInControl();
@@ -156,7 +157,7 @@ public class CheckAbandonedSquadrons {
 	  	  List<Spaceship> removeShips = new LinkedList<Spaceship>();
 	  	  boolean addSpace = false;
 	  	  for (Spaceship aShip : playerSpaceships) {
-	  		if (aShip.isSquadron()){
+	  		if (aShip.getSize() == SpaceShipSize.SQUADRON){
 	  			if (aShip.getCarrierLocation() == null){ // sqd is not in a carrier
 	  				if (aShip.getLocation() == null){
 	  					// not at a planet, do nothing (attached to carrier?)
@@ -236,8 +237,8 @@ public class CheckAbandonedSquadrons {
 		List<Spaceship> carriersWithFreeSlots = new ArrayList<Spaceship>();
 		List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aLocation, galaxy.getSpaceships());
 		for (Spaceship spaceship : shipsAtPlanet) {
-			if (SpaceshipPureFunctions.isCarrier(spaceship, galaxy.getGameWorld())) {
-				int maxSlots = SpaceshipPureFunctions.getSpaceshipTypeByKey(spaceship.getTypeKey(), galaxy.getGameWorld()).getSquadronCapacity();
+			if (SpaceshipPureFunctions.isCarrier(spaceship)) {
+				int maxSlots = spaceship.getSquadronCapacity();
 				int slotsFull = SpaceshipPureFunctions.getNoSquadronsAssignedToCarrier(spaceship, galaxy.getSpaceships());
 				int sqdMovingToCarrier = getNoSquadronsMovingToCarrier(spaceship, galaxy.getSpaceships());
 				if ((slotsFull + sqdMovingToCarrier) < maxSlots) {
@@ -253,7 +254,7 @@ public class CheckAbandonedSquadrons {
 		Player aPlayer = aCarrier.getOwner();
 		List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aCarrier.getLocation(), spaceships);
 		for (Spaceship aSpaceship : shipsAtPlanet) {
-			if (aSpaceship.isSquadron()) {
+			if (aSpaceship.getSize() == SpaceShipSize.SQUADRON) {
 				// check if sstemp has a move order to the carrier
 				if (aPlayer != null) {
 					boolean moveToCarrierOrder = aPlayer.checkShipToCarrierMove(aSpaceship, aCarrier);
@@ -272,7 +273,7 @@ public class CheckAbandonedSquadrons {
 			Spaceship aShip = iter.next();
 			if (aShip.getOwner() == aPlayer) {
 				if (aShip.getLocation() == aPlanet) {
-					if (SpaceshipPureFunctions.isCarrier(aShip, galaxy.getGameWorld())) {
+					if (SpaceshipPureFunctions.isCarrier(aShip)) {
 						found = true;
 					}
 				}

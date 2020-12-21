@@ -2,6 +2,7 @@ package spaceraze.webb.support.world;
 
 import spaceraze.world.Spaceship;
 import spaceraze.world.SpaceshipType;
+import spaceraze.world.enums.SpaceShipSize;
 
 public class SpaceShipHelper {
 
@@ -56,8 +57,8 @@ public class SpaceShipHelper {
 		sb.append("<tr>");
 		sb.append("<td>" + spaceshipType.getName() + "</td>");
 		sb.append("<td>" + spaceshipType.getShortName() + "</td>");
-		sb.append("<td>" + spaceshipType.getSize().getName() + "</td>");
-		if (spaceshipType.isSquadron()) {
+		sb.append("<td>" + spaceshipType.getSize().getDescription() + "</td>");
+		if (spaceshipType.getSize() == SpaceShipSize.SQUADRON) {
 			sb.append("<td>Squadron</td>");
 		} else {
 			sb.append("<td>Capital ship</td>");
@@ -95,7 +96,7 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.getPsychWarfare() + "</td>");
 		sb.append("<td>" + spaceshipType.getSquadronCapacity() + "</td>");
 		sb.append("<td>" + spaceshipType.isNoRetreat() + "</td>");
-		sb.append("<td>" + spaceshipType.getSupply().getName() + "</td>");
+		sb.append("<td>" + spaceshipType.getSupply().getDescription() + "</td>");
 		sb.append("<td>" + spaceshipType.isPlanetarySurvey() + "</td>");
 		sb.append("<td>" + spaceshipType.isCanAppearOnBlackMarket() + "</td>");
 		sb.append("<td>" + spaceshipType.isCanAttackScreenedShips() + "</td>");

@@ -17,16 +17,7 @@ public class SpaceshipTypeSizeComparator implements Comparator<SpaceshipType> {
 
 	public int compare(SpaceshipType sst1, SpaceshipType sst2) {
 		int diff = 0;
-		// squadrons first
-		if (diff == 0){
-			if (sst1.isSquadron() & !sst2.isSquadron()){
-				diff = -1;
-			}else
-			if (!sst1.isSquadron() & sst2.isSquadron()){
-				diff = 1;
-			}
-		}
-		// else smallest first
+		// smallest first
 		if (diff == 0){
 			diff = sst1.getSize().getCompareSize() - sst2.getSize().getCompareSize();
 		}

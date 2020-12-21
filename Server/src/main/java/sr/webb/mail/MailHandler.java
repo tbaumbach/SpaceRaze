@@ -229,12 +229,12 @@ public class MailHandler {
   			lisExist = true;
   		}
   		// print neutral ships destroyed
-  		tmpList = getLostInSpaceByFaction(lostShips,null, null);
+  		tmpList = getLostInSpaceByFaction(lostShips,null, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral ships destroyed"));
   			lisExist = true;
   		}
-  		tmpList = getLostInSpaceByFaction(lostTrops,null, null);
+  		tmpList = getLostInSpaceByFaction(lostTrops,null, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral troops destroyed"));
   			lisExist = true;
