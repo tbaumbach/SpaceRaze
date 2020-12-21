@@ -127,7 +127,7 @@ public class StatisticsUpdater {
                 String shipOwner = aSpaceship.getOwner().getName();
                 // size
                 Integer valueSize = dataSize.get(shipOwner);
-                dataSize.put(shipOwner, valueSize + aSpaceship.getType().getSize().getSlots());
+                dataSize.put(shipOwner, valueSize + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), galaxy.getGameWorld()).getSize().getSlots());
             }
         }
         for (Player aPlayer : galaxy.getPlayers()) {

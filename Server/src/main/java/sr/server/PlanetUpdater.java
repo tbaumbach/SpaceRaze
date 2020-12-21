@@ -1,6 +1,6 @@
 package sr.server;
 
-import spaceraze.servlethelper.game.VipPureFunctions;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
@@ -193,7 +194,7 @@ public class StartGameHandler {
         	BuildingType buildingTemp1 = (BuildingType) iter.next();
         	Logger.info("buildingTemp1.getName(): " + buildingTemp1.getName());
         	BuildingType buildingTemp2 = PlayerPureFunctions.findBuildingType(buildingTemp1.getName(), p);
-        	Building buildingTemp = buildingTemp2.getBuilding(homeplanet, galaxy);
+        	Building buildingTemp = buildingTemp2.getBuilding(homeplanet, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.BUILDING).getUniqueId());
         	//buildingTemp.setLocation(homeplanet);
         	//buildingTemp.setOwner(p);
         	Logger.finer("Building added: " + p.getName() + " " + buildingTemp.getBuildingType().getName());
@@ -225,7 +226,7 @@ public class StartGameHandler {
         	// first get trooptype from player
         	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy);
         	// then create new troop
-        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, galaxy.getUniqueIdCounter(CounterType.TROOP).getUniqueId());
+        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId());
         	aTroop.setPlanetLocation(homeplanet);
         	aTroop.setOwner(p);
         	galaxy.addTroop(aTroop);

@@ -3,6 +3,8 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.world.GameWorld;
 import spaceraze.world.Spaceship;
 import spaceraze.world.enums.SpaceShipSize;
 
@@ -23,25 +25,25 @@ public class ShipInfo {
 	private List<VIPInfo> vips;
 	private List<TroopInfo> troops;
 
-	ShipInfo(Spaceship aShip) {
+	ShipInfo(Spaceship aShip, GameWorld gameWorld) {
 
-		id = aShip.getUniqueId();
-		type = aShip.getTypeName();
+		id = aShip.getKey();
+		type = SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), gameWorld).getName();
 		name = aShip.getUniqueName();
 		shortName = aShip.getShortName();
-		size = aShip.getType().getSize();
+		size =SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), gameWorld).getSize();
 		kills = aShip.getKills();
 		currentHP = aShip.getCurrentDc();
 		retreating = aShip.isRetreating();
-		screened = aShip.getScreened();
+		screened = aShip.isScreened();
 		currentShield = aShip.getCurrentShields();
-		shields = aShip.getShields();
+		shields = SpaceshipPureFunctions.getShields(aShip, gameWorld);
 		techWhenBuilt = aShip.getTechWhenBuilt();
-		weaponsSmall = aShip.getWeaponsStrengthSmall();
-		weaponsMedium = aShip.getWeaponsStrengthMedium();
-		weaponsLarge = aShip.getWeaponsStrengthLarge();
-		weaponsHuge = aShip.getWeaponsStrengthHuge();
-		weaponsSquadron = aShip.getWeaponsStrengthSquadron();
+		weaponsSmall = SpaceshipPureFunctions.getWeaponsStrengthSmall(aShip, gameWorld);
+		weaponsMedium = SpaceshipPureFunctions.getWeaponsStrengthMedium(aShip, gameWorld);
+		weaponsLarge = SpaceshipPureFunctions.getWeaponsStrengthLarge(aShip, gameWorld);
+		weaponsHuge = SpaceshipPureFunctions.getWeaponsStrengthHuge(aShip, gameWorld);
+		weaponsSquadron = SpaceshipPureFunctions.getWeaponsStrengthSquadron(aShip, gameWorld);
 		weaponsSalvoesMedium = aShip.getWeaponsSalvoesMedium();
 		weaponsSalvoesLarge = aShip.getWeaponsSalvoesLarge();
 		weaponsSalvoesHuge = aShip.getWeaponsSalvoesHuge();

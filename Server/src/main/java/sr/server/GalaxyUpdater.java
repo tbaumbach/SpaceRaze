@@ -1,9 +1,3 @@
-//Title:        SpaceRaze
-//Author:       Paul Bodin
-//Description:  Javabaserad version av Spaceraze.
-//Bygger p� Spaceraze Galaxy fast skall fungera mera som Wigges webbaserade variant.
-//Detta Javaprojekt omfattar serversidan av spelet.
-
 package sr.server;
 
 import java.util.ArrayList;
@@ -26,7 +20,8 @@ import spaceraze.server.game.update.CheckAbandonedSquadrons;
 import spaceraze.server.game.update.OrdersPerformer;
 import spaceraze.servlethelper.game.DiplomacyMutator;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
-import spaceraze.servlethelper.game.VipPureFunctions;
+import spaceraze.servlethelper.game.vip.VipMutator;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.expenses.ExpensePureFunction;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
@@ -637,12 +632,12 @@ public class GalaxyUpdater {
         for (Planet aPlanet : g.getPlanets()) {
             Logger.finer("aPlanet: " + aPlanet.getName());
             // find all civilian ships at the current planet
-            List<Spaceship> civsAtPlanet = g.getShips(aPlanet, true);
+            List<Spaceship> civsAtPlanet = SpaceshipPureFunctions.getShips(aPlanet, true, g);
             // for each civilian ship
             for (Spaceship aSpaceship : civsAtPlanet) {
                 Logger.finer("aSpaceship: " + aSpaceship.getName());
                 // find if there are any friendly military ships in the system
-                List<Spaceship> militaryAtPlanet = g.getShips(aPlanet, false);
+                List<Spaceship> militaryAtPlanet = SpaceshipPureFunctions.getShips(aPlanet, false, g);
                 List<Spaceship> friendlyMilitarys = getFriendlyMilitaryShips(aSpaceship, militaryAtPlanet);
                 Logger.finest("militaryAtPlanet.size(): " + militaryAtPlanet.size());
                 Logger.finest("friendlyMilitarys.size(): " + friendlyMilitarys.size());
@@ -655,16 +650,15 @@ public class GalaxyUpdater {
                     if (enemyMilitarys.size() > 0) {
                         boolean stopRetreats = getStopRetreats(enemyMilitarys);
                         List<Player> enemyPlayers = getEnemyPlayers(enemyMilitarys);
-                        Logger.finer("aSpaceship.isAlwaysRetreat(): " + aSpaceship.isAlwaysRetreat());
-                        if (aSpaceship.isAlwaysRetreat() & !stopRetreats) {
+                        if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & !stopRetreats) {
                             boolean gotAway = aSpaceship.isRetreating();
                             Logger.finer("gotAway: " + gotAway);
                             if (gotAway) { // ship have retreated
                                 for (Player player : enemyPlayers) {
                                     if (aSpaceship.getOwner() != null) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " from govenor " + aSpaceship.getOwner().getName() + " have retreated in the " + aPlanet.getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " have retreated in the " + aPlanet.getName() + " system.");
                                     } else { // civ ship is neutral
-                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " have retreated in the " + aPlanet.getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " have retreated in the " + aPlanet.getName() + " system.");
                                     }
                                     player.getTurnInfo().addToLatestHighlights(aPlanet.getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_RETREATED);
                                 }
@@ -675,31 +669,31 @@ public class GalaxyUpdater {
                             } else { // ship had nowhere to retreat to, is scuttled
                                 for (Player player : enemyPlayers) {
                                     if (aSpaceship.getOwner() != null) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " from govenor " + aSpaceship.getOwner().getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
                                     } else { // civ ship is neutral
-                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
                                     }
-                                    player.getTurnInfo().addToLatestShipsLostInSpace(aSpaceship);
-                                    player.getTurnInfo().addToLatestHighlights(aSpaceship.getSpaceshipType().getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
+                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo());
+                                    player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                                 }
                                 if (aSpaceship.getOwner() != null) {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been scuttled in the system " + aSpaceship.getLocation().getName() + " when it had nowhere to retreat to.");
-                                    aSpaceship.getOwner().getTurnInfo().addToLatestShipsLostInSpace(aSpaceship);
+                                    SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo());
                                     aSpaceship.getOwner().getTurnInfo().addToLatestHighlights(aSpaceship.getName(), HighlightType.TYPE_OWN_CIVILIAN_SHIP_DESTROYED);
-                                    g.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner());
+                                    VipMutator.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner(), g);
                                     g.checkTroopsInDestroyedShips(aSpaceship, aSpaceship.getOwner());
                                 }
-                                g.removeShip(aSpaceship);
+                                SpaceshipMutator.removeShip(aSpaceship, g);
                             }
                         } else { // ship is destroyed
                             // add a general message to owner of civilian ship that the ship has been destroyed
                             if (aSpaceship.getOwner() != null) {
-                                if (aSpaceship.isAlwaysRetreat() & stopRetreats) {
+                                if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been destroyed in the system " + aSpaceship.getLocation().getName() + ". It tried to retreat but was stopped by an enemy ship with the stop retreats ability.");
                                 } else {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been destroyed in the system " + aSpaceship.getLocation().getName() + ".");
                                 }
-                                aSpaceship.getOwner().getTurnInfo().addToLatestShipsLostInSpace(aSpaceship);
+                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, aSpaceship.getOwner().getTurnInfo());
                                 aSpaceship.getOwner().getTurnInfo().addToLatestHighlights(aSpaceship.getName(), HighlightType.TYPE_OWN_CIVILIAN_SHIP_DESTROYED);
                             }
                             // add a general message to each enemy player about the destruction of the civilian ship
@@ -708,21 +702,21 @@ public class GalaxyUpdater {
                             for (Player player : enemyPlayers) {
                                 if (aSpaceship.getOwner() != null) {
                                     Logger.finest("addToLatestCivilianReport");
-                                    if (aSpaceship.isAlwaysRetreat() & stopRetreats) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " from govenor " + aSpaceship.getOwner().getName() + " couldn't retreat and has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                    if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " couldn't retreat and has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                     } else {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " from govenor " + aSpaceship.getOwner().getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                     }
                                 } else { // civ ship is neutral
-                                    player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + aSpaceship.getSpaceshipType().getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                    player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                 }
-                                player.getTurnInfo().addToLatestShipsLostInSpace(aSpaceship);
-                                player.getTurnInfo().addToLatestHighlights(aSpaceship.getSpaceshipType().getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
+                                SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo());
+                                player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                             }
                             // destroy the civilian ship
-                            g.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner());
+                            VipMutator.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner(), g);
                             g.checkTroopsInDestroyedShips(aSpaceship, aSpaceship.getOwner());
-                            g.removeShip(aSpaceship);
+                            SpaceshipMutator.removeShip(aSpaceship, g);
                         }
                     }
                 }
@@ -733,7 +727,7 @@ public class GalaxyUpdater {
     protected boolean getStopRetreats(List<Spaceship> enemyMilitarys) {
         boolean stopRetreats = false;
         for (Spaceship spaceship : enemyMilitarys) {
-            if (spaceship.getNoRetreat()) {
+            if (spaceship.isNoRetreat()) {
                 stopRetreats = true;
             }
         }
@@ -1022,22 +1016,22 @@ public class GalaxyUpdater {
 
         for (Spaceship ss : playerShips) {
             int sum = 1;
-            if (map.containsKey(ss.getSpaceshipType().getName())) {
-                sum += map.get(ss.getSpaceshipType().getName());
+            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName())) {
+                sum += map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName());
             }
-            map.put(ss.getSpaceshipType().getName(), sum);
+            map.put(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName(), sum);
         }
         if (map.size() > 0) {
             unitsStr += "\nShips under your command.\n";
         }
         for (Spaceship ss : playerShips) {
-            if (map.containsKey(ss.getSpaceshipType().getName())) {
-                if (map.get(ss.getSpaceshipType().getName()) > 1) {
-                    unitsStr += map.get(ss.getSpaceshipType().getName()) + " " + ss.getSpaceshipType().getName() + ".\n";
+            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName())) {
+                if (map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName()) > 1) {
+                    unitsStr += map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName()) + " " + SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName() + ".\n";
                 } else {
-                    unitsStr += ss.getSpaceshipType().getName() + ".\n";
+                    unitsStr += SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName() + ".\n";
                 }
-                map.remove(ss.getSpaceshipType().getName());
+                map.remove(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName());
             }
         }
         map.clear();
@@ -1510,7 +1504,7 @@ public class GalaxyUpdater {
                 //TODO 2020-04-22 No need to get players SpaceshipType(should not use the upgrades from the new owner), check why we are creating a nwe ship instead of just changing the owner. Possible name conflict?
                 //SpaceshipType sstTemp = PlayerPureFunctions.findSpaceshipType(ss.getSpaceshipType().getName(), dip.getBoss(), g);
                 //if(sstTemp == null){
-                SpaceshipType sstTemp = g.findSpaceshipType(ss.getSpaceshipType().getName());
+                SpaceshipType sstTemp = SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld());
                 //}
 
                 Spaceship ssTemp = SpaceshipMutator.createSpaceShip(dip.getBoss(), sstTemp, null, 0, ss.getTechWhenBuilt());
@@ -1531,7 +1525,7 @@ public class GalaxyUpdater {
         }
         for (Spaceship ss : removeShips) {
             // remove neutral ship
-            g.removeShip(ss);
+            SpaceshipMutator.removeShip(ss, g);
         }
     }
 
@@ -1574,7 +1568,7 @@ public class GalaxyUpdater {
         }
         for (Spaceship ss : removeShips) {
             // remove neutral ship
-            g.removeShip(ss);
+            SpaceshipMutator.removeShip(ss, g);
         }
     }
 
@@ -1625,7 +1619,7 @@ public class GalaxyUpdater {
                 // set last known owner name
                 boolean spy = (g.findVIPSpy(p, tempPlayer) != null);
                 boolean shipInSystem = (g.playerHasShipsInSystem(tempPlayer, p));
-                boolean surveyShip = (g.findSurveyShip(p, tempPlayer) != null);
+                boolean surveyShip = SpaceshipPureFunctions.findSurveyShip(p, tempPlayer, g.getSpaceships(), g.getGameWorld()) != null;
                 boolean surveyVIP = (g.findSurveyVIPonShip(p, tempPlayer) != null);
                 boolean open = p.isOpen();
                 boolean neutralPlanet = (p.getPlayerInControl() == null);
@@ -1633,15 +1627,15 @@ public class GalaxyUpdater {
                     if (!neutralPlanet) {
                         PlanetMutator.setLastKnownOwner(p.getName(), p.getPlayerInControl().getName(), g.turn + 1, tempPlayer.getPlanetInformations());
                         PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setRazed(false);
-                        PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setLastKnownMaxShipSize(g.getLargestShipSizeOnPlanet(p, tempPlayer));
-                        Logger.finest("setLastKnownMaxShipSize: " + p.getName() + ", " + g.getLargestShipSizeOnPlanet(p, tempPlayer));
+                        PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setLastKnownMaxShipSize(MapPureFunctions.getLargestShipSizeOnPlanet(p, tempPlayer, g));
+                        Logger.finest("setLastKnownMaxShipSize: " + p.getName() + ", " + MapPureFunctions.getLargestShipSizeOnPlanet(p, tempPlayer, g));
                     } else {
                         //            LoggingHandler.finest(this,g,"updatePlanetInfos","g.turn: " + g.turn);
                         //            LoggingHandler.finest(this,g,"updatePlanetInfos","p.getName: " + p.getName());
                         PlanetMutator.setLastKnownOwner(p.getName(), "Neutral", g.turn + 1, tempPlayer.getPlanetInformations());
                         PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setRazed(p.isRazed());
-                        PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setLastKnownMaxShipSize(g.getLargestShipSizeOnPlanet(p, null, false));
-                        Logger.finest("setLastKnownMaxShipSize neutral: " + p.getName() + ", " + g.getLargestShipSizeOnPlanet(p, null, false));
+                        PlanetPureFunctions.findPlanetInfo(p.getName(), tempPlayer.getPlanetInformations()).setLastKnownMaxShipSize(MapPureFunctions.getLargestShipSizeOnPlanet(p, null, false, g));
+                        Logger.finest("setLastKnownMaxShipSize neutral: " + p.getName() + ", " + MapPureFunctions.getLargestShipSizeOnPlanet(p, null, false, g));
                     }
                     if (open | spy) {
                         String buildingsOrbitString = createBuildingString(p.getBuildingsInOrbit());
@@ -1727,7 +1721,7 @@ public class GalaxyUpdater {
                 List<Spaceship> playersShipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(player, aPlanet, g.getSpaceships());
                 boolean pw = false;
                 for (Spaceship spaceship : playersShipsAtPlanet) {
-                    if (spaceship.getPsychWarfare() > 0) {
+                    if (SpaceshipPureFunctions.getSpaceshipTypeByKey(spaceship.getTypeKey(), g.getGameWorld()).getPsychWarfare() > 0) {
                         pw = true;
                     }
                 }
@@ -1738,43 +1732,6 @@ public class GalaxyUpdater {
         }
         return playersPresent;
     }
-
-/*
-  private void moveRetreatingShips(){
-    Vector allss = g.getSpaceships();
-    for (int x = 0; x < g.players.size(); x++){
-      Player tempPlayer = (Player)g.players.elementAt(x);
-      int genSize = tempPlayer.getTurnInfo().getGeneralSize();
-      for (int i = 0; i < allss.size(); i++){
-        Spaceship ss = (Spaceship)allss.elementAt(i);
-        if (ss.getOwner() == tempPlayer){
-          if (ss.getLocation() == null){ // skeppet �r p� flykt
-            ss.moveShip(ss.getRetreatingTo(),ss.getOwner().getTurnInfo());
-            // kolla om skeppet anl�nt till en av spelarens planeter
-            if (ss.getRetreatingTo().getPlayerInControl() != ss.getOwner()){
-              // s�tt skeppet att fly vidare om det kan
-              boolean planetExistsToRunTo = ss.runAway(true); // returnerar false om skeppet inte har n�gra planeter kvar att fly till (egna, samma faction eller neutrala)
-              if (!planetExistsToRunTo){
-                // remove ship from game
-                g.checkVIPsInScuttledShips(ss,tempPlayer);
-                g.spaceships.removeElement(ss);
-                ss.getOwner().getTurnInfo().addToLatestGeneralReport("Your ship " + ss.getName() + " has been scuttled by its crew, when retreating retreating from " + ss.getOldLocation().getName() + " last turn, because there was nowhere they could run to.");
-              }else{
-                ss.getOwner().getTurnInfo().addToLatestGeneralReport("Your ship " + ss.getName() + " has retreated again, this time to " + ss.getRetreatingTo().getName() + ", when trying to reach a friendly system.");
-              }
-            }else{
-              // ships has finished its retreat, clear retreat data
-              ss.clearRetreatPlanets();
-            }
-          }
-        }
-      }
-      if (genSize < tempPlayer.getTurnInfo().getGeneralSize()){
-        tempPlayer.addToGeneral("");
-      }
-    }
-  }
-*/
 
     protected void updateSquadronsLocation() {
         Logger.fine("updateSquadronsLocation called");
@@ -1796,7 +1753,7 @@ public class GalaxyUpdater {
                 Spaceship ss = allss.get(i);
                 if (ss.getOwner() == tempPlayer) {
                     if (ss.isRetreating()) {
-                        if (ss.getRange().canMove()) {
+                        if (SpaceshipPureFunctions.getRange(ss, g).canMove()) {
                             if (ss.getCarrierLocation() == null) { // only squadrons can have a carrier location
                                 Logger.finest("moveRetreatingShip: " + ss);
                                 SpaceshipHelper.moveShip(ss, ss.getRetreatingTo().getName(), ss.getOwner().getTurnInfo(), g);
@@ -1811,7 +1768,7 @@ public class GalaxyUpdater {
                 if (ss.getOwner() == tempPlayer) {
                     if (ss.isRetreating()) {
                         if (ss.getCarrierLocation() != null) { // is in a carrier, only squadron can be in a carrier
-                            ss.moveRetreatingSquadron(ss.getOwner().getTurnInfo());
+                            SpaceshipHelper.moveRetreatingSquadron(ss, ss.getOwner().getTurnInfo(), g);
                         }
                     }
                 }
@@ -1830,7 +1787,7 @@ public class GalaxyUpdater {
                 Planet location = ss.getLocation();
                 if (location != null) {  // skeppet är ej på flykt
                     if (location.getPlayerInControl() == ss.getOwner()) {  // skeppet är vid en av spelarens planeter
-                        if (ss.getType().getSize().getSlots() <= location.getMaxWharfsSize()) {  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
+                        if (SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getSize().getSlots() <= location.getMaxWharfsSize()) {  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
                             ss.performRepairs();
                         }
                     }
@@ -1883,17 +1840,17 @@ public class GalaxyUpdater {
         Logger.fine("performResupply called");
         List<Spaceship> allss = g.getSpaceships();
         for (Spaceship ss : allss) {  // gå igenom alla rymdskepp
-            if (ss.getNeedResupply()) {  // skeppet är skadat
+            if (SpaceshipPureFunctions.getNeedResupply(ss)) {  // skeppet är skadat
                 Planet location = ss.getLocation();
                 if (location != null) {  // skeppet är ej på flykt
                     if (location.getPlayerInControl() == ss.getOwner()) {  // skeppet är vid en av spelarens planeter
                         // max repair at wharfs is same as resupply level
                         int maxResupplySize = location.getMaxWharfsSize();
-                        ss.supplyWeapons(SpaceShipSize.createFromSlots(maxResupplySize));
+                        SpaceshipMutator.supplyWeapons(ss, SpaceShipSize.createFromSlots(maxResupplySize));
                     }
-                    if (ss.getNeedResupply()) { // skeppet är fortfarande i behov av resupply
+                    if (SpaceshipPureFunctions.getNeedResupply(ss)) { // skeppet är fortfarande i behov av resupply
                         // kolla efter supplyships
-                        ss.supplyWeapons(g.getMaxResupplyFromShip(location, ss.getOwner()));
+                        SpaceshipMutator.supplyWeapons(ss, SpaceshipPureFunctions.getMaxResupplyFromShip(location, ss.getOwner(), g));
                     }
                 }
             }
@@ -1980,7 +1937,7 @@ public class GalaxyUpdater {
             Player tempPlayer = (Player) g.players.get(x);
             if (!tempPlayer.isDefeated()) {
                 // r�kna antalet planeter spelaren har
-                boolean noPlanet = g.checkNoPlanet(tempPlayer);
+                boolean noPlanet = checkNoPlanet(tempPlayer, g);
 //          boolean noPlanet = true;
 //          for (int i = 0; i < g.planets.size();i++){
 //            Planet p = (Planet)g.planets.get(i);
@@ -2014,6 +1971,17 @@ public class GalaxyUpdater {
                 }
             }
         }
+    }
+
+    public boolean checkNoPlanet(Player aPlayer, Galaxy galaxy) {
+        boolean noPlanet = true;
+        for (int i = 0; i < galaxy.getPlanets().size(); i++) {
+            Planet p = (Planet) galaxy.getPlanets().get(i);
+            if (p.getPlayerInControl() == aPlayer) {
+                noPlanet = false;
+            }
+        }
+        return noPlanet;
     }
 
     protected void checkAbandonGame() {
@@ -2075,11 +2043,11 @@ public class GalaxyUpdater {
             Planet location = aShip.getLocation();
             if (location == null) {
                 // ship is retreating, remove it
-                g.removeShip(aShip);
+                SpaceshipMutator.removeShip(aShip, g);
             } else if (location.getPlayerInControl() != defeatedPlayer) {
                 planetsNoLongerBesieged.add(location);
                 // ship is not at own planet, remove it
-                g.removeShip(aShip);
+                SpaceshipMutator.removeShip(aShip, g);
             }
         }
         checkBesiegedPlanets(planetsNoLongerBesieged);
@@ -2090,7 +2058,7 @@ public class GalaxyUpdater {
         HashSet<Planet> planetsNoLongerBesieged = new HashSet<Planet>();
         for (Spaceship aShip : allShipsList) {
             Planet location = aShip.getLocation();
-            g.removeShip(aShip);
+            SpaceshipMutator.removeShip(aShip, g);
             if (location != null) {
                 if (location.getPlayerInControl() != defeatedPlayer) {
                     planetsNoLongerBesieged.add(location);
@@ -2280,29 +2248,29 @@ public class GalaxyUpdater {
                 Logger.finest("Hostile!");
 
 
-                (new SpaceBattlePerformer()).performCombat(tf1, tf2, g.getGameWorld().getInitMethod(), aPlanet.getName());
+                (new SpaceBattlePerformer()).performCombat(tf1, tf2, g.getGameWorld().getInitMethod(), aPlanet.getName(), g.getGameWorld(), g);
 
                 // 2019-12-26 Hantera detta, behöver vi detta? eller kan vi räkna ihop alla skepp nu när de ligger i SpaceBattleAttack. Får vara kvar ett tag till då enheter i listan används både av servern och klienten.
                 if (tf1.getPlayerName() != null) {
-                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
-                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo()));
+                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf1.getPlayerName()).getTurnInfo()));
                 }
 
                 if (tf2.getPlayerName() != null) {
-                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
-                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo().addToLatestShipsLostInSpace(destroyedShip));
+                    tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo()));
+                    tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipHelper.addToLatestShipsLostInSpace(destroyedShip, g.getPlayerByGovenorName(tf2.getPlayerName()).getTurnInfo()));
                 }
 
                 highlightsSpaceBattle(tf1.getTotalNrShips() > 0 ? tf1 : tf2, tf1.getTotalNrShips() > 0 ? tf2 : tf1, aPlanet);
 
                 //2019-12-30 Removing destroyed ships.
-                tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.removeShip(destroyedShip));
-                tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> g.removeShip(destroyedShip));
+                tf1.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipMutator.removeShip(destroyedShip, g));
+                tf2.getDestroyedShips().stream().map(ship -> ship.getSpaceship()).forEach(destroyedShip -> SpaceshipMutator.removeShip(destroyedShip, g));
 
                 //TODO 2019-12-26 Flyttad från SpaceBattlePerformer Undersök även möjligheten om skölderna ska återställas när alla strider är genomförda d.v.s. om en flotta slåss fler än en gång så kommer den inte få ladda om sin sköld i mellan. Är det bra eller dåligt? den vinnande flottan kommer då vara svagare i nästa strid. Flytta till checkSpaceshipBattles, metoden som anroppar den här, lägg i så fall logiken när alla strider på planeten är genomförda.
                 //TODO 2019-12-26 Dock ska troligen förstörda och skepp som har flytt nollställas om samma TF kan användas igen.
-                tf1.restoreShieldsAndCleanDestroyedAndRetreatedLists();
-                tf2.restoreShieldsAndCleanDestroyedAndRetreatedLists();
+                tf1.restoreShieldsAndCleanDestroyedAndRetreatedLists(getGalaxy().getGameWorld());
+                tf2.restoreShieldsAndCleanDestroyedAndRetreatedLists(getGalaxy().getGameWorld());
 
                 // reload winning sides squadrons if they have a carrierLocation
                 if (tf1.getTotalNrShips() > 0) {
@@ -2539,7 +2507,7 @@ public class GalaxyUpdater {
                         }
                         // check if attacker is alien
                         if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()) {
-                            boolean psychExist = g.getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
+                            boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
                             if (psychExist) { // attacker have psychWarfare ability
                                 // planet conquered by alien
                                 aPlanet.infectedByAttacker(attackingPlayer);
@@ -2563,7 +2531,7 @@ public class GalaxyUpdater {
                                     (new PlanetUpdater()).razed(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()));
                                     // check if attacker is alien
                                     if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()) {
-                                        boolean psychExist = g.getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
+                                        boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
                                         if (psychExist) { // attacker have psychWarfare ability
                                             // planet conquered by alien
                                             aPlanet.infectedByAttacker(attackingPlayer);
@@ -2577,7 +2545,7 @@ public class GalaxyUpdater {
                                 if (g.getPlayerByGovenorName(firstTF.getPlayerName()).isAlien()) {
                                     // check if resistance < 1
                                     if (aPlanet.checkSurrender(g)) {
-                                        boolean psychExist = g.getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName())) > 0;
+                                        boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
                                         if (psychExist) { // attacker have psychWarfare ability
                                             // planet conquered by alien
                                             aPlanet.infectedByAttacker(attackingPlayer);
@@ -2646,7 +2614,7 @@ public class GalaxyUpdater {
         }
         int oldRes = planet.getResistance();
 //        boolean infectedByAlien = getInfectedByAlien();
-        int psychWarfare = galaxy.getMaxPsychWarfare(planet, galaxy.getPlayerByGovenorName(tf.getPlayerName()));
+        int psychWarfare = getMaxPsychWarfare(planet, galaxy.getPlayerByGovenorName(tf.getPlayerName()), galaxy.getSpaceships(), galaxy.getGameWorld());
         if (psychWarfare > 0){
             // Detta var nog en bugg:  res -= psychWarfare; stog två gånger.
             //  res -= psychWarfare;
@@ -2660,7 +2628,7 @@ public class GalaxyUpdater {
                 galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the neutral planet " + planet.getName() + " the psych warfare bonus of the ships in your fleet have lowered its resistance by " + psychWarfare + ".");
             }
             // VIP psychWarfare bonus
-            VIP psychWarfareBonusVIP = galaxy.getPsychWarfareBonusVIPs(planet, galaxy.getPlayerByGovenorName(tf.getPlayerName()));
+            VIP psychWarfareBonusVIP = getPsychWarfareBonusVIPs(planet, galaxy.getPlayerByGovenorName(tf.getPlayerName()), galaxy);
             if (psychWarfareBonusVIP != null){
                 planet.setResistance(planet.getResistance() - psychWarfareBonusVIP.getPsychWarfareBonus());
                 if (planet.getPlayerInControl() != null){
@@ -3372,6 +3340,49 @@ public class GalaxyUpdater {
             }
         }
         return confList;
+    }
+
+    public int getMaxPsychWarfare(Planet aPlanet, Player aPlayer, List<Spaceship> spaceships, GameWorld gameWorld) {
+        List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aPlanet, spaceships);
+        int maxPW = 0;
+        for (Spaceship ss : shipsAtPlanet) {
+            if (ss.getPsychWarfare() > maxPW) {
+                maxPW = ss.getPsychWarfare();
+            }
+        }
+        return maxPW;
+    }
+
+    private VIP getPsychWarfareBonusVIPs(Planet aPlanet, Player aPlayer, Galaxy galaxy) {
+        List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aPlanet, galaxy.getSpaceships());
+        VIP highestPsychWarfareVIP = null;
+        for (Spaceship ss : shipsAtPlanet) {
+            VIP aVIP = findHighestVIPPsychWarfareBonus(ss, aPlayer, galaxy);
+            if (aVIP != null) {
+                if (highestPsychWarfareVIP == null) {
+                    highestPsychWarfareVIP = aVIP;
+                } else if (aVIP.getPsychWarfareBonus() > highestPsychWarfareVIP.getPsychWarfareBonus()) {
+                    highestPsychWarfareVIP = aVIP;
+                }
+            }
+        }
+        return highestPsychWarfareVIP;
+    }
+
+    private static VIP findHighestVIPPsychWarfareBonus(Spaceship aShip, Player aPlayer, Galaxy galaxy) {
+        VIP foundVIP = null;
+        int highestPsychWarfareBonus = 0;
+        for (int i = 0; i < galaxy.getAllVIPs().size(); i++) {
+            VIP tempVIP = (VIP) galaxy.getAllVIPs().get(i);
+            if ((tempVIP.hasPsychWarfareBonus()) & (tempVIP.getBoss() == aPlayer)
+                    & (tempVIP.getShipLocation() == aShip)) {
+                if (tempVIP.getPsychWarfareBonus() > highestPsychWarfareBonus) {
+                    highestPsychWarfareBonus = tempVIP.getPsychWarfareBonus();
+                    foundVIP = tempVIP;
+                }
+            }
+        }
+        return foundVIP;
     }
 
 }

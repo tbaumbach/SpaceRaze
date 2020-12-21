@@ -1,10 +1,11 @@
 package spaceraze.server.game.update;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Galaxy;
@@ -12,6 +13,7 @@ import spaceraze.world.Planet;
 import spaceraze.world.Player;
 import spaceraze.world.Spaceship;
 import spaceraze.battlehandler.spacebattle.TaskForce;
+import sr.server.SpaceshipHelper;
 
 public class CheckAbandonedSquadrons {
 	
@@ -58,8 +60,7 @@ public class CheckAbandonedSquadrons {
 					} else if (player != null && aShip.getLocation().getPlayerInControl() == null) { // neutral planet
 						if (!sqdSurvive) {
 							// handle sqds auto moves to carriers
-							List<Spaceship> carriersWithFreeSlots = galaxy
-									.getCarriersWithFreeSlotsInSystem(aShip.getLocation(), player);
+							List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(), player, null, galaxy);
 							if (carriersWithFreeSlots.size() > 0) {
 								Collections.shuffle(carriersWithFreeSlots);
 								Spaceship aCarrier = carriersWithFreeSlots.get(0);
@@ -79,7 +80,7 @@ public class CheckAbandonedSquadrons {
 							addSpace = true;
 						} else
 						// squadrons will survive if at least one carrier exist
-						if (!galaxy.playerHasCarrierAtPlanet(aShip.getOwner(), aShip.getLocation())) {
+						if (!playerHasCarrierAtPlanet(aShip.getOwner(), aShip.getLocation(), galaxy)) {
 							// add ship to remove list
 							removeShips.add(aShip);
 							addSpace = true;
@@ -89,8 +90,7 @@ public class CheckAbandonedSquadrons {
 							&& aShip.getOwner().getFaction() != aShip.getLocation().getPlayerInControl().getFaction()) {
 						if (!sqdSurvive) {
 							// handle sqds auto moves to carriers
-							List<Spaceship> carriersWithFreeSlots = galaxy
-									.getCarriersWithFreeSlotsInSystem(aShip.getLocation(), player);
+							List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(), player, null, galaxy);
 							if (carriersWithFreeSlots.size() > 0) {
 								Collections.shuffle(carriersWithFreeSlots);
 								Spaceship aCarrier = carriersWithFreeSlots.get(0);
@@ -109,7 +109,7 @@ public class CheckAbandonedSquadrons {
 								removeShips.add(aShip);
 								addSpace = true;
 							}
-						} else if (!galaxy.playerHasCarrierAtPlanet(aShip.getOwner(), aShip.getLocation())) {
+						} else if (!playerHasCarrierAtPlanet(aShip.getOwner(), aShip.getLocation(), galaxy)) {
 							// add ship to remove list
 							removeShips.add(aShip);
 							addSpace = true;
@@ -125,15 +125,15 @@ public class CheckAbandonedSquadrons {
 				owner.addToGeneral("Your sguadron " + aShip.getName()
 						+ " has been scuttled by it's crew because they had no supporting carrier in the system "
 						+ aShip.getLocation().getName() + ".");
-				owner.addToShipsLostInSpace(aShip);
-				galaxy.checkVIPsInDestroyedShips(aShip, owner);
+				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo());
+				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy);
 			}
 			Player controllingPlayer = thePlanet.getPlayerInControl();
 			if (controllingPlayer != null) {
 				if (controllingPlayer != aShip.getOwner()) {
 					if (aShip.getOwner() != null) {
-						controllingPlayer.addToGeneral(Functions.getDeterminedForm(aShip.getTypeName(), true) + " "
-								+ aShip.getTypeName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
+						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), galaxy.getGameWorld()).getName(), true) + " "
+								+ SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), galaxy.getGameWorld()).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
 								+ " has been scuttled in the " + thePlanet.getName()
 								+ " system, due to lack of carrier.");
 					} else {
@@ -141,7 +141,7 @@ public class CheckAbandonedSquadrons {
 					}
 				}
 			}
-			galaxy.removeShip(aShip);
+			SpaceshipMutator.removeShip(aShip, galaxy);
 		}
 		if (addSpace & (player != null)) {
 			player.addToGeneral("");
@@ -164,7 +164,7 @@ public class CheckAbandonedSquadrons {
 	  				if (aShip.getLocation().getPlayerInControl() == null){
 	  					if (!sqdSurvive){
 	  						// handle sqds auto moves to carriers
-	  						List<Spaceship> carriersWithFreeSlots = galaxy.getCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer);
+	  						List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer, null, galaxy);
 	  						if (carriersWithFreeSlots.size() > 0){
 	  							Collections.shuffle(carriersWithFreeSlots);
 	  							Spaceship aCarrier = carriersWithFreeSlots.get(0);
@@ -181,7 +181,7 @@ public class CheckAbandonedSquadrons {
 	  						addSpace = true;
 	  					}else
 	  					// planet is neutral
-	  					if (!galaxy.playerHasCarrierAtPlanet(aShip.getOwner(),aShip.getLocation())){
+	  					if (!playerHasCarrierAtPlanet(aShip.getOwner(),aShip.getLocation(), galaxy)){
 	  						// add ship to remove list
 	  						removeShips.add(aShip);
 	  						addSpace = true;
@@ -190,7 +190,7 @@ public class CheckAbandonedSquadrons {
 	  				if(aShip.getOwner().getFaction() != aShip.getLocation().getPlayerInControl().getFaction()){
 	  					if (!sqdSurvive){
 	  						// handle sqds auto moves to carriers
-	  						List<Spaceship> carriersWithFreeSlots = galaxy.getCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer);
+	  						List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer, null, galaxy);
 	  						if (carriersWithFreeSlots.size() > 0){
 	  							Collections.shuffle(carriersWithFreeSlots);
 	  							Spaceship aCarrier = carriersWithFreeSlots.get(0);
@@ -207,7 +207,7 @@ public class CheckAbandonedSquadrons {
 	  							addSpace = true;
 	  						}
 	  					}else
-	  					if (!galaxy.playerHasCarrierAtPlanet(aShip.getOwner(),aShip.getLocation())){
+	  					if (!playerHasCarrierAtPlanet(aShip.getOwner(),aShip.getLocation(), galaxy)){
 	  						// add ship to remove list
 	  						removeShips.add(aShip);
 	  						addSpace = true;
@@ -223,12 +223,61 @@ public class CheckAbandonedSquadrons {
 	  			}
 	  			Player owner = aShip.getOwner();
 	  			if (owner != null) {
-	  				galaxy.checkVIPsInDestroyedShips(aShip, owner);
+					VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy);
 	  			}
-	  	        galaxy.removeShip(aShip);
+			  SpaceshipMutator.removeShip(aShip, galaxy);
 	  	  }
 	  	  if (addSpace){
 	  		  aPlayer.addToGeneral("");
 	  	  }
 	    }
+
+	public List<Spaceship> getOtherCarriersWithFreeSlotsInSystem(Planet aLocation, Player aPlayer, Spaceship aCarrier, Galaxy galaxy) {
+		List<Spaceship> carriersWithFreeSlots = new ArrayList<Spaceship>();
+		List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aLocation, galaxy.getSpaceships());
+		for (Spaceship spaceship : shipsAtPlanet) {
+			if (SpaceshipPureFunctions.isCarrier(spaceship, galaxy.getGameWorld())) {
+				int maxSlots = SpaceshipPureFunctions.getSpaceshipTypeByKey(spaceship.getTypeKey(), galaxy.getGameWorld()).getSquadronCapacity();
+				int slotsFull = SpaceshipPureFunctions.getNoSquadronsAssignedToCarrier(spaceship, galaxy.getSpaceships());
+				int sqdMovingToCarrier = getNoSquadronsMovingToCarrier(spaceship, galaxy.getSpaceships());
+				if ((slotsFull + sqdMovingToCarrier) < maxSlots) {
+					carriersWithFreeSlots.add(spaceship);
+				}
+			}
+		}
+		return carriersWithFreeSlots;
+	}
+
+	private static int getNoSquadronsMovingToCarrier(Spaceship aCarrier, List<Spaceship> spaceships) {
+		int count = 0;
+		Player aPlayer = aCarrier.getOwner();
+		List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aCarrier.getLocation(), spaceships);
+		for (Spaceship aSpaceship : shipsAtPlanet) {
+			if (aSpaceship.isSquadron()) {
+				// check if sstemp has a move order to the carrier
+				if (aPlayer != null) {
+					boolean moveToCarrierOrder = aPlayer.checkShipToCarrierMove(aSpaceship, aCarrier);
+					if (moveToCarrierOrder) {
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+
+	private static boolean playerHasCarrierAtPlanet(Player aPlayer, Planet aPlanet, Galaxy galaxy) {
+		boolean found = false;
+		for (Iterator<Spaceship> iter = galaxy.getSpaceships().iterator(); iter.hasNext();) {
+			Spaceship aShip = iter.next();
+			if (aShip.getOwner() == aPlayer) {
+				if (aShip.getLocation() == aPlanet) {
+					if (SpaceshipPureFunctions.isCarrier(aShip, galaxy.getGameWorld())) {
+						found = true;
+					}
+				}
+			}
+		}
+		return found;
+	}
 }

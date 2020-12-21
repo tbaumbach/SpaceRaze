@@ -1,6 +1,7 @@
 package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.BlackMarketPureFunctions;
+import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
@@ -41,7 +42,7 @@ public class BlackMarketPerformer {
             nrOffers = Functions.getRandomInt(1,2);
         }
         for (int i = 0; i < nrOffers; i++){
-            BlackMarketOffer tempOffer = BlackMarketPerformer.createBlackMarketOffer(g, g.getUniqueIdCounter(CounterType.BLACK_MARKET).getUniqueId());
+            BlackMarketOffer tempOffer = BlackMarketPerformer.createBlackMarketOffer(g, UniqueIdHandler.getUniqueIdCounter(g, CounterType.BLACK_MARKET).getUniqueId());
             g.getCurrentOffers().add(tempOffer);
             g.addBlackMarketMessages(null,"New item for sale: a " + tempOffer.getString() + " is for sale at the Black Market.");
         }

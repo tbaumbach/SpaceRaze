@@ -1,6 +1,9 @@
 package sr.server;
 
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.orders.ShipMovement;
@@ -69,11 +72,11 @@ public class SpaceshipHelper {
                 if (spaceship.getRetreatingTo() == null){ // there is no planet to retreat to
                     ti.addToLatestGeneralReport("Your ship " + spaceship.getName() + " has been scuttled by it's crew because they had nowhere to retreat to.");
                     if (spaceship.getOwner() != null) {
-                        galaxy.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner());
+                        VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
                         galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
-                        spaceship.getOwner().getTurnInfo().addToLatestShipsLostInSpace(spaceship);
+                        addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo());
                     }
-                    galaxy.removeShip(spaceship);
+                    SpaceshipMutator.removeShip(spaceship, galaxy);
                 }else{ // there is a planet to retreat to
                     // running from is unchanged
                     // retreating is still true
@@ -93,6 +96,59 @@ public class SpaceshipHelper {
                 spaceship.setLocation(destination);
                 ti.addToLatestGeneralReport(spaceship.getName() + " has moved from " + spaceship.getOldLocation().getName() + " to " + spaceship.getLocation().getName() + ".");
             }
+        }
+    }
+
+    public static void addToLatestShipsLostInSpace(Spaceship ss, TurnInfo turnInfo) {
+        Report r = turnInfo.getGeneralReports().get( turnInfo.getGeneralReports().size() - 1);
+        addShipLostInSpace(ss, r);
+    }
+
+    private static void addShipLostInSpace(Spaceship ss, Report report) {
+        report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), ss.getOwner().getGalaxy().getGameWorld()).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
+    }
+
+    public static void moveRetreatingSquadron(Spaceship spaceship, TurnInfo ti, Galaxy galaxy) {
+        // The only ships without range who can be retreating are squadrons
+        // in a retreating carrier, and they move to where the carrier has
+        // moved. And is destroyed if the cartrier is destroyed.
+
+        // First check if carrier is destroyed
+        if (spaceship.getCarrierLocation().isDestroyed()) {
+            ti.addToLatestGeneralReport("Your squadron "
+                    + spaceship.getName()
+                    + " has been destroyed when it's retreating carrier "
+                    + spaceship.getCarrierLocation().getName()
+                    + " was scuttled by it's crew.");
+            if (spaceship.getOwner() != null) {
+                VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
+                galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
+                addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo());
+            }
+            SpaceshipMutator.removeShip(spaceship, galaxy);
+        } else if (spaceship.getCarrierLocation().isRetreating()) { // carrier is still
+            // retreating
+            // carrier is still in retreat
+            // location is still null
+            // retreat is still true
+            // runningFrom is unchanged
+            spaceship.setOldLocation(spaceship.getCarrierLocation().getOldLocation());
+            ti.addToLatestGeneralReport("Your squadron " + spaceship.getName()
+                    + " is retreating with it's carrier "
+                    + spaceship.getCarrierLocation().getName() + " and just left "
+                    + spaceship.getOldLocation().getName() + ".");
+        } else {
+            // carrier is no longer retreating
+            // location = destination;
+            spaceship.setLocation(spaceship.getCarrierLocation().getLocation());
+            ti.addToLatestGeneralReport("Your squadron " + spaceship.getName()
+                    + " has arrived to " + spaceship.getLocation().getName()
+                    + " after retreating with "
+                    + spaceship.getCarrierLocation().getName() + ".");
+            spaceship.setRunningTo(null);
+            spaceship.setRunningFrom(null);
+            spaceship.setOldLocation(null);
+            spaceship.setRetreating(false);
         }
     }
 }

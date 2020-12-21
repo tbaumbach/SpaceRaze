@@ -5,7 +5,7 @@ import java.util.Collections;
 import spaceraze.world.Faction;
 import spaceraze.world.SpaceshipType;
 import spaceraze.world.VIPType;
-import spaceraze.world.comparator.SpaceshipTypeComparator;
+import spaceraze.servlethelper.comparator.SpaceshipTypeComparator;
 
 public class FactionHelper {
 	

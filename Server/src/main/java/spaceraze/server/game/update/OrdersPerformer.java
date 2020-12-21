@@ -1,18 +1,17 @@
 package spaceraze.server.game.update;
 
-import spaceraze.servlethelper.game.DiplomacyPureFunctions;
-import spaceraze.servlethelper.game.VipPureFunctions;
+import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.vip.VipMutator;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
-import spaceraze.world.diplomacy.*;
 import spaceraze.world.enums.HighlightType;
 import spaceraze.world.orders.*;
 import sr.server.SpaceshipHelper;
 
-import java.util.Collections;
 import java.util.List;
 
 public class OrdersPerformer {
@@ -85,8 +84,8 @@ public class OrdersPerformer {
             Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getShipSelfDestructs().get(i));
             Logger.finest("shipSelfDestructs: " + orders.getShipSelfDestructs().get(i));
             if (tempss != null) {
-                galaxy.removeShip(tempss);
-                galaxy.checkVIPsInSelfDestroyedShips(tempss, p);
+                SpaceshipMutator.removeShip(tempss, galaxy);
+                VipMutator.checkVIPsInSelfDestroyedShips(tempss, p, galaxy);
                 // remove any troops in selfdestructed ship
                 List<Troop> troopsInShip = galaxy.findAllTroopsOnShip(tempss);
                 for (Troop troop : troopsInShip) {
@@ -114,8 +113,8 @@ public class OrdersPerformer {
             Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getScreenedShips().get(i));
             //      Player tempPlayer = tempss.getOwner();
             if (tempss != null) {
-                tempss.setScreened(!tempss.getScreened());
-                ti.addToLatestGeneralReport("Your ship " + tempss.getName() + " has changed screened status to: " + tempss.getScreened());
+                tempss.setScreened(!tempss.isScreened());
+                ti.addToLatestGeneralReport("Your ship " + tempss.getName() + " has changed screened status to: " + tempss.isScreened());
             }
         }
         // preform troop selfdestructs

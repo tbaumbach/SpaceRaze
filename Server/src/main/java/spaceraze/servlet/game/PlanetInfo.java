@@ -7,6 +7,7 @@ import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
+import spaceraze.servlethelper.map.MapPureFunctions;
 import spaceraze.world.Building;
 import spaceraze.world.Galaxy;
 import spaceraze.world.Planet;
@@ -83,7 +84,7 @@ public class PlanetInfo {
 		boolean haveSpy = (galaxy.findVIPSpy(planet,player) != null);
 		boolean alliedSpy = PlanetPureFunctions.isItAlliedSpyOnPlanet(player, planet, galaxy);
 		boolean spy = haveSpy || alliedSpy;
-		boolean surveyShip = (galaxy.findSurveyShip(planet,player) != null);
+		boolean surveyShip = SpaceshipPureFunctions.findSurveyShip(planet,player, galaxy.getSpaceships(), galaxy.getGameWorld()) != null;
 		boolean alliedSurveyShip = PlanetPureFunctions.isItAlliesSurveyShipsOnPlanet(player, planet, galaxy);
 		boolean surveyVIP = (galaxy.findSurveyVIPonShip(planet,player) != null);
 		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy);
@@ -164,8 +165,8 @@ public class PlanetInfo {
         // loopa igenom alla spelare och kolla efter flottor
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
-        		int shipSize = g.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer);
-        		boolean civilianExists = !player.getGalaxy().getLargestShipSizeOnPlanet(planet,tempPlayer,true).equals("");
+        		int shipSize = MapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer, g);
+        		boolean civilianExists = !MapPureFunctions.getLargestShipSizeOnPlanet(planet,tempPlayer,true, player.getGalaxy()).equals("");
         		if ((shipSize > -1) | civilianExists){
         			FleetInfo fleet = new FleetInfo(tempPlayer.getGovernorName(),shipSize,civilianExists);
         			fleets.add(fleet);
@@ -173,7 +174,7 @@ public class PlanetInfo {
         	}
         }
         // kolla efter neutrala skepp
-        int shipSize = player.getGalaxy().getLargestLookAsMilitaryShipSizeOnPlanet(planet,null);
+        int shipSize = MapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,null, g);
         if (shipSize > -1){
         	FleetInfo fleet = new FleetInfo(null,shipSize,false);
     		fleets.add(fleet);
@@ -281,7 +282,7 @@ public class PlanetInfo {
 			if(spaceship.isSquadron() && spaceship.getCarrierLocation() != null){
 				squdronsOnShip.add(spaceship);
 			}else{
-				ships.add(new ShipInfo(spaceship));
+				ships.add(new ShipInfo(spaceship, galaxy.getGameWorld()));
 			}
 		}
 		

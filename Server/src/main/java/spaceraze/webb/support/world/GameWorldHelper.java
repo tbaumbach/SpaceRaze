@@ -9,7 +9,7 @@ import spaceraze.util.general.Logger;
 import spaceraze.world.Faction;
 import spaceraze.world.GameWorld;
 import spaceraze.world.SpaceshipType;
-import spaceraze.world.comparator.SpaceshipTypeComparator;
+import spaceraze.servlethelper.comparator.SpaceshipTypeComparator;
 
 public class GameWorldHelper {
 	

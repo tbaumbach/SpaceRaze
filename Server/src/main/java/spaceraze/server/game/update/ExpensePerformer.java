@@ -1,10 +1,13 @@
 package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.BuildingPureFunctions;
+import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -43,7 +46,7 @@ public class ExpensePerformer {
             String uniqueBuildingString="";
             boolean buildBuilding = true;
 
-            VIP tempVIP = p.getGalaxy().findVIPBuildingBuildBonus(planet,p,o);
+            VIP tempVIP = VipPureFunctions.findVIPBuildingBuildBonus(planet,p,o, p.getGalaxy());
 
             if(buildingType.isWorldUnique()){
                 if(!BuildingPureFunctions.isWorldUniqueBuild(p.getGalaxy(), buildingType)){
@@ -81,7 +84,7 @@ public class ExpensePerformer {
                 planet.getPlayerInControl().removeFromTreasury(buildingType.getBuildCost(tempVIP));
 
                 Building tempBuilding = null;
-                tempBuilding = buildingType.getBuilding(planet, g);
+                tempBuilding = buildingType.getBuilding(planet, UniqueIdHandler.getUniqueIdCounter(g, CounterType.BUILDING).getUniqueId());
                 // add the building to the planet.
                 planet.addBuilding(tempBuilding);
                 // if the building have any parent building this is a upgrade and the parent building should be removed
@@ -134,14 +137,14 @@ public class ExpensePerformer {
 
             if(buildShip){
                 Spaceship sstemp = null;
-                VIP tempVIP = p.getGalaxy().findVIPShipBuildBonus(planet,p,o);
-                VIP tempVIP2 = p.getGalaxy().findVIPTechBonus(planet,p,o);
+                VIP tempVIP = VipPureFunctions.findVIPShipBuildBonus(planet,p,o, p.getGalaxy());
+                VIP tempVIP2 = VipPureFunctions.findVIPTechBonus(planet,p,o, p.getGalaxy());
                 int factionTechBonus = p.getFaction().getTechBonus();
 
                 sstemp = SpaceshipMutator.createSpaceShip(p, sst, tempVIP2, factionTechBonus, planet.getBuildingTechBonus());
                 //sstemp = sst.getShip(tempVIP2,factionTechBonus,planet.getBuildingTechBonus());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
-                Logger.finest(" -buildship planet: " + sstemp.getTypeName());
+                Logger.finest(" -buildship planet: " + SpaceshipPureFunctions.getSpaceshipTypeByKey(sstemp.getTypeKey(), galaxy.getGameWorld()).getName());
                 sstemp.setOwner(planet.getPlayerInControl());
                 sstemp.setLocation(planet);
                 g.addSpaceship(sstemp);
@@ -194,11 +197,11 @@ public class ExpensePerformer {
 
                 Troop tempTroop = null;
 
-                VIP tempVIP = p.getGalaxy().findVIPTroopBuildBonus(planet,p,o);
-                VIP tempVIP2 = p.getGalaxy().findVIPTechBonus(planet,p,o);
+                VIP tempVIP = VipPureFunctions.findVIPTroopBuildBonus(planet,p,o, p.getGalaxy());
+                VIP tempVIP2 =VipPureFunctions.findVIPTechBonus(planet,p,o,  p.getGalaxy());
                 int factionTechBonus = p.getFaction().getTechBonus();
 
-                tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), galaxy.getUniqueIdCounter(CounterType.TROOP).getUniqueId());
+                tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
                 Logger.finest(" -buildship planet: " + tempTroop.getUniqueName());
                 tempTroop.setOwner(planet.getPlayerInControl());

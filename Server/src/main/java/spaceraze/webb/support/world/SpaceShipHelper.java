@@ -77,12 +77,12 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.getArmorHuge() + "</td>");
 		sb.append("<td><nobr>" + spaceshipType.getIncomeOpenString() + "</nobr></td>");
 		sb.append("<td><nobr>" + spaceshipType.getIncomeClosedString() + "</nobr></td>");
-		if (!spaceshipType.getInitSupport()) {
+		if (!spaceshipType.isInitSupport()) {
 			sb.append("<td>" + spaceshipType.getIncreaseInitiative() + "</td>");
 		} else {
 			sb.append("<td>0</td>");
 		}
-		if (spaceshipType.getInitSupport()) {
+		if (spaceshipType.isInitSupport()) {
 			sb.append("<td>" + spaceshipType.getIncreaseInitiative() + "</td>");
 		} else {
 			sb.append("<td>0</td>");
@@ -94,7 +94,7 @@ public class SpaceShipHelper {
 		sb.append("<td></td>");
 		sb.append("<td>" + spaceshipType.getPsychWarfare() + "</td>");
 		sb.append("<td>" + spaceshipType.getSquadronCapacity() + "</td>");
-		sb.append("<td>" + spaceshipType.getNoRetreat() + "</td>");
+		sb.append("<td>" + spaceshipType.isNoRetreat() + "</td>");
 		sb.append("<td>" + spaceshipType.getSupply().getName() + "</td>");
 		sb.append("<td>" + spaceshipType.isPlanetarySurvey() + "</td>");
 		sb.append("<td>" + spaceshipType.isCanAppearOnBlackMarket() + "</td>");
