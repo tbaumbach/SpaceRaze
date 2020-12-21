@@ -1796,7 +1796,7 @@ public class GalaxyUpdater {
                 if (location != null) {  // skeppet är ej på flykt
                     if (location.getPlayerInControl() == ss.getOwner()) {  // skeppet är vid en av spelarens planeter
                         if (SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getSize().getSlots() <= location.getMaxWharfsSize()) {  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
-                            ss.performRepairs();
+                            SpaceshipMutator.performRepairs(ss);
                         }
                     }
                 }
