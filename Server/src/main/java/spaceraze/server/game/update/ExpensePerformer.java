@@ -7,6 +7,7 @@ import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -110,7 +111,7 @@ public class ExpensePerformer {
             SpaceshipType sst = PlayerPureFunctions.findOwnSpaceshipType(expense.getSpaceshipTypeName(), p, galaxy);
 
             if(sst.isWorldUnique()){
-                if(!sst.isWorldUniqueBuild(p.getGalaxy())){
+                if(!SpaceshipPureFunctions.isWorldUniqueBuild(p.getGalaxy(), sst)){
                     uniqueBuildingString = "Congratulations you have build the world unique " + sst.getName() + ".";
                 }else{// The building can't be build.
                     buildShip =  false;
@@ -118,7 +119,7 @@ public class ExpensePerformer {
                 }
             }else
             if(sst.isFactionUnique()){
-                if(!sst.isFactionUniqueBuild(p)){
+                if(!SpaceshipPureFunctions.isFactionUniqueBuild(p, sst)){
                     uniqueBuildingString = "Congratulations you have build the faction unique " + sst.getName() + ".";
                 }else{// The building can't be build.
                     buildShip =  false;
@@ -126,7 +127,7 @@ public class ExpensePerformer {
                 }
             }else
             if(sst.isPlayerUnique()){
-                if(!sst.isPlayerUniqueBuild(p)){
+                if(!SpaceshipPureFunctions.isPlayerUniqueBuild(p, sst)){
                     uniqueBuildingString = "You have build the player unique " + sst.getName() + " and you can not build more of this type.";
 
                 }else{// The building can't be build. Should never happend if the orders is checked then the select box is filled.
@@ -150,9 +151,9 @@ public class ExpensePerformer {
                 g.addSpaceship(sstemp);
                 ti.addToLatestExpenseReport("You have built a new " + sst.getName() + " (named " + sstemp.getName() + ") at " + planet.getName() + ".");
                 // TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
-                planet.getPlayerInControl().removeFromTreasury(sst.getBuildCost(tempVIP));
+                planet.getPlayerInControl().removeFromTreasury(SpaceshipPureFunctions.getBuildCost(sst, tempVIP));
                 Logger.finest(" -buildship loc name: " + planet.getName());
-                ti.addToLatestExpenseReport("Cost to build new " + sst.getName() + ": " + sst.getBuildCost(tempVIP) + ".");
+                ti.addToLatestExpenseReport("Cost to build new " + sst.getName() + ": " + SpaceshipPureFunctions.getBuildCost(sst, tempVIP) + ".");
 
             } // the ship is unique and cant be build.
             if(!uniqueBuildingString.equalsIgnoreCase("")){
@@ -168,28 +169,28 @@ public class ExpensePerformer {
             TroopType troopType = PlayerPureFunctions.findOwnTroopType(expense.getTroopTypeName(), g.getPlayer(expense.getPlayerName()), g);
 
             if(troopType.isWorldUnique()){
-                if(!troopType.isWorldUniqueBuild(p.getGalaxy())){
-                    uniqueBuildingString = "Congratulations you have build the world unique " + troopType.getUniqueName() + ".";
+                if(!TroopPureFunctions.isWorldUniqueBuild(p.getGalaxy(), troopType)){
+                    uniqueBuildingString = "Congratulations you have build the world unique " + troopType.getName() + ".";
                 }else{// The building can't be build.
                     buildTroop =  false;
-                    uniqueBuildingString = "You can not build the world unique " + troopType.getUniqueName() + " troop. Some other organisation was faster then you.";
+                    uniqueBuildingString = "You can not build the world unique " + troopType.getName() + " troop. Some other organisation was faster then you.";
                 }
             }else
             if(troopType.isFactionUnique()){
-                if(!troopType.isFactionUniqueBuild(p)){
-                    uniqueBuildingString = "Congratulations you have build the faction unique " + troopType.getUniqueName() + ".";
+                if(!TroopPureFunctions.isFactionUniqueBuild(p, troopType)){
+                    uniqueBuildingString = "Congratulations you have build the faction unique " + troopType.getName() + ".";
                 }else{// The building can't be build.
                     buildTroop =  false;
-                    uniqueBuildingString = "You can not build the faction unique " + troopType.getUniqueName() + " troop. Some other leader was faster then you.";
+                    uniqueBuildingString = "You can not build the faction unique " + troopType.getName() + " troop. Some other leader was faster then you.";
                 }
             }else
             if(troopType.isPlayerUnique()){
-                if(!troopType.isPlayerUniqueBuild(p)){
-                    uniqueBuildingString = "You have build the player unique " + troopType.getUniqueName() + " and you can not build more of this type.";
+                if(!TroopPureFunctions.isPlayerUniqueBuild(p, troopType)){
+                    uniqueBuildingString = "You have build the player unique " + troopType.getName() + " and you can not build more of this type.";
 
                 }else{// The building can't be build. Should never happend if the orders is checked then the select box is filled.
                     buildTroop =  false;
-                    uniqueBuildingString = "You can not build the player unique " + troopType.getUniqueName() + " troop, you have already the troop.";
+                    uniqueBuildingString = "You can not build the player unique " + troopType.getName() + " troop, you have already the troop.";
                 }
             }
 
@@ -203,15 +204,15 @@ public class ExpensePerformer {
 
                 tempTroop = TroopMutator.createTroop(p, troopType, tempVIP2, factionTechBonus, planet.getBuildingTechBonus(), UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
-                Logger.finest(" -buildship planet: " + tempTroop.getUniqueName());
+                Logger.finest(" -buildship planet: " + tempTroop.getName());
                 tempTroop.setOwner(planet.getPlayerInControl());
                 tempTroop.setPlanetLocation(planet);
                 g.addTroop(tempTroop);
-                ti.addToLatestExpenseReport("You have built a new " + troopType.getUniqueName() + " (named " + tempTroop.getUniqueName() + ") at " + planet.getName() + ".");
+                ti.addToLatestExpenseReport("You have built a new " + troopType.getName() + " (named " + tempTroop.getName() + ") at " + planet.getName() + ".");
                 // TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
-                planet.getPlayerInControl().removeFromTreasury(troopType.getCostBuild(tempVIP));
+                planet.getPlayerInControl().removeFromTreasury(TroopPureFunctions.getCostBuild(troopType, tempVIP));
                 Logger.finest(" -buildtroop loc name: " + planet.getName());
-                ti.addToLatestExpenseReport("Cost to build new " + troopType.getUniqueName() + ": " + troopType.getCostBuild(tempVIP) + ".");
+                ti.addToLatestExpenseReport("Cost to build new " + troopType.getName() + ": " + TroopPureFunctions.getCostBuild(troopType, tempVIP) + ".");
 
             }//else{// the ship is unique and cant be build.
             if(!uniqueBuildingString.equalsIgnoreCase("")){

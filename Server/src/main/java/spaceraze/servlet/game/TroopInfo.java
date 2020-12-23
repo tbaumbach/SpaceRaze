@@ -3,6 +3,8 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
+import spaceraze.world.GameWorld;
 import spaceraze.world.Troop;
 import spaceraze.world.enums.TypeOfTroop;
 
@@ -26,22 +28,22 @@ public class TroopInfo {
 	
 	private List<VIPInfo> vips;
 
-	TroopInfo(Troop aTroop) {
+	TroopInfo(Troop aTroop, GameWorld gameWorld) {
 
-		type = aTroop.getTroopType().getUniqueName();
-		name = aTroop.getUniqueName();
-		shortName = aTroop.getUniqueShortName();
+		type = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getName();
+		name = aTroop.getName();
+		shortName = aTroop.getShortName();
 		id = aTroop.getUniqueId();
-		typeOfTroop = aTroop.getTroopType().getTypeOfTroop(); 
+		typeOfTroop = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getTypeOfTroop();
 		kills = aTroop.getKills();
-		currentHP = aTroop.getCurrentDC();
-		maxHP = aTroop.getMaxDC();
-		position = aTroop.getTroopType().getDefaultPosition().toString();
+		currentHP = aTroop.getCurrentDamageCapacity();
+		maxHP = aTroop.getDamageCapacity();
+		position = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getDefaultPosition().toString();
 		techWhenBuilt = aTroop.getTechWhenBuilt();
-		attackInfantry = aTroop.getAttackInfantry();
-		attackArmored = aTroop.getAttackArmored();
-		attackArtillery = aTroop.getAttackArtillery();
-		vips =  new ArrayList<VIPInfo>();
+		attackInfantry = TroopPureFunctions.getAttackInfantry(aTroop);
+		attackArmored = TroopPureFunctions.getAttackArmored(aTroop);
+		attackArtillery = TroopPureFunctions.getAttackArtillery(aTroop);
+		vips =  new ArrayList<>();
 		
 	}
 

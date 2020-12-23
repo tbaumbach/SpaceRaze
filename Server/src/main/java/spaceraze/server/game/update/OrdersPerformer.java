@@ -1,6 +1,7 @@
 package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
@@ -32,12 +33,12 @@ public class OrdersPerformer {
         // perform troop to carrier
         for (TroopToCarrierMovement aTroopToCarrierMovement : orders.getTroopToCarrierMoves()) {
             Logger.finest("aTroopToCarrierMovement: " + aTroopToCarrierMovement.toString());
-            aTroopToCarrierMovement.performMove(ti, galaxy);
+            performMove(aTroopToCarrierMovement, ti, galaxy);
         }
         // perform troop to planet moves (was spaceship moves)
         for (TroopToPlanetMovement aTroopToPlanetMovement : orders.getTroopToPlanetMoves()) {
             Logger.finest("aTroopToPlanetMovement: " + aTroopToPlanetMovement.toString());
-            aTroopToPlanetMovement.performMove(ti, galaxy);
+            performMove(aTroopToPlanetMovement, ti, galaxy);
         }
         // perform squadrons to carrier moves
         for (int i = 0; i < orders.getShipToCarrierMoves().size(); i++) {
@@ -89,8 +90,8 @@ public class OrdersPerformer {
                 // remove any troops in selfdestructed ship
                 List<Troop> troopsInShip = galaxy.findAllTroopsOnShip(tempss);
                 for (Troop troop : troopsInShip) {
-                    galaxy.removeTroop(troop);
-                    ti.addToLatestGeneralReport("When " + tempss.getName() + " was scuttled your troop " + troop.getUniqueName() + " has also been destroyed.");
+                    TroopMutator.removeTroop(troop, galaxy);
+                    ti.addToLatestGeneralReport("When " + tempss.getName() + " was scuttled your troop " + troop.getName() + " has also been destroyed.");
                 }
                 ti.addToLatestGeneralReport("On your command " + tempss.getName() + " has been scuttled by its crew.");
             }
@@ -121,9 +122,9 @@ public class OrdersPerformer {
         for (int aTroopId : orders.getTroopSelfDestructs()) {
             Troop aTroop = galaxy.findTroop(aTroopId);
             if (aTroop != null) {
-                galaxy.removeTroop(aTroop);
-                galaxy.checkVIPsInSelfDestroyedTroops(aTroop, p);
-                ti.addToLatestGeneralReport("On your command " + aTroop.getUniqueName() + " has been disbanded.");
+                TroopMutator.removeTroop(aTroop, galaxy);
+                checkVIPsInSelfDestroyedTroops(aTroop, p, galaxy);
+                ti.addToLatestGeneralReport("On your command " + aTroop.getName() + " has been disbanded.");
             }
         }
 
@@ -154,6 +155,113 @@ public class OrdersPerformer {
                 }
             }
         }
+    }
+
+    public static void checkVIPsInSelfDestroyedTroops(Troop aTroop, Player aPlayer, Galaxy galaxy) {
+        List<VIP> allVIPsOnTroop = VipPureFunctions.findAllVIPsOnTroop(aTroop, galaxy.getAllVIPs());
+        for (VIP aVip : allVIPsOnTroop) {
+            TurnInfo ti = aVip.getBoss().getTurnInfo();
+            // troop is aboard ship -> move VIP to ship
+            if (aTroop.getShipLocation() != null) {
+                ti.addToLatestGeneralReport(aVip.getName() + " has been forced to move when " + aTroop.getName()
+                        + " was selfdestructed.");
+                aVip.moveVIP(aTroop.getShipLocation(), ti);
+            } else { // troop is on planet
+                Planet thePlanet = aTroop.getPlanetLocation();
+                // own planet -> move VIP to planet
+                if (thePlanet.getPlayerInControl() == aVip.getBoss()) {
+                    ti.addToLatestGeneralReport(aVip.getName() + " has been forced to move when "
+                            + aTroop.getName() + " was selfdestructed.");
+                    aVip.moveVIP(thePlanet, ti);
+                } else if (thePlanet.getPlayerInControl() == null) {
+                    // neutral planet
+                    if (aVip.canVisitNeutralPlanets()) {
+                        // VIP can visit neutral planets -> move VIP to planet
+                        ti.addToLatestGeneralReport(aVip.getName() + " has moved from " + aTroop.getName()
+                                + " to " + thePlanet.getName());
+                        ti.addToLatestVIPReport(
+                                aVip.getName() + " has been forced to move to the planet " + thePlanet.getName()
+                                        + " when your troop " + aTroop.getName() + " was selfdestructed.");
+                        aVip.setLocation(thePlanet);
+                    } else {
+                        // otherwise VIP is killed
+                        galaxy.getAllVIPs().remove(aVip);
+                        aPlayer.addToVIPReport("Your " + aVip.getName() + " has been killed when your troop "
+                                + aTroop.getName() + " was selfdestructed at " + thePlanet.getName() + ".");
+                        aPlayer.addToHighlights(aVip.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                    }
+                } else {
+                    // enemy planet
+                    if (aVip.canVisitEnemyPlanets()) {
+                        // VIP can visit enemy planets -> move VIP to planet
+                        ti.addToLatestGeneralReport(aVip.getName() + " has moved from " + aTroop.getName()
+                                + " to " + thePlanet.getName());
+                        ti.addToLatestVIPReport(
+                                aVip.getName() + " has been forced to move to the planet " + thePlanet.getName()
+                                        + " when your troop " + aTroop.getName() + " was selfdestructed.");
+                        aVip.setLocation(thePlanet);
+                    } else {
+                        // otherwise VIP is killed
+                        galaxy.getAllVIPs().remove(aVip);
+                        aPlayer.addToVIPReport("Your " + aVip.getName() + " has been killed when your troop "
+                                + aTroop.getName() + " was selfdestructed at " + thePlanet.getName() + ".");
+                        aPlayer.addToHighlights(aVip.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void performMove(TroopToPlanetMovement troopToPlanetMovement, TurnInfo ti, Galaxy aGalaxy) {
+        Troop aTroop = aGalaxy.findTroop(troopToPlanetMovement.getTroopId());
+        Planet aPlanet = aGalaxy.getPlanet(troopToPlanetMovement.getPlanetName());
+        if (aTroop == null || aPlanet == null) {
+            Logger.severe("performMove Error: troopId= " + troopToPlanetMovement.getTroopId() + " planetName= " + troopToPlanetMovement.getPlanetName());
+        } else {
+            Logger.finest("performMove: " + aTroop.getName() + " destination: " + aPlanet.getName());
+            move(aTroop, aPlanet, ti);
+            aTroop.setLastPlanetMoveTurn(troopToPlanetMovement.getTurn());
+        }
+    }
+
+    public static void move(Troop troop, Planet destination, TurnInfo ti){
+        // move troop from ship
+        if(troop.getShipLocation() == null || destination == null){
+            Logger.severe("Error: shipLocation= " + troop.getShipLocation() + " destination= " + destination);
+        }else{
+            troop.setOldShipLocation(troop.getShipLocation());
+            troop.setShipLocation(null);
+            troop.setPlanetLocation(destination);
+            ti.addToLatestGeneralReport(troop.getName() + " has moved from " + troop.getOldShipLocation().getName() + " to " + troop.getPlanetLocation().getName() + ".");
+        }
+    }
+
+    public static void performMove(TroopToCarrierMovement troopToCarrierMovement, TurnInfo ti, Galaxy aGalaxy){
+        Troop aTroop = aGalaxy.findTroop(troopToCarrierMovement.getTroopId());
+        Spaceship destinationCarrier = aGalaxy.findSpaceshipByUniqueId(troopToCarrierMovement.getDestinationCarrierId());
+        if(aTroop == null || destinationCarrier == null){
+            Logger.severe( "performMove Error: troopId= " + troopToCarrierMovement.getTroopId() + " destinationCarrierId= " + troopToCarrierMovement.getDestinationCarrierId());
+        }else{
+            Logger.finest( "performMove: " + aTroop.getName() + " destination: " + destinationCarrier.getName());
+            move(aTroop, destinationCarrier, ti);
+        }
+
+    }
+
+    public static void move(Troop troop, Spaceship destinationCarrier, TurnInfo ti) {
+        String oldLocString = null;
+        if (troop.getPlanetLocation() == null) { // old location is a ship
+            troop.setOldShipLocation(troop.getShipLocation());
+            oldLocString = troop.getOldShipLocation().getName();
+        } else { // old location is a planet
+            troop.setOldPlanetLocation(troop.getPlanetLocation());
+            oldLocString = troop.getOldPlanetLocation().getName();
+            troop.setPlanetLocation(null);
+            Logger.finer("New planet location = null!");
+        }
+        // ; beh�vs denna, eller en motsvarighet till det?
+        troop.setShipLocation(destinationCarrier);
+        ti.addToLatestGeneralReport(troop.getName() + " has moved from " + oldLocString + " to " + troop.getShipLocation().getName() + ".");
     }
 
 }

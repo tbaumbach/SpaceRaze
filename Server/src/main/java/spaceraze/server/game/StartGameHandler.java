@@ -73,7 +73,7 @@ public class StartGameHandler {
 	    		Player randomPlayer = randomPlayers.get(playerNr);
 	    		if (randomPlayer.isAlien()){
 	    			galaxyUpdater.removeNeutralShips(planet);
-	    			galaxy.checkTroopsOnInfestedPlanet(planet, randomPlayer);
+					galaxyUpdater.checkTroopsOnInfestedPlanet(planet, randomPlayer);
 	    			planet.setProd(0);
 	    			planet.setResistance(1 + randomPlayer.getFaction().getResistanceBonus());
 	    			planet.setHasNeverSurrendered(false);
@@ -224,7 +224,7 @@ public class StartGameHandler {
         List<TroopType> startTroopTypes = p.getFaction().getStartingTroops();
         for (TroopType aTroopType : startTroopTypes) {
         	// first get trooptype from player
-        	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getUniqueName(), p, galaxy);
+        	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getName(), p, galaxy);
         	// then create new troop
         	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId());
         	aTroop.setPlanetLocation(homeplanet);
@@ -277,7 +277,7 @@ public class StartGameHandler {
 
     private void addPlayersTroopImprovements(Player player){
 		player.getFaction().getTroopTypes().stream()
-				.forEach(type -> player.addTroopImprovement(new PlayerTroopImprovement(type.getUniqueName(), type.isCanBuild())));
+				.forEach(type -> player.addTroopImprovement(new PlayerTroopImprovement(type.getName(), type.isCanBuild())));
 	}
     
     /**

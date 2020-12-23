@@ -81,16 +81,16 @@ public class ResearchPerformer {
 
                 // adding troops to the player
                 for (TroopType aTroopType : researchAdvantage.getTroops()) {
-                    PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(true);
-                    Logger.finer("adding a new troop type: " + aTroopType.getUniqueName());
-                    researchInfoText += "A new troop type: " + aTroopType.getUniqueName() + ".\n";
+                    PlayerPureFunctions.findTroopImprovement(aTroopType.getName(), p).setAvailableToBuild(true);
+                    Logger.finer("adding a new troop type: " + aTroopType.getName());
+                    researchInfoText += "A new troop type: " + aTroopType.getName() + ".\n";
                 }
 
                 //	removing old troop types from the player
                 for(TroopType aTroopType : researchAdvantage.getReplaceTroops()){
-                    PlayerPureFunctions.findTroopImprovement(aTroopType.getUniqueName(), p).setAvailableToBuild(false);
-                    Logger.finer("Removing old troop type : " + aTroopType.getUniqueName());
-                    researchInfoText += "The troop type: " + aTroopType.getUniqueName() + " was removed.\n";
+                    PlayerPureFunctions.findTroopImprovement(aTroopType.getName(), p).setAvailableToBuild(false);
+                    Logger.finer("Removing old troop type : " + aTroopType.getName());
+                    researchInfoText += "The troop type: " + aTroopType.getName() + " was removed.\n";
                 }
 
                 //adding Buildings to the player

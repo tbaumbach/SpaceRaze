@@ -5,12 +5,10 @@ import spaceraze.battlehandler.landbattle.TaskForceTroop;
 import spaceraze.battlehandler.spacebattle.TaskForceHandler;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
-import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Planet;
-import spaceraze.world.Player;
-import spaceraze.world.Troop;
+import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
 import spaceraze.world.report.PlanetReport;
 import spaceraze.battlehandler.spacebattle.TaskForce;
@@ -82,7 +80,7 @@ public class LandBattleHelper {
 
             // get all players with troops after the battles.
             players = getAttackingPlayersWithTroopsOnPlanet(aPlanet, galaxy);
-            if(galaxy.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl()).size() == 0){ // Försvarande spelar har inga trupper kvar.
+            if(TroopPureFunctions.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl(), galaxy.getTroops()).size() == 0){ // Försvarande spelar har inga trupper kvar.
                 if(players.size() == 1){// only one attacker and the planet should change owner.
                     if (players.get(0).isAlien()){
                         Logger.finer("Attacker is alien");
@@ -155,8 +153,7 @@ public class LandBattleHelper {
     }
 
     /**
-     *     	Luftangrepp sker innan striden börjar? Nix.
-     Luftförsvar sker samtidigt? Ja
+     *
      Artilleri sker också först??? Nix.
      Alla strider kan ge skada åt bägge hållen? Ja.
 
@@ -178,21 +175,21 @@ public class LandBattleHelper {
 
     public static void performLandBattle(Player defendingPlayer, List<TaskForceTroop> defendingTroops, Player attackingPlayer, List<TaskForceTroop> attackingTroops, Planet aPlanet, Galaxy galaxy){
 
-        LandBattle battle = new LandBattle(defendingTroops, attackingTroops, aPlanet.getName(), aPlanet.getResistance(), galaxy.getTurn());
+        LandBattle battle = new LandBattle(defendingTroops, attackingTroops, aPlanet.getName(), aPlanet.getResistance(), galaxy.getTurn(), galaxy.getGameWorld());
         battle.performBattle();
 
         if(attackingPlayer!= null) {
-            battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
-            battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> attackingPlayer.addToTroopsLostInSpace(troop));
+            battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.addToLatestTroopsLostInSpace(troop, attackingPlayer.getTurnInfo(), galaxy.getGameWorld()));
+            battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.addToLatestTroopsLostInSpace(troop, attackingPlayer.getTurnInfo(), galaxy.getGameWorld()));
         }
         if(defendingPlayer != null) {
-            battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
-            battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> defendingPlayer.addToTroopsLostInSpace(troop));
+            battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.addToLatestTroopsLostInSpace(troop, defendingPlayer.getTurnInfo(), galaxy.getGameWorld()));
+            battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.addToLatestTroopsLostInSpace(troop, defendingPlayer.getTurnInfo(), galaxy.getGameWorld()));
         }
 
         // Om en VIP var på en troop ska den då dö? eller görs det senare i koden när VIPar gås igenom?
-        battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> galaxy.removeTroop(troop));
-        battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(Troop::isDestroyed).forEach(troop -> galaxy.removeTroop(troop));
+        battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy));
+        battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy));
 
         addLandBattleReport(attackingPlayer, battle.getAttBG().getReport(), aPlanet, galaxy);
         addLandBattleReport(defendingPlayer, battle.getDefBG().getReport(), aPlanet, galaxy);

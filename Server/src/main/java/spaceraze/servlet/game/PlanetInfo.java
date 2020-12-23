@@ -187,13 +187,13 @@ public class PlanetInfo {
         // loopa igenom alla spelare och kolla efter troops
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
-        		List<Troop> troopsOnPlanet = g.getTroopsOnPlanet(planet, tempPlayer, showUnVisible);
+        		List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, tempPlayer, showUnVisible, g.getTroops());
         		if(troopsOnPlanet.size()> 0){
         			armys.add(new ArmyInfo(tempPlayer.getGovernorName(),troopsOnPlanet.size()));
         		}
         	}
         }
-        List<Troop> troopsOnPlanet = g.getTroopsOnPlanet(planet, null, showUnVisible);
+        List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, null, showUnVisible, g.getTroops());
         if(troopsOnPlanet.size()> 0){
 			armys.add(new ArmyInfo("Neutral",troopsOnPlanet.size()));
 		}
@@ -218,7 +218,7 @@ public class PlanetInfo {
 				}
 			}//Check if VIP are on a troop
 			else if(aVIP.getTroopLocation() != null && aVIP.getBoss() == player){
-				TroopInfo troop = findTroop(aVIP.getTroopLocation().getUniqueName());
+				TroopInfo troop = findTroop(aVIP.getTroopLocation().getName());
 				if(troop != null){
 					troop.addVIP(new VIPInfo(aVIP, player));
 				}
@@ -306,9 +306,9 @@ public class PlanetInfo {
 		for (Troop troop : troopsOnPlanet) {
 			if(troop.getShipLocation() != null){
 				ShipInfo ship = findShip(troop.getShipLocation().getUniqueName());
-				ship.addTroop(new TroopInfo(troop));
+				ship.addTroop(new TroopInfo(troop, galaxy.getGameWorld()));
 			}else{
-				troops.add(new TroopInfo(troop));
+				troops.add(new TroopInfo(troop, galaxy.getGameWorld()));
 			}
 		}
 	}

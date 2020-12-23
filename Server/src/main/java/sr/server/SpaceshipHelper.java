@@ -3,6 +3,7 @@ package sr.server;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -73,7 +74,7 @@ public class SpaceshipHelper {
                     ti.addToLatestGeneralReport("Your ship " + spaceship.getName() + " has been scuttled by it's crew because they had nowhere to retreat to.");
                     if (spaceship.getOwner() != null) {
                         VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
-                        galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
+                        TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
                         addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
                     }
                     SpaceshipMutator.removeShip(spaceship, galaxy);
@@ -122,7 +123,7 @@ public class SpaceshipHelper {
                     + " was scuttled by it's crew.");
             if (spaceship.getOwner() != null) {
                 VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
-                galaxy.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner());
+                TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy);
                 addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
             }
             SpaceshipMutator.removeShip(spaceship, galaxy);

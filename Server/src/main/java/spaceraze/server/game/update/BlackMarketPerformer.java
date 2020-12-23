@@ -4,7 +4,9 @@ import spaceraze.servlethelper.game.BlackMarketPureFunctions;
 import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -80,10 +82,95 @@ public class BlackMarketPerformer {
                 blackMarketOffer.setHotStuffAmount(createHotStuffBid());
             }
         }else{ //TroopIndex 10-12
-            blackMarketOffer.setTroopType(galaxy.getRandomCommonTroopType());
+            blackMarketOffer.setTroopType(getRandomCommonTroopType(galaxy));
         }
 
         return blackMarketOffer;
+    }
+
+    private static TroopType getRandomCommonTroopType(Galaxy galaxy) {
+        TroopType aTroopType = null;
+        TroopType tempTroopType = null;
+        List<TroopType> allAvailableTroopTypes = getTroopTypesToBlackMarket(galaxy);
+        int totalFrequencypoint = 0;
+        for (TroopType troopType : allAvailableTroopTypes) {
+            totalFrequencypoint += troopType.getBlackMarketFrequency().getFrequency();
+        }
+
+        int freqValue = Functions.getRandomInt(0, totalFrequencypoint - 1);
+        int counter = 0;
+        int tmpFreqSum = 0;
+        while (aTroopType == null) {
+            tempTroopType = allAvailableTroopTypes.get(counter);
+            tmpFreqSum = tmpFreqSum + tempTroopType.getBlackMarketFrequency().getFrequency();
+            if (tmpFreqSum > freqValue) {
+                aTroopType = tempTroopType;
+            }
+            counter++;
+        }
+
+        return aTroopType;
+    }
+
+    /**
+     * Searches through all trooptype lists for all factions
+     *
+     * @return list containing trooptypes. If a trooptype can be build by several
+     *         factions it will appear several times in the list
+     */
+    private static List<TroopType> getTroopTypesToBlackMarket(Galaxy galaxy) {
+        Logger.fine("getTroopTypesToBlackMarket() called");
+        List<TroopType> troopTypes = new LinkedList<TroopType>();
+        for (Faction aFaction : galaxy.getGameWorld().getFactions()) {
+            Logger.finer("Faction: " + aFaction.getName());
+            List<TroopType> factionTroopTypes = aFaction.getTroopTypes();
+            Logger.finer("TroopTypes #: " + factionTroopTypes.size());
+            for (TroopType aTroopType : factionTroopTypes) {
+                Logger.finer("TT: " + aTroopType.getName());
+
+                if (isReadyToUseInBlackMarket(galaxy, aTroopType)) {
+                    if (!troopTypes.contains(aTroopType)) {
+                        troopTypes.add(aTroopType);
+                    }
+                }
+            }
+        }
+        return troopTypes;
+    }
+
+    public static boolean isReadyToUseInBlackMarket(Galaxy aGalaxy, TroopType troopType){
+        boolean isConstructable =  false;
+        if(aGalaxy.getTurn() >= troopType.getBlackmarketFirstTurn()){
+            if (troopType.isSpaceshipTravel()){
+                if (troopType.isCanAppearOnBlackMarket()){
+                    if(!troopType.isPlayerUnique() && !troopType.isFactionUnique()){
+                        if(troopType.isWorldUnique() && !TroopPureFunctions.isWorldUniqueBuild(aGalaxy, troopType)){
+                            boolean isAlreadyAoffer = false;
+                            for (BlackMarketOffer aBlackMarketOffer : aGalaxy.getCurrentOffers()) {
+                                if(aBlackMarketOffer.isTroop() && aBlackMarketOffer.getTroopType().getName().equals(troopType.getName())){
+                                    isAlreadyAoffer = true;
+                                }
+                            }
+
+                            if(!isAlreadyAoffer){
+                                boolean haveBuildingOrder = false;
+                                for (Player tempPlayer : aGalaxy.getPlayers()) {
+                                    if(tempPlayer.getOrders().haveTroopTypeBuildOrder(troopType)){
+                                        haveBuildingOrder = true;
+                                    }
+                                }
+                                if(!haveBuildingOrder){
+                                    isConstructable =  true;
+                                }
+                            }
+                        }else{
+                            isConstructable = true;
+                        }
+                    }
+                }
+            }
+        }
+        return isConstructable;
     }
 
     private static int createHotStuffBid(){
@@ -155,14 +242,14 @@ public class BlackMarketPerformer {
                         winningPlayer.addToHighlights(blackMarketOffer.getBlueprint().getName(),HighlightType.TYPE_SHIPTYPE_WON);
                     }
                 }else{ // is troop
-                    Logger.finest( "performSelling: troop: " + blackMarketOffer.getTroopType().getUniqueName());
-                    Troop newTroop = TroopMutator.createTroop(winningPlayer.getGalaxy().findTroopType(blackMarketOffer.getTroopType().getUniqueName()), winningPlayer.getGalaxy());
+                    Logger.finest( "performSelling: troop: " + blackMarketOffer.getTroopType().getName());
+                    Troop newTroop = TroopMutator.createTroop(winningPlayer.getGalaxy().findTroopType(blackMarketOffer.getTroopType().getName()), winningPlayer.getGalaxy());
                     newTroop.setOwner(winningPlayer);
                     newTroop.setPlanetLocation(destinationPlanet);
                     galaxy.addTroop(newTroop);
                     winningPlayer.removeFromTreasury(winningBid.getCost());
-                    winningPlayer.addToLatestBlackMarketMessages("Your new " + newTroop.getUniqueName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
-                    winningPlayer.addToHighlights(blackMarketOffer.getTroopType().getUniqueName(),HighlightType.TYPE_TROOP_WON);
+                    winningPlayer.addToLatestBlackMarketMessages("Your new " + newTroop.getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
+                    winningPlayer.addToHighlights(blackMarketOffer.getTroopType().getName(),HighlightType.TYPE_TROOP_WON);
                 }
                 // send messages to everyone except the winner
                 galaxy.addBlackMarketMessages(winningPlayer,blackMarketOffer.getString() + " sold to Govenor " + winningPlayer.getGovernorName() + " for cost: " + winningBid.getCost() + ".");
@@ -273,7 +360,7 @@ public class BlackMarketPerformer {
             if (spaceshipType.getRange().canMove() || spaceshipType.getSize() == SpaceShipSize.SQUADRON){
                 if (spaceshipType.isCanAppearOnBlackMarket()){
                     if(!spaceshipType.isPlayerUnique() && !spaceshipType.isFactionUnique()){
-                        if(spaceshipType.isWorldUnique() && !spaceshipType.isWorldUniqueBuild(aGalaxy)){
+                        if(spaceshipType.isWorldUnique() && !SpaceshipPureFunctions.isWorldUniqueBuild(aGalaxy, spaceshipType)){
                             boolean isAlreadyAoffer = false;
                             for (BlackMarketOffer aBlackMarketOffer : aGalaxy.getCurrentOffers()) {
                                 if(aBlackMarketOffer.isShip() && aBlackMarketOffer.getSpaceshipType().getName().equals(spaceshipType.getName())){

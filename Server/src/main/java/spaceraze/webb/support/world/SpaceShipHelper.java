@@ -1,5 +1,6 @@
 package spaceraze.webb.support.world;
 
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.world.Spaceship;
 import spaceraze.world.SpaceshipType;
 import spaceraze.world.enums.SpaceShipSize;
@@ -29,8 +30,6 @@ public class SpaceShipHelper {
 		sb.append("<td>Armor<br>Medium</td>");
 		sb.append("<td>Armor<br>Large</td>");
 		sb.append("<td>Armor<br>Huge</td>");
-		sb.append("<td>Income Open<br>o/f/n/e</td>");
-		sb.append("<td>Income Closed<br>o/f/n/e</td>");
 		sb.append("<td>Init<br>Bonus</td>");
 		sb.append("<td>Init<br>Support<br>Bonus</td>");
 		sb.append("<td>Init<br>Defence</td>");
@@ -69,15 +68,13 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.getHits() + "</td>");
 		sb.append("<td>" + spaceshipType.getWeaponsStrengthSquadron() + "</td>");
 		sb.append("<td>" + spaceshipType.getWeaponsStrengthSmall() + "</td>");
-		sb.append("<td>" + spaceshipType.getWeaponsStrengthMedium() + " (" + spaceshipType.getWeaponsMaxSalvoesMediumString() + ")</td>");
-		sb.append("<td>" + spaceshipType.getWeaponsStrengthLarge() + " (" + spaceshipType.getWeaponsMaxSalvoesLargeString() + ")</td>");
-		sb.append("<td>" + spaceshipType.getWeaponsStrengthHuge() + " (" + spaceshipType.getWeaponsMaxSalvoesHugeString() + ")</td>");
+		sb.append("<td>" + spaceshipType.getWeaponsStrengthMedium() + " (" + spaceshipType.getWeaponsMaxSalvosMedium() + ")</td>");
+		sb.append("<td>" + spaceshipType.getWeaponsStrengthLarge() + " (" + spaceshipType.getWeaponsMaxSalvosLarge() + ")</td>");
+		sb.append("<td>" + spaceshipType.getWeaponsStrengthHuge() + " (" + spaceshipType.getWeaponsMaxSalvosHuge() + ")</td>");
 		sb.append("<td>" + spaceshipType.getArmorSmall() + "</td>");
 		sb.append("<td>" + spaceshipType.getArmorMedium() + "</td>");
 		sb.append("<td>" + spaceshipType.getArmorLarge() + "</td>");
 		sb.append("<td>" + spaceshipType.getArmorHuge() + "</td>");
-		sb.append("<td><nobr>" + spaceshipType.getIncomeOpenString() + "</nobr></td>");
-		sb.append("<td><nobr>" + spaceshipType.getIncomeClosedString() + "</nobr></td>");
 		if (!spaceshipType.isInitSupport()) {
 			sb.append("<td>" + spaceshipType.getIncreaseInitiative() + "</td>");
 		} else {
@@ -102,7 +99,7 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.isCanAttackScreenedShips() + "</td>");
 		sb.append("<td>" + spaceshipType.isVisibleOnMap() + "</td>");
 		// TODO sb.append("<td>" + screened + "</td>");
-		sb.append("<td>" + spaceshipType.getBuildCost(null) + "</td>");
+		sb.append("<td>" + SpaceshipPureFunctions.getBuildCost(spaceshipType, null) + "</td>");
 		sb.append("<td>" + spaceshipType.getUpkeep() + "</td>");
 		sb.append("</tr>\n");
 		return sb.toString();
