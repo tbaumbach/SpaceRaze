@@ -33,13 +33,5 @@ public class FactionHelper {
 		return retHTML.toString();
 	}
 
-	public String getStartVIPTypesTableContentHTML(){
-		StringBuffer retHTML = new StringBuffer();
-		retHTML.append(faction.getGovernorVIPType().getHTMLTableContent());
-		for (VIPType vt : faction.getStartingVIPTypes()) {
-			retHTML.append(vt.getHTMLTableContent());
-		}
-		return retHTML.toString();
-	}
 
 }

@@ -4,9 +4,11 @@ import spaceraze.battlehandler.landbattle.LandBattle;
 import spaceraze.battlehandler.landbattle.TaskForceTroop;
 import spaceraze.battlehandler.spacebattle.TaskForceHandler;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
+import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -86,7 +88,7 @@ public class LandBattleHelper {
                         Logger.finer("Attacker is alien");
                         // planet conquered by alien
                         (new PlanetUpdater()).razed(aPlanet, players.get(0));
-                        aPlanet.infectedByAttacker(players.get(0));
+                        PlanetMutator.infectedByAttacker(aPlanet, players.get(0), galaxy.getGameWorld());
                     }else{ // attacker is not alien
                         Logger.finer("Attacker is not alien");
                         // check if defender is alien
@@ -117,7 +119,19 @@ public class LandBattleHelper {
     }
 
     public static List<TaskForceTroop> getPlayerTroopsAndVipsOnPlanet(Player player, Planet planet, Galaxy galaxy){
-        return  galaxy.findTroopsOnPlanet(planet, player).stream().map(troop -> new TaskForceTroop(troop, galaxy.findLandBattleVIPs(troop,true))).collect(Collectors.toList());
+        return  galaxy.findTroopsOnPlanet(planet, player).stream().map(troop -> new TaskForceTroop(troop, findLandBattleVIPs(troop, galaxy))).collect(Collectors.toList());
+    }
+
+    public static List<VIP> findLandBattleVIPs(Troop aTroop, Galaxy galaxy) {
+        List<VIP> VIPs = new LinkedList<VIP>();
+        for (VIP aVIP : galaxy.getAllVIPs()) {
+
+            if (VipPureFunctions.isLandBattleVip(VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld())) & (aVIP.getTroopLocation() != null
+                    && aVIP.getTroopLocation().getName().equalsIgnoreCase(aTroop.getName()))) {
+                VIPs.add(aVIP);
+            }
+        }
+        return VIPs;
     }
 
     public static void addLandBattleHighlights(boolean defHaveTroops, boolean attHaveTroops, Player defPlayer, Player attPlayer, String planetName){

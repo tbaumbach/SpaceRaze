@@ -14,6 +14,7 @@ import spaceraze.world.Player;
 import spaceraze.world.Spaceship;
 import spaceraze.battlehandler.spacebattle.TaskForce;
 import spaceraze.world.enums.SpaceShipSize;
+import spaceraze.world.orders.Orders;
 import sr.server.SpaceshipHelper;
 
 public class CheckAbandonedSquadrons {
@@ -257,7 +258,7 @@ public class CheckAbandonedSquadrons {
 			if (aSpaceship.getSize() == SpaceShipSize.SQUADRON) {
 				// check if sstemp has a move order to the carrier
 				if (aPlayer != null) {
-					boolean moveToCarrierOrder = aPlayer.checkShipToCarrierMove(aSpaceship, aCarrier);
+					boolean moveToCarrierOrder = checkShipToCarrierMove(aSpaceship, aCarrier, aPlayer.getOrders());
 					if (moveToCarrierOrder) {
 						count++;
 					}
@@ -280,5 +281,10 @@ public class CheckAbandonedSquadrons {
 			}
 		}
 		return found;
+	}
+
+	// kolla om det finns en gammal order för detta skepp
+	private static boolean checkShipToCarrierMove(Spaceship aSqd, Spaceship aCarrier, Orders orders) {
+		return orders.getShipToCarrierMoves().stream().filter(move -> aSqd.getKey().equalsIgnoreCase(move.getSpaceShipKey())).anyMatch(move -> aCarrier.getKey().equalsIgnoreCase(move.getDestinationCarrierKey()));
 	}
 }

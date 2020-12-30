@@ -1,5 +1,6 @@
 package sr.server;
 
+import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
@@ -40,11 +41,12 @@ public class PlanetUpdater {
             if (planet.isHasNeverSurrendered()){
                 planet.setHasNeverSurrendered(false);
                 // lägg till en slumpvis VIP till denna spelare
-                VIP aVIP = conqueringPlayer.getGalaxy().maybeAddVIP(conqueringPlayer);
+                VIP aVIP = VipMutator.maybeAddVIP(conqueringPlayer, conqueringPlayer.getGalaxy());
                 if (aVIP != null){
-                    aVIP.setLocation(planet);
-                    conqueringPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + aVIP.getName() + " who has joined your service.");
-                    conqueringPlayer.addToHighlights(aVIP.getName(),HighlightType.TYPE_VIP_JOINS);
+                    VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), conqueringPlayer.getGalaxy().getGameWorld());
+                    VipMutator.setShipLocation(aVIP, planet);
+                    conqueringPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + vipType.getName() + " who has joined your service.");
+                    conqueringPlayer.addToHighlights(vipType.getName(),HighlightType.TYPE_VIP_JOINS);
                 }
             }
         }
@@ -89,11 +91,12 @@ public class PlanetUpdater {
             if (planet.isHasNeverSurrendered()){
                 planet.setHasNeverSurrendered(false);
                 // lägg till en slumpvis VIP till denna spelare
-                VIP aVIP = attackingPlayer.getGalaxy().maybeAddVIP(attackingPlayer);
+                VIP aVIP = VipMutator.maybeAddVIP(attackingPlayer, attackingPlayer.getGalaxy());
                 if (aVIP != null){
-                    aVIP.setLocation(planet);
-                    attackingPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + aVIP.getName() + " who has joined your service.");
-                    attackingPlayer.addToHighlights(aVIP.getName(),HighlightType.TYPE_VIP_JOINS);
+                    VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld());
+                    VipMutator.setShipLocation(aVIP, planet);
+                    attackingPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + vipType.getName() + " who has joined your service.");
+                    attackingPlayer.addToHighlights(vipType.getName(),HighlightType.TYPE_VIP_JOINS);
                 }
             }
         }
@@ -163,11 +166,12 @@ public class PlanetUpdater {
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
             if (tempVIP.getBoss() == aPlayer) {
-                if (!tempVIP.canVisitEnemyPlanets()) {
+                VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+                if (!vipType.isCanVisitEnemyPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
-                    aPlayer.addToVIPReport("Your " + tempVIP.getName() + " has been killed when the planet "
+                    aPlayer.addToVIPReport("Your " + vipType.getName() + " has been killed when the planet "
                             + aPlanet.getName() + " was RAZED.");
-                    aPlayer.addToHighlights(tempVIP.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                    aPlayer.addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                 }
             }
         }
@@ -177,9 +181,10 @@ public class PlanetUpdater {
         List<VIP> allVIPsOnPlanet = VipPureFunctions.findAllVIPsOnPlanet(aPlanet, galaxy);
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
-            if (tempVIP.isGovernor()) {
+            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+            if (vipType.isGovernor()) {
                 galaxy.getAllVIPs().remove(tempVIP);
-                tempVIP.getBoss().addToVIPReport("Your " + tempVIP.getName() + " has been killed when the planet "
+                tempVIP.getBoss().addToVIPReport("Your " + vipType.getName() + " has been killed when the planet "
                         + aPlanet.getName() + " was RAZED.");
                 // aPlayer.addToHighlights(tempVIP.getName(),Highlight.TYPE_OWN_VIP_KILLED);
             }
@@ -191,14 +196,15 @@ public class PlanetUpdater {
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
             if (tempVIP.getBoss() != aPlayer) {
-                if (!tempVIP.canVisitEnemyPlanets()) {
+                VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+                if (!vipType.isCanVisitEnemyPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
-                    tempVIP.getBoss().addToVIPReport("Your " + tempVIP.getName() + " have been killed when the planet "
+                    tempVIP.getBoss().addToVIPReport("Your " + vipType.getName() + " have been killed when the planet "
                             + aPlanet.getName() + " was conquered.");
-                    tempVIP.getBoss().addToHighlights(tempVIP.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
-                    aPlayer.addToVIPReport("An enemy " + tempVIP.getTypeName()
+                    tempVIP.getBoss().addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                    aPlayer.addToVIPReport("An enemy " + vipType.getName()
                             + " have been killed when you conquered the planet " + aPlanet.getName() + ".");
-                    aPlayer.addToHighlights(tempVIP.getName(), HighlightType.TYPE_ENEMY_VIP_KILLED);
+                    aPlayer.addToHighlights(vipType.getName(), HighlightType.TYPE_ENEMY_VIP_KILLED);
                 }
             }
         }

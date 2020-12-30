@@ -7,6 +7,8 @@ import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
+import spaceraze.servlethelper.game.vip.VipMutator;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -67,7 +69,7 @@ public class BlackMarketPerformer {
             boolean canBeUsed = false;
             int tries = 0;
             while (!canBeUsed & (tries < 100)){
-                blackMarketOffer.setVipType(galaxy.getRandomVIPType());
+                blackMarketOffer.setVipType(VipPureFunctions.getRandomVIPType(galaxy));
                 tries++;
                 canBeUsed = galaxy.vipCanBeUsed(blackMarketOffer.getVIPType());
             }
@@ -207,7 +209,7 @@ public class BlackMarketPerformer {
                 }else
                 if (blackMarketOffer.getVipType() != null){ // is vip
                     Logger.finest( "performSelling: vip: ");
-                    VIP newVIP = blackMarketOffer.getVipType().createNewVIP(winningPlayer,destinationPlanet, true);
+                    VIP newVIP = VipMutator.createNewVIP(blackMarketOffer.getVipType(), winningPlayer,destinationPlanet, true);
                     galaxy.allVIPs.add(newVIP);
                     winningPlayer.removeFromTreasury(winningBid.getCost());
                     winningPlayer.addToLatestBlackMarketMessages("Your new " + blackMarketOffer.getVipType().getTypeName() + " is awaiting your orders at " + winningBid.getDestination() + ".");

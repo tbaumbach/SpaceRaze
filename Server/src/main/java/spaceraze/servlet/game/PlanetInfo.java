@@ -7,14 +7,9 @@ import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.map.MapPureFunctions;
-import spaceraze.world.Building;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Planet;
-import spaceraze.world.Player;
-import spaceraze.world.Spaceship;
-import spaceraze.world.Troop;
-import spaceraze.world.VIP;
+import spaceraze.world.*;
 import spaceraze.world.enums.SpaceShipSize;
 
 /*
@@ -82,12 +77,12 @@ public class PlanetInfo {
 		notes = PlanetPureFunctions.findPlanetInfo(planet.getName(), player.getPlanetInformations()).getNotes();
 		
 		Galaxy galaxy = player.getGalaxy();
-		boolean haveSpy = (galaxy.findVIPSpy(planet,player) != null);
+		boolean haveSpy = VipPureFunctions.findVIPSpy(planet,player, galaxy) != null;
 		boolean alliedSpy = PlanetPureFunctions.isItAlliedSpyOnPlanet(player, planet, galaxy);
 		boolean spy = haveSpy || alliedSpy;
 		boolean surveyShip = SpaceshipPureFunctions.findSurveyShip(planet,player, galaxy.getSpaceships(), galaxy.getGameWorld()) != null;
 		boolean alliedSurveyShip = PlanetPureFunctions.isItAlliesSurveyShipsOnPlanet(player, planet, galaxy);
-		boolean surveyVIP = (galaxy.findSurveyVIPonShip(planet,player) != null);
+		boolean surveyVIP = VipPureFunctions.findSurveyVIPonShip(planet, player, galaxy) != null;
 		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy);
 		boolean survey = surveyShip || alliedSurveyShip || surveyVIP || alliedSurveyVIP;
 		boolean shipInSystem = (galaxy.playerHasShipsInSystem(player,planet));
@@ -202,11 +197,12 @@ public class PlanetInfo {
 	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isAllied, boolean haveSpy, boolean survey, boolean haveTroopsOnTheGround){
 		
 		for (VIP aVIP : galaxy.getAllVIPs()) {
+			VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld());
 			if (aVIP.getPlanetLocation() == planet){
 				if(aVIP.getBoss() == player || DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVIP.getBoss(), galaxy)){
 					vips.add(new VIPInfo(aVIP, player));
 				}else if(open || isAllied ||haveSpy || survey || haveTroopsOnTheGround){ // VIPar som  tillhör fiender. Alltså VIPar som inte finns på spelarens eller dess allierades planeter. 
-					if (aVIP.getShowOnOpenPlanet()){
+					if (vipType.getShowOnOpenPlanet()){
 						vips.add(new VIPInfo(aVIP, player));
 					}
 				}

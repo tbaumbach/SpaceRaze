@@ -77,7 +77,7 @@ This faction can not build Space Stations.
 Number of random VIPs: <%= f.getNrStartingRandomVIPs() %>
 <p>
 <!-- Start VIP types -->
-  <%= new FactionHelper(f).getStartVIPTypesTableContentHTML() %>
+
 <p>
 <h3>Start ships</h3>
 <!-- Start ships -->

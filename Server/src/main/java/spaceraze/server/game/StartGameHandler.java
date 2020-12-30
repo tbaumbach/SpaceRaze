@@ -7,10 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import spaceraze.servlethelper.game.UniqueIdHandler;
+import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.vip.VipMutator;
+import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.world.*;
 import spaceraze.server.world.comparator.PlanetRangeComparator;
 import spaceraze.util.general.Functions;
@@ -79,8 +82,8 @@ public class StartGameHandler {
 	    			planet.setHasNeverSurrendered(false);
 	    			planet.setPlayerInControl(randomPlayer);
 	    		}else{
-	    			VIP guvenor = galaxy.findVIPGovenor(randomPlayer);
-	    			planet.joinsVisitingDiplomat(guvenor, false);
+	    			VIP guvenor = VipPureFunctions.findVIPGovernor(randomPlayer, galaxy);
+	    			PlanetMutator.joinsVisitingDiplomat(planet, guvenor, false, galaxy.getGameWorld());
 	    			galaxyUpdater.shipsJoinGovenor(planet,guvenor);
 	    			galaxyUpdater.troopsJoinGovenor(planet, guvenor);
 	    		}
@@ -211,7 +214,7 @@ public class StartGameHandler {
         List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
 
 		for (SpaceshipType sstTemp1 : startTypes) {
-			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, null, p.getFaction().getTechBonus(),0);
+			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, 0, p.getFaction().getTechBonus(),0);
 			createdSpaceShip.setLocation(homeplanet);
 			createdSpaceShip.setOwner(p);
 			galaxy.addSpaceship(createdSpaceShip);
@@ -226,7 +229,7 @@ public class StartGameHandler {
         	// first get trooptype from player
         	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getName(), p, galaxy);
         	// then create new troop
-        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, null, p.getFaction().getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId());
+        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, 0, p.getFaction().getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId(), galaxy.getGameWorld());
         	aTroop.setPlanetLocation(homeplanet);
         	aTroop.setOwner(p);
         	galaxy.addTroop(aTroop);
@@ -236,21 +239,21 @@ public class StartGameHandler {
         Logger.finer("create gov");
 //        VIP tempVip = ((VIPType)vipTypes.elementAt(0)).createNewVIP(p,homeplanet);
 //        allVIPs.addElement(tempVip);
-        galaxy.getAllVIPs().add(p.getFaction().getGovernorVIPType().createNewVIP(p, homeplanet, true));
+        galaxy.getAllVIPs().add(VipMutator.createNewVIP(p.getFaction().getGovernorVIPType(), p, homeplanet, true));
         // create 1 random VIP
 //        tempVip = this.createRandomVIP();
 //        tempVip.setBoss(p);
         Logger.finer("create player vip");
         for (int i = 0; i < p.getFaction().getNrStartingRandomVIPs(); i++) {
         	//TODO createPlayerVIP(p) should be moved to server side.
-            VIP tempVip = galaxy.createPlayerVIP(p);
-            tempVip.setLocation(homeplanet);
+            VIP tempVip = VipMutator.createPlayerVIP(p, galaxy);
+            VipMutator.setShipLocation(tempVip, homeplanet);
 		}
         List<VIPType> playerStartVips = p.getFaction().getStartingVIPTypes();
         for (VIPType aVipType : playerStartVips) {
-            VIP tempVip = aVipType.createNewVIP(true);
+            VIP tempVip = VipMutator.createNewVIP(aVipType, true);
 	        tempVip.setBoss(p);
-            tempVip.setLocation(homeplanet);
+            VipMutator.setShipLocation(tempVip, homeplanet);
 	        galaxy.getAllVIPs().add(tempVip);
 		}        
         // create new diplomacy states to all other players (that have already joined this game)

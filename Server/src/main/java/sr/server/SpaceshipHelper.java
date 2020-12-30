@@ -13,8 +13,8 @@ import spaceraze.world.orders.ShipToCarrierMovement;
 public class SpaceshipHelper {
 
     public static void performMove(ShipToCarrierMovement shipToCarrierMovement, TurnInfo ti, Galaxy aGalaxy){
-        Spaceship aSpaceship = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getSpaceshipId());
-        Spaceship aSpaceshipCarrier = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getDestinationCarrierId());
+        Spaceship aSpaceship = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getSpaceShipKey());
+        Spaceship aSpaceshipCarrier = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getDestinationCarrierKey());
         Logger.finest( "performMove: " + aSpaceship.getName() + " destination: " + aSpaceshipCarrier.getName());
         moveShip(aSpaceship, aSpaceshipCarrier, ti);
     }
@@ -35,7 +35,7 @@ public class SpaceshipHelper {
     }
 
     public static void performMove(ShipMovement shipMovement,  TurnInfo ti, Galaxy aGalaxy) {
-        Spaceship spaceship = aGalaxy.findSpaceshipByUniqueId(shipMovement.getSpaceShipID());
+        Spaceship spaceship = aGalaxy.findSpaceshipByUniqueId(shipMovement.getSpaceshipKey());
         if (spaceship != null) {
             String spaceShipname = spaceship.getName();
             Logger.finest("performMove: " + spaceShipname + " destination: " + shipMovement.getDestinationName());

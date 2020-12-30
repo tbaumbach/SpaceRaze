@@ -99,7 +99,7 @@ public class SpaceShipHelper {
 		sb.append("<td>" + spaceshipType.isCanAttackScreenedShips() + "</td>");
 		sb.append("<td>" + spaceshipType.isVisibleOnMap() + "</td>");
 		// TODO sb.append("<td>" + screened + "</td>");
-		sb.append("<td>" + SpaceshipPureFunctions.getBuildCost(spaceshipType, null) + "</td>");
+		sb.append("<td>" + SpaceshipPureFunctions.getBuildCost(spaceshipType, 0) + "</td>");
 		sb.append("<td>" + spaceshipType.getUpkeep() + "</td>");
 		sb.append("</tr>\n");
 		return sb.toString();

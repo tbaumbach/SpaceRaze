@@ -1,7 +1,9 @@
 package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
+import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
@@ -28,7 +30,7 @@ public class OrdersPerformer {
         // perform VIP moves
         for (int i = 0; i < orders.getVIPMoves().size(); i++) {
             VIPMovement tempVIPMove = orders.getVIPMoves().get(i);
-            tempVIPMove.performMove(ti, galaxy);
+            performMove(tempVIPMove, ti, galaxy);
         }
         // perform troop to carrier
         for (TroopToCarrierMovement aTroopToCarrierMovement : orders.getTroopToCarrierMoves()) {
@@ -104,10 +106,10 @@ public class OrdersPerformer {
             }
         }
         for (int i = 0; i < orders.getVIPSelfDestructs().size(); i++) {
-            VIP tempVIP = galaxy.findVIP(orders.getVIPSelfDestructs().get(i));
+            VIP tempVIP = VipPureFunctions.findVIP(orders.getVIPSelfDestructs().get(i), galaxy);
 //        Player tempPlayer = tempow.getLocation().getPlayerInControl();
             galaxy.getAllVIPs().remove(tempVIP);
-            ti.addToLatestGeneralReport("On your command " + tempVIP.getName() + " at " + tempVIP.getLocation().getName() + " has been retired.");
+            ti.addToLatestGeneralReport("On your command " + VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld()).getName() + " at " + VipPureFunctions.getLocation(tempVIP).getName() + " has been retired.");
         }
 
         for (int i = 0; i < orders.getScreenedShips().size(); i++) {
@@ -119,8 +121,8 @@ public class OrdersPerformer {
             }
         }
         // preform troop selfdestructs
-        for (int aTroopId : orders.getTroopSelfDestructs()) {
-            Troop aTroop = galaxy.findTroop(aTroopId);
+        for (String aTroopId : orders.getTroopSelfDestructs()) {
+            Troop aTroop = TroopPureFunctions.findTroop(aTroopId, galaxy);
             if (aTroop != null) {
                 TroopMutator.removeTroop(aTroop, galaxy);
                 checkVIPsInSelfDestroyedTroops(aTroop, p, galaxy);
@@ -146,12 +148,13 @@ public class OrdersPerformer {
         List<VIP> allVIPsOnPlanet = VipPureFunctions.findAllVIPsOnPlanet(aPlanet, galaxy);
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
+            VIPType vipType =VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
             if (tempVIP.getBoss() == aPlayer) {
-                if (!tempVIP.canVisitNeutralPlanets()) {
+                if (!vipType.isCanVisitNeutralPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
-                    aPlayer.addToVIPReport("Your " + tempVIP.getName() + " has abandoned your cause when your planet "
+                    aPlayer.addToVIPReport("Your " + vipType.getName() + " has abandoned your cause when your planet "
                             + aPlanet.getName() + " was abandoned.");
-                    aPlayer.addToHighlights(tempVIP.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                    aPlayer.addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                 }
             }
         }
@@ -160,52 +163,53 @@ public class OrdersPerformer {
     public static void checkVIPsInSelfDestroyedTroops(Troop aTroop, Player aPlayer, Galaxy galaxy) {
         List<VIP> allVIPsOnTroop = VipPureFunctions.findAllVIPsOnTroop(aTroop, galaxy.getAllVIPs());
         for (VIP aVip : allVIPsOnTroop) {
+            VIPType vipType = VipPureFunctions.getVipTypeByKey(aVip.getTypeKey(), galaxy.getGameWorld());
             TurnInfo ti = aVip.getBoss().getTurnInfo();
             // troop is aboard ship -> move VIP to ship
             if (aTroop.getShipLocation() != null) {
-                ti.addToLatestGeneralReport(aVip.getName() + " has been forced to move when " + aTroop.getName()
+                ti.addToLatestGeneralReport(vipType.getName() + " has been forced to move when " + aTroop.getName()
                         + " was selfdestructed.");
-                aVip.moveVIP(aTroop.getShipLocation(), ti);
+                VipMutator.moveVIP(aVip, aTroop.getShipLocation(), ti, galaxy.getGameWorld());
             } else { // troop is on planet
                 Planet thePlanet = aTroop.getPlanetLocation();
                 // own planet -> move VIP to planet
                 if (thePlanet.getPlayerInControl() == aVip.getBoss()) {
-                    ti.addToLatestGeneralReport(aVip.getName() + " has been forced to move when "
+                    ti.addToLatestGeneralReport(vipType.getName() + " has been forced to move when "
                             + aTroop.getName() + " was selfdestructed.");
-                    aVip.moveVIP(thePlanet, ti);
+                    VipMutator.moveVIP(aVip, thePlanet, ti, galaxy.getGameWorld());
                 } else if (thePlanet.getPlayerInControl() == null) {
                     // neutral planet
-                    if (aVip.canVisitNeutralPlanets()) {
+                    if (vipType.isCanVisitNeutralPlanets()) {
                         // VIP can visit neutral planets -> move VIP to planet
-                        ti.addToLatestGeneralReport(aVip.getName() + " has moved from " + aTroop.getName()
+                        ti.addToLatestGeneralReport(vipType.getName() + " has moved from " + aTroop.getName()
                                 + " to " + thePlanet.getName());
                         ti.addToLatestVIPReport(
-                                aVip.getName() + " has been forced to move to the planet " + thePlanet.getName()
+                                vipType.getName() + " has been forced to move to the planet " + thePlanet.getName()
                                         + " when your troop " + aTroop.getName() + " was selfdestructed.");
-                        aVip.setLocation(thePlanet);
+                        VipMutator.setShipLocation(aVip, thePlanet);
                     } else {
                         // otherwise VIP is killed
                         galaxy.getAllVIPs().remove(aVip);
-                        aPlayer.addToVIPReport("Your " + aVip.getName() + " has been killed when your troop "
+                        aPlayer.addToVIPReport("Your " + vipType.getName() + " has been killed when your troop "
                                 + aTroop.getName() + " was selfdestructed at " + thePlanet.getName() + ".");
-                        aPlayer.addToHighlights(aVip.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                        aPlayer.addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                     }
                 } else {
                     // enemy planet
-                    if (aVip.canVisitEnemyPlanets()) {
+                    if (vipType.isCanVisitEnemyPlanets()) {
                         // VIP can visit enemy planets -> move VIP to planet
-                        ti.addToLatestGeneralReport(aVip.getName() + " has moved from " + aTroop.getName()
+                        ti.addToLatestGeneralReport(vipType.getName() + " has moved from " + aTroop.getName()
                                 + " to " + thePlanet.getName());
                         ti.addToLatestVIPReport(
-                                aVip.getName() + " has been forced to move to the planet " + thePlanet.getName()
+                                vipType.getName() + " has been forced to move to the planet " + thePlanet.getName()
                                         + " when your troop " + aTroop.getName() + " was selfdestructed.");
-                        aVip.setLocation(thePlanet);
+                        VipMutator.setShipLocation(aVip, thePlanet);
                     } else {
                         // otherwise VIP is killed
                         galaxy.getAllVIPs().remove(aVip);
-                        aPlayer.addToVIPReport("Your " + aVip.getName() + " has been killed when your troop "
+                        aPlayer.addToVIPReport("Your " + vipType.getName() + " has been killed when your troop "
                                 + aTroop.getName() + " was selfdestructed at " + thePlanet.getName() + ".");
-                        aPlayer.addToHighlights(aVip.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
+                        aPlayer.addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                     }
                 }
             }
@@ -213,10 +217,10 @@ public class OrdersPerformer {
     }
 
     public static void performMove(TroopToPlanetMovement troopToPlanetMovement, TurnInfo ti, Galaxy aGalaxy) {
-        Troop aTroop = aGalaxy.findTroop(troopToPlanetMovement.getTroopId());
+        Troop aTroop = TroopPureFunctions.findTroop(troopToPlanetMovement.getTroopKey(), aGalaxy);
         Planet aPlanet = aGalaxy.getPlanet(troopToPlanetMovement.getPlanetName());
         if (aTroop == null || aPlanet == null) {
-            Logger.severe("performMove Error: troopId= " + troopToPlanetMovement.getTroopId() + " planetName= " + troopToPlanetMovement.getPlanetName());
+            Logger.severe("performMove Error: troopKey= " + troopToPlanetMovement.getTroopKey() + " planetName= " + troopToPlanetMovement.getPlanetName());
         } else {
             Logger.finest("performMove: " + aTroop.getName() + " destination: " + aPlanet.getName());
             move(aTroop, aPlanet, ti);
@@ -237,10 +241,10 @@ public class OrdersPerformer {
     }
 
     public static void performMove(TroopToCarrierMovement troopToCarrierMovement, TurnInfo ti, Galaxy aGalaxy){
-        Troop aTroop = aGalaxy.findTroop(troopToCarrierMovement.getTroopId());
-        Spaceship destinationCarrier = aGalaxy.findSpaceshipByUniqueId(troopToCarrierMovement.getDestinationCarrierId());
+        Troop aTroop = TroopPureFunctions.findTroop(troopToCarrierMovement.getTroopKey(), aGalaxy);
+        Spaceship destinationCarrier = aGalaxy.findSpaceshipByUniqueId(troopToCarrierMovement.getDestinationCarrierKey());
         if(aTroop == null || destinationCarrier == null){
-            Logger.severe( "performMove Error: troopId= " + troopToCarrierMovement.getTroopId() + " destinationCarrierId= " + troopToCarrierMovement.getDestinationCarrierId());
+            Logger.severe( "performMove Error: troopId= " + troopToCarrierMovement.getTroopKey() + " destinationCarrierId= " + troopToCarrierMovement.getDestinationCarrierKey());
         }else{
             Logger.finest( "performMove: " + aTroop.getName() + " destination: " + destinationCarrier.getName());
             move(aTroop, destinationCarrier, ti);
@@ -262,6 +266,17 @@ public class OrdersPerformer {
         // ; beh�vs denna, eller en motsvarighet till det?
         troop.setShipLocation(destinationCarrier);
         ti.addToLatestGeneralReport(troop.getName() + " has moved from " + oldLocString + " to " + troop.getShipLocation().getName() + ".");
+    }
+
+    public static void performMove(VIPMovement vipMovement, TurnInfo ti, Galaxy aGalaxy) {
+        VIP tempVIP = VipPureFunctions.findVIP(vipMovement.getVipKey(), aGalaxy);
+        if (vipMovement.getPlanetDestination() != null) {
+            VipMutator.moveVIP(tempVIP, aGalaxy.getPlanet(vipMovement.getPlanetDestination()), ti, aGalaxy.getGameWorld());
+        } else if (vipMovement.getShipDestination() != null) {
+            VipMutator.moveVIP(tempVIP, SpaceshipPureFunctions.findSpaceship(vipMovement.getShipDestination(), aGalaxy), ti, aGalaxy.getGameWorld());
+        } else { // troop move
+            VipMutator.moveVIP(tempVIP, TroopPureFunctions.findTroop(vipMovement.getTroopDestination(), aGalaxy), ti, aGalaxy.getGameWorld());
+        }
     }
 
 }
