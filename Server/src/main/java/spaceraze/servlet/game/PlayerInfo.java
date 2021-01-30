@@ -1,5 +1,6 @@
 package spaceraze.servlet.game;
 
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.world.Player;
 
 public class PlayerInfo {
@@ -8,7 +9,7 @@ public class PlayerInfo {
 	
 	PlayerInfo(Player player){
 		name = player.getGovernorName();
-		faction = player.getFaction().getName();
+		faction = GameWorldHandler.getFactionByKey(player.getFactionKey(), player.getGalaxy().getGameWorld()).getName();
 	}
 
 	public String getName() {

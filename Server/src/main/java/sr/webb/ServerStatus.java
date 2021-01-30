@@ -3,6 +3,7 @@
  */
 package sr.webb;
 
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Galaxy;
 import spaceraze.world.Player;
@@ -14,20 +15,6 @@ import sr.server.UpdateRunner;
  */
 public class ServerStatus {
 
-	public static String getServerStatus(int port){
-		String msg = null;
-		CheckServer cs = new CheckServer(port);
-		if (!cs.isRunning()){
-			msg = "Server is not online at the moment";
-		}else
-		if (cs.getTurn() == 0){
-			msg = "New game is starting. Click the Client/Login link in the menu to log in and join the game.";
-		}else{
-			msg = "Server is online (current game turn number is " + cs.getTurn() + ").<br> Click <a href=\"current_game.jsp\">Game Status</a> to see more information about the game.";
-		}
-		return msg;
-	}
-	
 	public static String getStartingText(Galaxy g){
 		String retStr = "";
 		if (g.getTurn() == 0){
@@ -79,8 +66,8 @@ public class ServerStatus {
 		Logger.finer("getPlayerList (boolean): " + showUser);
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
-        	Player temp = (Player)g.getPlayers().get(i);
-        	String color = temp.getFaction().getColorHexValue();
+        	Player temp = g.getPlayers().get(i);
+        	String color = GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
@@ -125,7 +112,7 @@ public class ServerStatus {
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
-        	String color = temp.getFaction().getColorHexValue();
+        	String color = GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 

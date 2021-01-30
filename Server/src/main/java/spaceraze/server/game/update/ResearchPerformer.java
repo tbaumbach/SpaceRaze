@@ -2,6 +2,7 @@ package spaceraze.server.game.update;
 
 import spaceraze.servlethelper.game.ResearchPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -17,7 +18,7 @@ public class ResearchPerformer {
 
     public static  void performResearch(ResearchOrder researchOrder, TurnInfo ti, Player p, Galaxy galaxy){
         Logger.finest( "performResearch: " + researchOrder.getAdvantageName() + " player: " + p.getName());
-        ResearchPerformer.researchAdvantage(p.getFaction(), researchOrder.getAdvantageName(), ti, p, galaxy);
+        ResearchPerformer.researchAdvantage(GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()), researchOrder.getAdvantageName(), ti, p, galaxy);
     }
 
     public static void research(ResearchAdvantage researchAdvantage, TurnInfo ti, Player p, Galaxy galaxy){

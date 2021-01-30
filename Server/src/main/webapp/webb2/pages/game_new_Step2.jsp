@@ -137,7 +137,6 @@ Server message:
 <tr>
 <td>Choose maximum number of players:&nbsp;&nbsp;&nbsp;</td>
 <td><select name="maxnrplayers" style="width:350px;" class="InputText">
-<%= aMap.getNrPlayersHTML() %>
 </select></td>
 </tr>
 <tr>

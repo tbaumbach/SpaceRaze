@@ -4,24 +4,21 @@ import spaceraze.world.Building;
 
 public class BuildingInfo {
 
-	private String name, type;
-	private int id;
+//	private String name;
+	private String typeKey;
+	private String key;
 	
 	BuildingInfo(Building building){
-		type = building.getBuildingType().getName();
-		id = building.getUniqueId();
-		name = building.getName();
+		typeKey = building.getTypeKey();
+		key = building.getKey();
+//		name = building.getName();
 	}
 
-	public String getName() {
-		return name;
+	public String getTypeKey() {
+		return typeKey;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public int getId() {
-		return id;
+	public String getKey() {
+		return key;
 	}
 }

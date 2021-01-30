@@ -6,9 +6,11 @@ import spaceraze.battlehandler.spacebattle.TaskForceHandler;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 public class LandBattleHelper {
 
     public static void troopFight(Planet aPlanet, Galaxy galaxy){
-        if (!aPlanet.isRazedAndUninfected()){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
+        if (!PlanetPureFunctions.isRazedAndUninfected(aPlanet)){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
 
             //Get all non planet owner players that have troops on the planet.
             // If more than one attacking = blocking attack on defending troops.
@@ -84,7 +86,7 @@ public class LandBattleHelper {
             players = getAttackingPlayersWithTroopsOnPlanet(aPlanet, galaxy);
             if(TroopPureFunctions.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl(), galaxy.getTroops()).size() == 0){ // Försvarande spelar har inga trupper kvar.
                 if(players.size() == 1){// only one attacker and the planet should change owner.
-                    if (players.get(0).isAlien()){
+                    if (GameWorldHandler.getFactionByKey(players.get(0).getFactionKey(), galaxy.getGameWorld()).isAlien()){
                         Logger.finer("Attacker is alien");
                         // planet conquered by alien
                         (new PlanetUpdater()).razed(aPlanet, players.get(0));
@@ -92,13 +94,13 @@ public class LandBattleHelper {
                     }else{ // attacker is not alien
                         Logger.finer("Attacker is not alien");
                         // check if defender is alien
-                        if (aPlanet.getInfectedByAlien()){
+                        if (PlanetPureFunctions.getInfectedByAlien(aPlanet, galaxy)){
                             // planet is razed
                             (new PlanetUpdater()).razed(aPlanet, players.get(0));
                         }else{ // defender is not alien
                             // planet conquered
 
-                            (new PlanetUpdater()).conqueredByTroops(aPlanet, players.get(0));
+                            (new PlanetUpdater()).conqueredByTroops(aPlanet, players.get(0), galaxy.getGameWorld());
                             List<TaskForce> taskForces = TaskForceHandler.getTaskForces(aPlanet, false, galaxy);
                             List<TaskForce> countBesiegingTFs = countBesiegingTFs(taskForces, aPlanet, galaxy);
                             if(countBesiegingTFs.size() == 0){
@@ -111,7 +113,7 @@ public class LandBattleHelper {
                 }
             }else{
                 if(players.size() >= 1){ // at least one player still have troops on the planet.
-                    aPlanet.besiegedAfterInconclusiveLandbattle();
+                    aPlanet.setBesieged(true);
                 }
             }
 

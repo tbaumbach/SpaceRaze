@@ -9,6 +9,7 @@ import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -34,7 +35,7 @@ public class BlackMarketPerformer {
 
     public static void newTurn(Galaxy g){
         int nrOffers;
-        int nrPlayers = g.getNrActivePlayers();
+        int nrPlayers = PlayerPureFunctions.getActivePlayers(g).size();
         if (nrPlayers == duelGame){
             int tmpRdm = Functions.getRandomInt(1,4);
             if (tmpRdm == 4){ // 25% of 2 offers
@@ -71,7 +72,7 @@ public class BlackMarketPerformer {
             while (!canBeUsed & (tries < 100)){
                 blackMarketOffer.setVipType(VipPureFunctions.getRandomVIPType(galaxy));
                 tries++;
-                canBeUsed = galaxy.vipCanBeUsed(blackMarketOffer.getVIPType());
+                canBeUsed = vipCanBeUsed(blackMarketOffer.getVIPType(), galaxy);
             }
             if(!canBeUsed){ // if no vip was found use a hot stuff instead
                 blackMarketOffer.setVipType(null);
@@ -88,6 +89,21 @@ public class BlackMarketPerformer {
         }
 
         return blackMarketOffer;
+    }
+
+    public static boolean vipCanBeUsed(VIPType aVIPType, Galaxy galaxy) {
+        boolean found = false;
+        int index = 0;
+        List<Player> activePlayers = PlayerPureFunctions.getActivePlayers(galaxy);
+        while (!found & (index < activePlayers.size())) {
+            Player aPlayer = activePlayers.get(index);
+            if (GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()).getAlignment().canHaveVip(aVIPType.getAlignment().getName())) {
+                found = true;
+            } else {
+                index++;
+            }
+        }
+        return found;
     }
 
     private static TroopType getRandomCommonTroopType(Galaxy galaxy) {
@@ -268,7 +284,7 @@ public class BlackMarketPerformer {
         List<SpaceshipType> possibleShipTypes = new LinkedList<>();
         for (SpaceshipType aSpaceshipType : galaxy.getGameWorld().getShipTypes()) {
             boolean allhaveType = true;
-            for (Player aPlayer : galaxy.getActivePlayers()) {
+            for (Player aPlayer : PlayerPureFunctions.getActivePlayers(galaxy)) {
                 if (PlayerPureFunctions.findSpaceshipImprovement(aSpaceshipType.getName(), aPlayer) == null) {
                     allhaveType = false;
                 }

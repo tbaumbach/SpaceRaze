@@ -67,12 +67,7 @@ public class CheckServer {
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
         	String color = "#FF0000";
-        	if (temp.getFaction().getName().equalsIgnoreCase("rebel")){
-        		color = "#00FF00";
-        	}else
-        	if (temp.getFaction().getName().equalsIgnoreCase("league")){
-        		color = "#0000FF";
-        	}
+
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName() + "</font><span></span>";
         	// pad with space
         	for (int j = temp.getGovernorName().length(); j < (longestName + 3); j++){

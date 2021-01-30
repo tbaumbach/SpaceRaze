@@ -9,11 +9,13 @@ import java.util.List;
 import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.world.*;
 import spaceraze.server.world.comparator.PlanetRangeComparator;
 import spaceraze.util.general.Functions;
@@ -31,7 +33,7 @@ public class StartGameHandler {
 			int tempNumberOfStartPlanet = numberOfStartPlanet-1;
 			List<Planet> neutralPlanets = new ArrayList<Planet>();
 			List<Planet> neutralPlanetsRandom = new ArrayList<Planet>();
-			neutralPlanets.addAll(galaxy.getPlayersPlanets(null));
+			neutralPlanets.addAll(PlanetPureFunctions.getPlayersPlanets(null, galaxy));
 			if(neutralPlanets.size() < (galaxy.getPlayers().size() * tempNumberOfStartPlanet)){
 				tempNumberOfStartPlanet = neutralPlanets.size()/galaxy.getPlayers().size();
 			}
@@ -44,7 +46,7 @@ public class StartGameHandler {
 			
 			List<Planet> razedPlanets = new ArrayList<Planet>();
 			for (Planet planet : neutralPlanets) {
-				if(planet.isRazed()){
+				if(PlanetPureFunctions.isRazed(planet)){
 					razedPlanets.add(planet);
 				}
 			}
@@ -74,11 +76,11 @@ public class StartGameHandler {
 	    	for (Planet planet : neutralPlanetsRandom) {
 	    		
 	    		Player randomPlayer = randomPlayers.get(playerNr);
-	    		if (randomPlayer.isAlien()){
+	    		if (GameWorldHandler.getFactionByKey(randomPlayer.getFactionKey(), galaxy.getGameWorld()).isAlien()){
 	    			galaxyUpdater.removeNeutralShips(planet);
 					galaxyUpdater.checkTroopsOnInfestedPlanet(planet, randomPlayer);
 	    			planet.setProd(0);
-	    			planet.setResistance(1 + randomPlayer.getFaction().getResistanceBonus());
+	    			planet.setResistance(1 + randomPlayer.getResistanceBonus());
 	    			planet.setHasNeverSurrendered(false);
 	    			planet.setPlayerInControl(randomPlayer);
 	    		}else{
@@ -116,13 +118,27 @@ public class StartGameHandler {
             galaxy.removeNeutralShips(homeplanet);
             galaxy.removeNeutralTroops(homeplanet);
             Logger.finer("Galaxy.getNewPlayer3");
-            homeplanet.setHomePlanet(p.getFaction());
+            setHomePlanet(homeplanet, GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()));
             Logger.finer("Galaxy.getNewPlayer4");
             galaxy.addPlayer(p);
             Logger.finer("Galaxy.getNewPlayer5");
         }
         return p;
     }
+
+	private void setHomePlanet(Planet planet, Faction playersFaction){
+		planet.setOpen(false);
+		planet.setHasNeverSurrendered(false);
+		if (playersFaction.isAlien()){
+			planet.setPopulation(0);
+			planet.setBasePopulation(7);
+			planet.setResistance(7 + playersFaction.getResistanceBonus());
+		}else {
+			planet.setPopulation(7);
+			planet.setBasePopulation(7);
+			planet.setResistance(3 + playersFaction.getResistanceBonus());
+		}
+	}
 	
 //  @SuppressWarnings("unchecked")
   private Planet getStartPlanet(int steps, Faction playerFaction, Galaxy galaxy){
@@ -175,7 +191,7 @@ public class StartGameHandler {
 	
 //  gissar att TurnInfo texten inte visas någon stan?  den är tok fel i alla fall.
     private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy){
-		Player p = new Player(name,password,galaxy, govenorName, factionName, homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
+		Player p = new Player(name,password,galaxy, govenorName, GameWorldHandler.getFactionByName(factionName, galaxy.getGameWorld()) , homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
         p.getTurnInfo().addToLatestGeneralReport("Welcome to this SpaceRaze Game.");
         p.getTurnInfo().addToLatestGeneralReport("You have 1 planet under your control - the planet " + homeplanet.getName() + ".");
         p.getTurnInfo().addToLatestGeneralReport("");
@@ -186,50 +202,42 @@ public class StartGameHandler {
         p.getTurnInfo().addToLatestGeneralReport("You start with 2 Corvettes, 1 Nebulon B Frigate, 1 medium orbital fort and 1 orbital wharf.");
         p.getTurnInfo().addToLatestGeneralReport("");
         // add res bonus to homeplanet
-        homeplanet.setResistance(homeplanet.getResistance() + p.getFaction().getResistanceBonus());
+        homeplanet.setResistance(homeplanet.getResistance() + p.getResistanceBonus());
 
-        addPlayerBuildingImprovements(p);
-        // clone all buildings type to the player obj
-        //p.setBuildings(Functions.deepClone(p.getFaction().getBuildings()));
+        addPlayerBuildingImprovements(p, galaxy.getGameWorld());
 //      create all starting buildings for the new player
-        List<BuildingType> startBuildingTypes = p.getFaction().getStartingBuildings();
+        List<BuildingType> startBuildingTypes = GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getStartingBuildings();
         for (Iterator<BuildingType> iter = startBuildingTypes.iterator(); iter.hasNext();) {
         	BuildingType buildingTemp1 = (BuildingType) iter.next();
         	Logger.info("buildingTemp1.getName(): " + buildingTemp1.getName());
         	BuildingType buildingTemp2 = PlayerPureFunctions.findBuildingType(buildingTemp1.getName(), p);
-        	Building buildingTemp = buildingTemp2.getBuilding(homeplanet, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.BUILDING).getUniqueId());
-        	//buildingTemp.setLocation(homeplanet);
-        	//buildingTemp.setOwner(p);
-        	Logger.finer("Building added: " + p.getName() + " " + buildingTemp.getBuildingType().getName());
-        	homeplanet.addBuilding(buildingTemp);
-        	//spaceships.add(buildingTemp);
+        	Building buildingTemp = new Building(buildingTemp2, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.BUILDING).getUniqueId(), homeplanet);
+        	Logger.finer("Building added: " + p.getName() + " " + buildingTemp.getTypeKey());
+        	homeplanet.getBuildings().add(buildingTemp);
         }
         
-        
-        //orbitalWharfs.add(new OrbitalWharf(p.getFaction().getStartingWharfSize(),homeplanet,this));
-        //LoggingHandler.finer("Wharf added: " + p.getName() + " " + orbitalWharfs.size());
         // create all spaceshiptypes
-		addPlayerSpaceshipImprovements(p);
+		addPlayerSpaceshipImprovements(p, galaxy.getGameWorld());
         // create all starting spaceships for the new player
-        List<SpaceshipType> startTypes = p.getFaction().getStartingShipTypes();
+        List<SpaceshipType> startTypes = GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getStartingShipTypes();
 
 		for (SpaceshipType sstTemp1 : startTypes) {
-			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, 0, p.getFaction().getTechBonus(),0);
+			Spaceship createdSpaceShip = SpaceshipMutator.createSpaceShip(p, sstTemp1, 0, p.getTechBonus(),0);
 			createdSpaceShip.setLocation(homeplanet);
 			createdSpaceShip.setOwner(p);
 			galaxy.addSpaceship(createdSpaceShip);
 		}
 
         // clone trooptypes in faction and add to new player
-		addPlayersTroopImprovements(p);
+		addPlayersTroopImprovements(p, galaxy.getGameWorld());
 		//addTroopTypes(p);
         // create all starting troops for this player
-        List<TroopType> startTroopTypes = p.getFaction().getStartingTroops();
+        List<TroopType> startTroopTypes = GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getStartingTroops();
         for (TroopType aTroopType : startTroopTypes) {
         	// first get trooptype from player
         	TroopType playerTroopType = PlayerPureFunctions.findOwnTroopType(aTroopType.getName(), p, galaxy);
         	// then create new troop
-        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, 0, p.getFaction().getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId(), galaxy.getGameWorld());
+        	Troop aTroop = TroopMutator.createTroop(p, playerTroopType, 0, p.getTechBonus(), 0, UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId(), galaxy.getGameWorld());
         	aTroop.setPlanetLocation(homeplanet);
         	aTroop.setOwner(p);
         	galaxy.addTroop(aTroop);
@@ -239,17 +247,17 @@ public class StartGameHandler {
         Logger.finer("create gov");
 //        VIP tempVip = ((VIPType)vipTypes.elementAt(0)).createNewVIP(p,homeplanet);
 //        allVIPs.addElement(tempVip);
-        galaxy.getAllVIPs().add(VipMutator.createNewVIP(p.getFaction().getGovernorVIPType(), p, homeplanet, true));
+        galaxy.getAllVIPs().add(VipMutator.createNewVIP(GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getGovernorVIPType(), p, homeplanet, true));
         // create 1 random VIP
 //        tempVip = this.createRandomVIP();
 //        tempVip.setBoss(p);
         Logger.finer("create player vip");
-        for (int i = 0; i < p.getFaction().getNrStartingRandomVIPs(); i++) {
+        for (int i = 0; i < GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getNrStartingRandomVIPs(); i++) {
         	//TODO createPlayerVIP(p) should be moved to server side.
             VIP tempVip = VipMutator.createPlayerVIP(p, galaxy);
             VipMutator.setShipLocation(tempVip, homeplanet);
 		}
-        List<VIPType> playerStartVips = p.getFaction().getStartingVIPTypes();
+        List<VIPType> playerStartVips = GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).getStartingVIPTypes();
         for (VIPType aVipType : playerStartVips) {
             VIP tempVip = VipMutator.createNewVIP(aVipType, true);
 	        tempVip.setBoss(p);
@@ -268,18 +276,18 @@ public class StartGameHandler {
         return p;
     }
 
-	private void addPlayerBuildingImprovements(Player player) {
-		player.getFaction().getBuildings().stream()
+	private void addPlayerBuildingImprovements(Player player, GameWorld gameWorld) {
+		GameWorldHandler.getFactionByKey(player.getFactionKey(), gameWorld).getBuildings().stream()
 				.forEach(type -> player.addBuildingImprovement(new PlayerBuildingImprovement(type.getName(), type.isDeveloped())));
 	}
 
-	private void addPlayerSpaceshipImprovements(Player player){
-		player.getFaction().getSpaceshipTypes().stream()
+	private void addPlayerSpaceshipImprovements(Player player, GameWorld gameWorld){
+		GameWorldHandler.getFactionByKey(player.getFactionKey(), gameWorld).getSpaceshipTypes().stream()
 				.forEach(type -> player.addSpaceshipImprovement(new PlayerSpaceshipImprovement(type.getName(), type.isAvailableToBuild())));
 	}
 
-    private void addPlayersTroopImprovements(Player player){
-		player.getFaction().getTroopTypes().stream()
+    private void addPlayersTroopImprovements(Player player, GameWorld gameWorld){
+		GameWorldHandler.getFactionByKey(player.getFactionKey(), gameWorld).getTroopTypes().stream()
 				.forEach(type -> player.addTroopImprovement(new PlayerTroopImprovement(type.getName(), type.isCanBuild())));
 	}
     
@@ -298,7 +306,7 @@ public class StartGameHandler {
   	  int nrSameFaction = 0;
   	  for (Planet planet : allPlanets) {
   		  if (planet.getPlayerInControl() != null){
-  			  if (planet.getPlayerInControl().getFaction() == playersFaction){
+  			  if (planet.getPlayerInControl().getFactionKey().equals(playersFaction.getKey())){
   				  nrSameFaction++;
   			  }
   		  }
@@ -373,7 +381,7 @@ public class StartGameHandler {
 	        Planet tempPlanet = newEdgePlanets.get(k);
 	        // kolla om planeten är en startplanet
 	        if (tempPlanet.getPlayerInControl() != null){
-	        	if (tempPlanet.getPlayerInControl().getFaction() == playerFaction){
+	        	if (tempPlanet.getPlayerInControl().getFactionKey().equals(playerFaction.getKey())){
 	        		// planet hittad! Sätt till true!
 	        		planetFound = true;
 	        	}

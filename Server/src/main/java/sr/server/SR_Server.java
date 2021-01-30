@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import spaceraze.server.game.StartGameHandler;
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Faction;
@@ -231,7 +232,7 @@ public class SR_Server {
 		Logger.finest("gamePassword: " + gamePassword);
 		g.setPassword(gamePassword);
 		g.setRandomFaction(randomGame);
-		g.setranked(ranked);
+		g.setRanked(ranked);
 		if (selectableFactionNames == null) {
 			// all factions should be selectable
 			g.setAllFactionsSelectable();
@@ -436,7 +437,7 @@ public class SR_Server {
 			if (g.gameEnded) {
 				Logger.info("Game is ended, no update or mails will be performed.");
 			} else if (g.turn > 0) {
-				int nrActive = g.getNrActivePlayers();
+				int nrActive = PlayerPureFunctions.getActivePlayers(g).size();
 				int nrUpdated = g.getNrFinishedPlayers();
 				Logger.info(nrUpdated + "/" + nrActive + " players updated.");
 				if (nrActive == nrUpdated) {

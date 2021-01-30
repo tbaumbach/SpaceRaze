@@ -5,6 +5,7 @@ import java.util.List;
 
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
@@ -69,7 +70,7 @@ public class PlanetInfo {
 		armys = new ArrayList<ArmyInfo>();
 		
 		name = planet.getName();
-		razed = planet.isRazed();
+		razed = PlanetPureFunctions.isRazed(planet);
 		//TODO klasserna PlanerInfos och sr.world.PlanetInfo ska ersättas av denna klass enligt samma model som MapPLanetInfo.
 		// Frågan är då om notes här kommer bli orginalet? Annars är all information här hämtad från andra källor.
 		// Kanske enkelt att bara skapa en länkad list i player med planet name som nyckel. Vänta med att göra det tills det går att spela på siten.
@@ -85,7 +86,7 @@ public class PlanetInfo {
 		boolean surveyVIP = VipPureFunctions.findSurveyVIPonShip(planet, player, galaxy) != null;
 		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy);
 		boolean survey = surveyShip || alliedSurveyShip || surveyVIP || alliedSurveyVIP;
-		boolean shipInSystem = (galaxy.playerHasShipsInSystem(player,planet));
+		boolean shipInSystem = PlayerPureFunctions.playerHasShipsInSystem(player,planet, galaxy);
 		boolean alliedShipsInSystem = PlanetPureFunctions.isItAlliedShipsInSystem(player, planet, galaxy);
 		
 		
@@ -101,7 +102,7 @@ public class PlanetInfo {
 	//	if(!razed){ // a razed planet is a dead planet = nothing on it.
 			open = planet.isOpen();
 						
-			boolean isOwner = planet.isPlanetOwner(player);
+			boolean isOwner = PlanetPureFunctions.isPlanetOwner(planet, player);
 			
 			
 			//Checks if the planets owner is a allied = show all.
@@ -109,7 +110,7 @@ public class PlanetInfo {
 			
 			if(open || shipInSystem || alliedShipsInSystem || isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
 				
-				if(planet.isPlayerPlanet()){
+				if(planet.getPlayerInControl() != null){
 					owner = planet.getPlayerInControl().getGovernorName();
 				}else{
 					owner = "neutral";
@@ -136,7 +137,7 @@ public class PlanetInfo {
 					addBuildings(planet.getBuildings());
 				} else if(open || shipInSystem || alliedShipsInSystem){// Information from orbit, can't see cloaked units.
 					getOthersArmys(planet, player, galaxy, false);
-					addBuildings(planet.getBuildingsByVisibility(true)); // bara buildings som syns på kartan.
+					addBuildings(MapPureFunctions.getBuildingsByVisibility(planet, true)); // bara buildings som syns på kartan.
 				}
 				
 				

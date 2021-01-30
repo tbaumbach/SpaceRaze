@@ -4,6 +4,7 @@ import spaceraze.servlethelper.game.StatisticsHandler;
 import spaceraze.servlethelper.game.player.CostPureFunctions;
 import spaceraze.servlethelper.game.player.IncomePureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 
@@ -32,7 +33,7 @@ public class StatisticsUpdater {
         for (Player player : galaxy.getPlayers()) {
             if (!player.isDefeated()) {
                 tempIncome = IncomePureFunctions.getPlayerIncome(player, false);
-                tempIncome -= CostPureFunctions.getPlayerUpkeepShips(player, galaxy.getPlanets(), galaxy.getSpaceships());
+                tempIncome -= CostPureFunctions.getPlayerUpkeepShips(player, galaxy.getPlanets(), galaxy.getSpaceships(), galaxy.getGameWorld());
                 tempIncome -= CostPureFunctions.getPlayerUpkeepTroops(player, galaxy.getPlanets(), galaxy.getTroops());
                 tempIncome -= CostPureFunctions.getPlayerUpkeepVIPs(player, galaxy.getAllVIPs());
                 if (tempIncome < 0) { // if broke set net income to 0
@@ -51,7 +52,7 @@ public class StatisticsUpdater {
         // nollsätt totalpop för alla factioner
         for (Player aPlayer : galaxy.getPlayers()) {
             aPlayer.setTotalPop(0);
-            factionProductions.putIfAbsent(aPlayer.getFaction().getName(), 0);
+            factionProductions.putIfAbsent(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()).getName(), 0);
         }
         int neutralPop = 0; // räkna popen på alla neutrala planeter
         // lägg till factionerna
@@ -62,8 +63,8 @@ public class StatisticsUpdater {
         // räkna popen för alla spelare
         for (Planet planet : galaxy.getPlanets()) {
             if (planet.getPlayerInControl() != null) {
-                Faction planetFaction = planet.getPlayerInControl().getFaction();
-                if (planet.getPlayerInControl().isAlien()) {
+                Faction planetFaction = GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), galaxy.getGameWorld());
+                if (GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), galaxy.getGameWorld()).isAlien()) {
                     planet.getPlayerInControl()
                             .setTotalPop(planet.getPlayerInControl().getTotalPop() + planet.getResistance());
                     factionProductions.put(planetFaction.getName(),
@@ -196,7 +197,7 @@ public class StatisticsUpdater {
     private static void setStatisticsShipsKilled(Galaxy galaxy) {
         for (Player aPlayer : galaxy.getPlayers()) {
             Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
-            String factionName = aPlayer.getFaction().getName();
+            String factionName = GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()).getName();
             List<CanBeLostInSpace> lisOwn = SpaceshipPureFunctions.getShipsLostInSpace(galaxy, lastReport.getLostShips(), factionName, true); // egna förlorade
             // skepp
             StatisticsHandler.addStatistics(StatisticType.SHIPS_LOST, aPlayer.getName(), lisOwn.size(), true, galaxy);

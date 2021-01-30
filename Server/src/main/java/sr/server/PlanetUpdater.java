@@ -1,5 +1,6 @@
 package sr.server;
 
+import spaceraze.servlethelper.game.BuildingPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
@@ -16,9 +17,9 @@ import java.util.List;
 //TODO 2020-11-12 snygga till och gör om det senare till en @Service
 public class PlanetUpdater {
 
-    public void conqueredByTroops(Planet planet, Player conqueringPlayer){
+    public void conqueredByTroops(Planet planet, Player conqueringPlayer, GameWorld gameWorld){
         Logger.finer("conqueredByTroops called");
-        planet.setResistance(1 + conqueringPlayer.getFaction().getResistanceBonus()); // olika typer av spelare för olika res på nyerövrade planeter
+        planet.setResistance(1 + conqueringPlayer.getResistanceBonus()); // olika typer av spelare för olika res på nyerövrade planeter
         Player playerInControl = planet.getPlayerInControl();
         if (playerInControl != null){
             PlanetPureFunctions.findPlanetInfo(planet.getName(), playerInControl.getPlanetInformations()).setLastKnownOwner(conqueringPlayer.getName());
@@ -32,7 +33,7 @@ public class PlanetUpdater {
 
             planet.setHasNeverSurrendered(false); // should not be needed?
 
-            planet.destroyBuildingsThatCanNotBeOverTaked(conqueringPlayer);
+            PlanetMutator.destroyBuildingsThatCanNotBeOverTaken(planet, conqueringPlayer, gameWorld);
 
         }else{
             conqueringPlayer.addToGeneral("The neutral planet " + planet.getName() + " have no troops and can make no resistance to your troops.");
@@ -65,7 +66,7 @@ public class PlanetUpdater {
     public void planetSurrenders(Planet planet, TaskForce attackingTaskForce, Galaxy galaxy){
         Player attackingPlayer = galaxy.getPlayerByGovenorName(attackingTaskForce.getPlayerName());
         Player playerInControl = planet.getPlayerInControl();
-        planet.setResistance(1 + attackingPlayer.getFaction().getResistanceBonus()); // olika typer av spelare för olika res på erövrade planeter
+        planet.setResistance(1 + attackingPlayer.getResistanceBonus()); // olika typer av spelare för olika res på erövrade planeter
         if (playerInControl != null){
             PlanetMutator.setLastKnownOwner(planet.getName(), attackingPlayer.getName(),galaxy.turn + 1, playerInControl.getPlanetInformations());
             PlanetMutator.setLastKnownProductionAndResistance(planet.getName(), planet.getPopulation(), planet.getResistance(), playerInControl.getPlanetInformations());
@@ -76,7 +77,7 @@ public class PlanetUpdater {
             checkVIPsOnConqueredPlanet(planet, attackingPlayer, attackingPlayer.getGalaxy());
             planet.setHasNeverSurrendered(false);
 
-            planet.destroyBuildingsThatCanNotBeOverTaked(attackingPlayer);
+            PlanetMutator.destroyBuildingsThatCanNotBeOverTaken(planet, attackingPlayer, galaxy.getGameWorld());
     	/*	if (hasSpaceStation()){
     			attackingTaskForce.getPlayer().addToGeneral("The space station orbiting the planet " + name + " has been destroyed.");
     			playerInControl.addToGeneral("Your space station orbiting the planet " + name + " has been destroyed.");
@@ -143,20 +144,20 @@ public class PlanetUpdater {
             List<Building> removeBuildings = new ArrayList<Building>();
             List<Building> buildings = aPlanet.getBuildings();
             for (Building building : buildings) {
-                if (building.getBuildingType().isInOrbit()) {
+                if (BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).isInOrbit()) {
                     removeBuildings.add(building);
                 }
             }
             for (Building building : removeBuildings) {
                 // skriva meddelanden...
                 aPlayer.getTurnInfo().addToLatestGeneralReport("You have destroyed a "
-                        + building.getBuildingType().getName() + " on " + aPlanet.getName() + ".");
+                        + BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).getName() + " on " + aPlanet.getName() + ".");
                 if (aPlanet.getPlayerInControl() != null) {
                     aPlanet.getPlayerInControl().getTurnInfo()
-                            .addToLatestGeneralReport("Your " + building.getBuildingType().getName() + " on the "
+                            .addToLatestGeneralReport("Your " + BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).getName() + " on the "
                                     + aPlanet.getName() + " has been destroyed.");
                 }
-                aPlanet.removeBuilding(building.getUniqueId());
+                PlanetMutator.removeBuilding(aPlanet, building.getKey());
             }
         }
     }

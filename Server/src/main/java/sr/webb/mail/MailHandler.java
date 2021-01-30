@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
@@ -200,7 +201,7 @@ public class MailHandler {
 
 	private static boolean isOwnedByFaction(CanBeLostInSpace canBeLostInSpace, String aFactionName, Galaxy galaxy) {
 		if (canBeLostInSpace.getOwner() != null){
-			if (galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFaction().getName().equalsIgnoreCase(aFactionName)){
+			if (GameWorldHandler.getFactionByKey(galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFactionKey(), galaxy.getGameWorld()).getName().equalsIgnoreCase(aFactionName)){
 				return true;
 			}
 		}else
@@ -217,7 +218,7 @@ public class MailHandler {
 		List<CanBeLostInSpace> lostShips = lastReport.getLostShips();
 		List<CanBeLostInSpace> lostTrops = lastReport.getLostTroops();
 		// print players own losses
-  		String playerFactionName = aPlayer.getFaction().getName();
+  		String playerFactionName = GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()).getName();
   		List<CanBeLostInSpace> tmpList = getLostInSpaceByFaction(lostShips, playerFactionName, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own ships lost"));
@@ -240,7 +241,7 @@ public class MailHandler {
   			lisExist = true;
   		}
   		// print ships from other factions
-  		List<Faction> allFactions = galaxy.getActiveFactions(aPlayer.getFaction());
+  		List<Faction> allFactions = galaxy.getActiveFactions(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()));
   		for (Faction aFaction : allFactions) {
 
   			tmpList = getLostInSpaceByFaction(lostShips,aFaction.getName(), galaxy);

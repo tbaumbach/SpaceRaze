@@ -5,8 +5,11 @@ import java.util.List;
 
 import spaceraze.servlethelper.game.GameWorldCreator;
 import spaceraze.servlethelper.game.StatisticsHandler;
+import spaceraze.servlethelper.game.planet.PlanetMutator;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -60,7 +63,8 @@ public class GalaxyCreator{
         Planet tempp = (Planet)allPlanets.get(i);
         if (!tempp.isStartPlanet()){
           int tmpProd = Functions.getRandomInt(1,3) + Functions.getRandomInt(1,4) - 1;
-          tempp.setProd(tmpProd,tmpProd);
+            tempp.setProd(tmpProd);
+            tempp.setBasePopulation(tmpProd);
           if (tempp.getPopulation() > 3){
             tempp.setResistance(Functions.getRandomInt(1,3) + Functions.getRandomInt(1,3));
           }else{
@@ -68,14 +72,14 @@ public class GalaxyCreator{
           }
           int temp = Functions.getRandomInt(1,100);
           if (temp <= g.getGameWorld().getClosedNeutralPlanetChance()){  // �ndrar s� att �ppna blir st�ngda
-            tempp.reverseVisibility();
+            PlanetMutator.reverseVisibility(tempp);
           }
           SpaceshipType sst1 = g.getGameWorld().getNeutralSize1();
           SpaceshipType sst2 = g.getGameWorld().getNeutralSize2();
           SpaceshipType sst3 = g.getGameWorld().getNeutralSize3();
           TroopType tt = g.getGameWorld().getNeutralTroopType();
           if (couldBeRazed && Functions.getRandomInt(1,100) <= g.getGameWorld().getRazedPlanetChance()){ 
-        	  tempp.setRazed();
+        	  PlanetMutator.setRazed(tempp);
           }else 
           if (tempp.getPopulation() < 3){ // pop 1-2
             temp = Functions.getRandomInt(1,3) - 1;
@@ -152,7 +156,7 @@ public class GalaxyCreator{
         // create new diplomacy states to all other players (that have already joined this game)
         GameWorldDiplomacy diplomacy = gw.getDiplomacy();
         for (Player aPlayer : galaxy.getPlayers()) {
-            DiplomacyRelation tmpRelation = GameWorldCreator.getRelation(aPlayer.getFaction(), p.getFaction(), gw);
+            DiplomacyRelation tmpRelation = GameWorldCreator.getRelation(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), gw), GameWorldHandler.getFactionByKey(p.getFactionKey(), gw), gw);
             GameDiplomacyRelation gameDiplomacyRelation = GameDiplomacyRelation.builder()
                     .faction1(tmpRelation.getFaction1())
                     .faction2(tmpRelation.getFaction2())

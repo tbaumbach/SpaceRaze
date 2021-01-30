@@ -1,5 +1,6 @@
 package spaceraze.server.game.update;
 
+import spaceraze.servlethelper.game.BuildingPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopMutator;
@@ -9,6 +10,7 @@ import spaceraze.servlethelper.game.vip.VipPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusMutator;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
@@ -56,7 +58,7 @@ public class OrdersPerformer {
         }
         for (int i = 0; i < orders.getPlanetVisibilities().size(); i++) {
             Planet temp = galaxy.getPlanet(orders.getPlanetVisibilities().get(i));
-            temp.reverseVisibility();
+            PlanetMutator.reverseVisibility(temp);
             String openString = "closed";
             if (temp.isOpen()) {
                 openString = "open";
@@ -70,8 +72,8 @@ public class OrdersPerformer {
             checkVIPsOnAbandonedPlanet(tempPlanet, tempPlayer, galaxy);
             tempPlanet.setPlayerInControl(null);
             PlanetOrderStatusMutator.setAttackIfNeutral(false, tempPlanet.getName(), tempPlayer.getPlanetOrderStatuses());
-            if (p.isAlien()) {
-                tempPlanet.setRazed();
+            if (GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).isAlien()) {
+                PlanetMutator.setRazed(tempPlanet);
                 galaxy.removeBuildingsOnPlanet(tempPlanet);
                 PlanetMutator.setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1, tempPlayer.getPlanetInformations());
                 PlanetMutator.setLastKnownProductionAndResistance(tempPlanet.getName(), 0, 0, tempPlayer.getPlanetInformations());
@@ -99,10 +101,10 @@ public class OrdersPerformer {
             }
         }
         for (int i = 0; i < orders.getBuildingSelfDestructs().size(); i++) {
-            Building tempBuilding = galaxy.findBuilding(orders.getBuildingSelfDestructs().get(i), p);
+            Building tempBuilding = BuildingPureFunctions.findBuilding(orders.getBuildingSelfDestructs().get(i), p, galaxy);
             if (tempBuilding != null) {
-                tempBuilding.getLocation().removeBuilding(tempBuilding.getUniqueId());
-                ti.addToLatestGeneralReport("On your command " + tempBuilding.getBuildingType().getName() + " at " + tempBuilding.getLocation().getName() + " has been destroyed.");
+                PlanetMutator.removeBuilding(tempBuilding.getLocation(), tempBuilding.getKey());
+                ti.addToLatestGeneralReport("On your command " + BuildingPureFunctions.getBuildingType(tempBuilding.getTypeKey(), galaxy.getGameWorld()).getName() + " at " + tempBuilding.getLocation().getName() + " has been destroyed.");
             }
         }
         for (int i = 0; i < orders.getVIPSelfDestructs().size(); i++) {

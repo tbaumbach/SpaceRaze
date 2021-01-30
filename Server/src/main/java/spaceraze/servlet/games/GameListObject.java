@@ -1,5 +1,6 @@
 package spaceraze.servlet.games;
 
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
 
@@ -23,7 +24,7 @@ public class GameListObject {
 		numberOfStartPlanets = aServer.getNumberOfStartPlanet();
 		endTurn = aServer.getEndTurn();
 		maxNrOfPlayers = aServer.getGalaxy().getNrStartPlanets();
-		nrActivePlayers = aServer.getGalaxy().getActivePlayers().size();
+		nrActivePlayers = PlayerPureFunctions.getActivePlayers(aServer.getGalaxy()).size();
 		passwordProteced = aServer.isPasswordProtected();
 		nextUpdate = "None";
 		

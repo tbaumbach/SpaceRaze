@@ -89,7 +89,7 @@ public class CheckAbandonedSquadrons {
 						}
 					} else // planet is not neutral, check if it belongs to another faction
 					if (player != null
-							&& aShip.getOwner().getFaction() != aShip.getLocation().getPlayerInControl().getFaction()) {
+							&& !aShip.getOwner().getFactionKey().equals(aShip.getLocation().getPlayerInControl().getFactionKey())) {
 						if (!sqdSurvive) {
 							// handle sqds auto moves to carriers
 							List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(), player, null, galaxy);
@@ -153,7 +153,7 @@ public class CheckAbandonedSquadrons {
 	private void checkAbandonedSquadrons(Player aPlayer){
 	  	  Logger.finest("checkAbandonedSquadron called, player: " + aPlayer.getName());
 	  	  boolean sqdSurvive = galaxy.getGameWorld().isSquadronsSurviveOutsideCarriers();
-	  	  List<Spaceship> playerSpaceships = galaxy.getPlayersSpaceships(aPlayer).stream().collect(Collectors.toList());
+	  	  List<Spaceship> playerSpaceships = SpaceshipPureFunctions.getPlayersSpaceships(aPlayer, galaxy).stream().collect(Collectors.toList());
 	  	  Collections.shuffle(playerSpaceships);
 	  	  List<Spaceship> removeShips = new LinkedList<Spaceship>();
 	  	  boolean addSpace = false;
@@ -189,7 +189,7 @@ public class CheckAbandonedSquadrons {
 	  						addSpace = true;
 	  					}
 	  				}else // planet is not neutral, check if it belongs to another faction
-	  				if(aShip.getOwner().getFaction() != aShip.getLocation().getPlayerInControl().getFaction()){
+	  				if(!aShip.getOwner().getFactionKey().equals(aShip.getLocation().getPlayerInControl().getFactionKey())){
 	  					if (!sqdSurvive){
 	  						// handle sqds auto moves to carriers
 	  						List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer, null, galaxy);

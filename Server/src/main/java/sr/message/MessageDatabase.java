@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Galaxy;
 import spaceraze.world.Message;
@@ -177,7 +178,7 @@ public class MessageDatabase implements Serializable{
 			  tempMessage.setOwner(mesage.getRecipientPlayer());
 			  recipientMessages.add(tempMessage);
 		  }else{ // meddelandet skall till alla i en Faction
-			  List<Player> players = aGalaxy.getFactionMember(aGalaxy.getFaction(mesage.getRecipientFaction()));
+			  List<Player> players = aGalaxy.getFactionMember(GameWorldHandler.getFactionByName(mesage.getRecipientFaction(), aGalaxy.getGameWorld()));
 			  for (Player player : players) {
 				  if(!player.isPlayer(mesage.getSender())){
 					  Logger.finer("Adding unique player mail to: " +player.getName() + " from:" + mesage.getSender());
