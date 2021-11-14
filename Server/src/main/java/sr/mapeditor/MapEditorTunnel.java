@@ -61,7 +61,7 @@ public class MapEditorTunnel extends HttpServlet{
 					Map aMap = MapHandler.getMap(tw.getMapFileName(),null).getCopyFromFile();
 					// always set author, since the map can be a "copy" of another players published map
 					User curUser = UserHandler.findUser(tw.getPlayerLogin());
-					aMap.setAuthorLogin(curUser.getLogin());
+					aMap.setAuthor(curUser.getLogin());
 					aMap.setAuthorName(curUser.getName());
 					// set map
 					tw.setMap(aMap);
@@ -87,7 +87,7 @@ public class MapEditorTunnel extends HttpServlet{
 						String path = tw.getPlayerLogin() + File.separator + tw.getMapFileName() + ".properties";
 						// set user name
 						Map theMap = tw.getMap();
-						User curUser = UserHandler.findUser(theMap.getAuthorLogin());
+						User curUser = UserHandler.findUser(theMap.getAuthor());
 						theMap.setAuthorName(curUser.getName());
 						// save the map
 						success = MapHandler.saveMapToFile(theMap,path);
@@ -99,7 +99,7 @@ public class MapEditorTunnel extends HttpServlet{
 				if(action.equals(TransferWrapper.SAVE_PUB)){
 					// set user name
 					Map theMap = tw.getMap();
-					User curUser = UserHandler.findUser(theMap.getAuthorLogin());
+					User curUser = UserHandler.findUser(theMap.getAuthor());
 					String success = null;
 					// check that there are not already a published map from another player with the same name
 					Map anotherMap = MapHandler.getMap(tw.getMapFileName());
@@ -110,7 +110,7 @@ public class MapEditorTunnel extends HttpServlet{
 						String path = tw.getMapFileName() + ".properties";
 						success = MapHandler.saveMapToFile(theMap,path);
 					}else
-					if (anotherMap.getAuthorLogin().equals(curUser.getLogin())){ // ok to save map, if confirm overwrite exists
+					if (anotherMap.getAuthor().equals(curUser.getLogin())){ // ok to save map, if confirm overwrite exists
 						// check if file exists with same name
 						if (tw.isOwerwriteConfirm()){
 							System.out.println("pub existingMap: " + anotherMap);

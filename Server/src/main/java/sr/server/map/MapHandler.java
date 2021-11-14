@@ -154,7 +154,7 @@ public class MapHandler {
 			String RowName = i + "MapListRow";
 //			LoggingHandler.finer("in loop: " + aMap.getName());
 			String editStr = "";
-			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
+			if (aMap.getAuthor().equals(aUser.getLogin())){
 				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 //				editStr = editStr + "<a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getFileName() + "\">Delete</a>";
@@ -175,7 +175,7 @@ public class MapHandler {
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
 		for (Map aMap : tmpMaps) {
 //			LoggingHandler.finer("in loop: " + aMap.getName());
-			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthorLogin() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
+			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthor() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
 		}
 		return retStr;
 	}
@@ -191,7 +191,7 @@ public class MapHandler {
 			i = i + 1;
 			String RowName = i + "MapDraftListRow";
 			String editStr = "";
-			if (aMap.getAuthorLogin().equals(aUser.getLogin())){
+			if (aMap.getAuthor().equals(aUser.getLogin())){
 				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";
@@ -282,7 +282,7 @@ public class MapHandler {
 	 */
 	public static String saveMapToFile(Map aMap, String path){
 		Logger.fine("saveMapToFile called(): " + path + " " + aMap.getFileName());
-		Logger.fine("playerLogin:: " + aMap.getAuthorLogin());
+		Logger.fine("playerLogin:: " + aMap.getAuthor());
 		String success = null;
 		// create complete path to file to save
 		if (dataPath == null){
