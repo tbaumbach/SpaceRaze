@@ -1,0 +1,82 @@
+<html>
+<head>
+	<title>Learning AngularJS</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.4/angular.min.js"></script>
+	<script src="app.js"></script>
+	<script src="maincontroller.js"></script>
+</head>
+<body>
+	<div id='content' ng-app='MyTutorialApp' ng-controller='MainController'>
+		<select ng-model='selectedPerson' ng-options='obj.name for obj in people'></select>
+		<select ng-model='selectedGenre'>
+			<option ng-repeat='label in people[selectedPerson.id].music'>{{label}}</option>
+		</select>
+		
+		<input type='text' ng-model='searchText' />
+        <ul>
+            <li ng-repeat='person in people | filter:searchText' ng-show='person.live == true'>#{{person.id}} {{person.name}}</li>
+        </ul>
+        <ul>
+            <li ng-repeat='person in people | filter:searchText' ng-hide='person.live == false'>#{{person.id}} {{person.name}}</li>
+        </ul>
+        
+        
+        <input type='text' ng-model='newPerson' />
+        <button ng-click='addNew()'>Add</button>
+        
+        
+        
+        <input type='text' ng-model='gameParameters.gameName' />
+        <select ng-model='selectedGameWorld' ng-options='gameWorld.name for gameWorld in gameWorlds track by gameWorld.id' ng-change='selectGameWorld()'></select>
+        <!--  <select ng-model='gameParameters.mapName' ng-options='map.name for map in maps track by map.fileName' ng-change='selectMap()'></select>-->
+        <select ng-model='selectedMap' ng-options='map.name for map in maps track by map.fileName' ng-change='selectMap()'></select>
+        <input type='text' ng-model='gameParameters.steps' />
+        <input type='text' ng-model='gameParameters.time' />
+        <!-- ng-options="map.maxNrStartPlanets for map in maps | filter:map.mapName:gameParameters.mapName]" 
+        ng-options="map.maxNrStartPlanets for map in maps | filter:gameParameters.mapName"
+        
+        -->
+        <input type='text' ng-model='gameParameters.maxNrPlayers' />
+        <input type='text' ng-model='gameParameters.gamePassword' />
+        <input type='text' ng-model='gameParameters.groupFaction' />
+        <!-- 
+        <input type='text' ng-model='gameParameters.selectableFactionNames' />
+         -->
+        
+        <select multiple ng-model='gameParameters.selectableFactionNames' ng-options='faction for faction in selectedGameWorld.factions'></select>
+        
+        <input type='text' ng-model='gameParameters.randomFaction' />
+        <input type='text' ng-model='gameParameters.numberOfStartPlanet' />
+        
+        <button ng-click='getContract()'>Get contract</button>
+        <button ng-click='getGameWorlds()'>Get gameworlds</button>
+        <button ng-click='getMaps()'>Get Maps</button>
+        <button ng-click='callCreateNewgame()'>Create a new game</button>
+        <button ng-click='getUserContract()'>Get user contract</button>
+        <button ng-click='callCreateUser()'>Create a new User</button>
+        <button ng-click='activate()'>Activate user</button>
+        <button ng-click='login()'>Login</button>
+        <button ng-click='logout()'>Logout</button>
+        <button ng-click='callJoinGame()'>Join Game</button>
+        <button ng-click='callNewOrders()'>Call New Orders</button>
+        <button ng-click='callOrderTaxi()'>Call new Taxi</button>
+        <button ng-click='cancelTaxi()'>Cancel Taxi</button>
+        <button ng-click='listTaxiOrders()'>Lista alla Taxi beställningar</button>
+        
+        
+        
+        
+        <div style="border-color:red;border-width:10px;border:solid;">message: {{message}}</div>
+        
+        <!-- 
+        {"gameWorldName":"thelastgreatwar","gameName":"","mapName":"wigge9","steps":"10","autoBalance":"yes","time":"0","emailPlayers":"no","maxNrPlayers":"9",
+        "gamePassword":"","groupFaction":"yes","selectableFactionNames":["China","USA"],"randomFaction":"no","diplomacy":"faction","ranked":"no","singleVictory":60,"factionVictory":60,"endTurn":0,"numberOfStartPlanet":1,"statisticGameType":"ALL"}
+         -->
+        
+        <div>{{hej}}</div>
+        <div style="border-color:red;border-width:10px;border:solid;">hej: {{hej.name}}</div>
+        <button ng-click='callJson()'>getTroops</button>
+        
+	</div>
+</body>
+</html>
