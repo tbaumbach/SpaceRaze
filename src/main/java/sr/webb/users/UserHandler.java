@@ -7,14 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
-import sr.notifier.JnlpHandler;
 import sr.server.ServerHandler;
 import sr.webb.mail.MailHandler;
 
@@ -43,6 +35,8 @@ public class UserHandler {
 //	private static final String COOKIE_TEMP_LOGIN = "sr_temp_user";
 //	private static final String COOKIE_TEMP_TIMESTAMP = "sr_temp_id";
 	private static Map<String,Long> sessions = new HashMap<>();
+
+	private UserHandler () {}
 	
 	/**
 	 * Reads login and password from request. If they match a user timestanp 
@@ -288,7 +282,7 @@ public class UserHandler {
 		}
 		
 		getTempList();
-		String userString = userName + "\t" + userLogin + "\t" + userPassword + "\t" + userRole + "\t" + email + "\t" + turnEmail + "\t" + gameEmail + "\t" + adminEmail;
+		String userString = UUID.randomUUID().toString() + "\t" + userName + "\t" + userLogin + "\t" + userPassword + "\t" + userRole + "\t" + email + "\t" + turnEmail + "\t" + gameEmail + "\t" + adminEmail;
 		User newUser = new User(userString);
 		allTempUsers.add(newUser);
 		saveTempUsers();
@@ -324,7 +318,6 @@ public class UserHandler {
 			getList();
 			allUsers.add(theUser);
 			saveUsers();
-			JnlpHandler.createJnlpFile(theUser);
 			
 			deleteTempUser(userLogin);
 			
@@ -578,7 +571,7 @@ public class UserHandler {
 		if (allUsers == null){
 			allUsers = new ArrayList<User>();
 			// add default users
-			guestUser = new User("Anonymous\tguest\tguest\tguest");
+			guestUser = new User(UUID.randomUUID().toString() +"\tAnonymous\tguest\tguest\tguest");
 			allUsers.add(guestUser);
 //			allUsers.add(new User("Administrator\tadmin\toverlord\tadmin"));
 //			properties = UserHandler.getInstance();
@@ -591,7 +584,6 @@ public class UserHandler {
 					Logger.finest("adding user: " + tmpStr);
 					User tmpUser = new User(tmpStr);
 					allUsers.add(tmpUser);
-					JnlpHandler.checkJnlpFile(tmpUser);
 					index++;
 				}else{
 					continueLoop = false;

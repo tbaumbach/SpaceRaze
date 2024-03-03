@@ -13,6 +13,7 @@ import sr.webb.mail.Base64;
  * Handles data for one user
  */
 public class User {
+	private String uuid;//TODO lägg till logik
 	private String login,name,password;
 	private String emails; // is a space separated list of email addresses
 	private boolean recieveTurnMail,recieveGameMail,recieveAdminMail;
@@ -31,6 +32,7 @@ public class User {
 	
 	public User(String userData){
 		StringTokenizerPlusPlus stpp = new StringTokenizerPlusPlus(userData,"\t");
+		uuid = stpp.nextToken();
 		name = stpp.nextToken();
 		login = stpp.nextToken();
 		password = stpp.nextToken();

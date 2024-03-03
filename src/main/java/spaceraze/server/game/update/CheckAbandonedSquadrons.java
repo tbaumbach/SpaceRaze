@@ -89,7 +89,7 @@ public class CheckAbandonedSquadrons {
 						}
 					} else // planet is not neutral, check if it belongs to another faction
 					if (player != null
-							&& !aShip.getOwner().getFactionKey().equals(aShip.getLocation().getPlayerInControl().getFactionKey())) {
+							&& !aShip.getOwner().getFactionUuid().equals(aShip.getLocation().getPlayerInControl().getFactionUuid())) {
 						if (!sqdSurvive) {
 							// handle sqds auto moves to carriers
 							List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(), player, null, galaxy);
@@ -134,8 +134,8 @@ public class CheckAbandonedSquadrons {
 			if (controllingPlayer != null) {
 				if (controllingPlayer != aShip.getOwner()) {
 					if (aShip.getOwner() != null) {
-						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), galaxy.getGameWorld()).getName(), true) + " "
-								+ SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), galaxy.getGameWorld()).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
+						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName(), true) + " "
+								+ SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
 								+ " has been scuttled in the " + thePlanet.getName()
 								+ " system, due to lack of carrier.");
 					} else {
@@ -189,7 +189,7 @@ public class CheckAbandonedSquadrons {
 	  						addSpace = true;
 	  					}
 	  				}else // planet is not neutral, check if it belongs to another faction
-	  				if(!aShip.getOwner().getFactionKey().equals(aShip.getLocation().getPlayerInControl().getFactionKey())){
+	  				if(!aShip.getOwner().getFactionUuid().equals(aShip.getLocation().getPlayerInControl().getFactionUuid())){
 	  					if (!sqdSurvive){
 	  						// handle sqds auto moves to carriers
 	  						List<Spaceship> carriersWithFreeSlots = getOtherCarriersWithFreeSlotsInSystem(aShip.getLocation(),aPlayer, null, galaxy);
@@ -285,6 +285,6 @@ public class CheckAbandonedSquadrons {
 
 	// kolla om det finns en gammal order för detta skepp
 	private static boolean checkShipToCarrierMove(Spaceship aSqd, Spaceship aCarrier, Orders orders) {
-		return orders.getShipToCarrierMoves().stream().filter(move -> aSqd.getKey().equalsIgnoreCase(move.getSpaceShipKey())).anyMatch(move -> aCarrier.getKey().equalsIgnoreCase(move.getDestinationCarrierKey()));
+		return orders.getShipToCarrierMoves().stream().filter(move -> aSqd.getUuid().equalsIgnoreCase(move.getSpaceShipKey())).anyMatch(move -> aCarrier.getUuid().equalsIgnoreCase(move.getDestinationCarrierKey()));
 	}
 }

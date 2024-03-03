@@ -13,8 +13,8 @@ import spaceraze.world.orders.ShipToCarrierMovement;
 public class SpaceshipHelper {
 
     public static void performMove(ShipToCarrierMovement shipToCarrierMovement, TurnInfo ti, Galaxy aGalaxy){
-        Spaceship aSpaceship = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getSpaceShipKey());
-        Spaceship aSpaceshipCarrier = aGalaxy.findSpaceshipByUniqueId(shipToCarrierMovement.getDestinationCarrierKey());
+        Spaceship aSpaceship = aGalaxy.findSpaceshipByUuid(shipToCarrierMovement.getSpaceShipKey());
+        Spaceship aSpaceshipCarrier = aGalaxy.findSpaceshipByUuid(shipToCarrierMovement.getDestinationCarrierKey());
         Logger.finest( "performMove: " + aSpaceship.getName() + " destination: " + aSpaceshipCarrier.getName());
         moveShip(aSpaceship, aSpaceshipCarrier, ti);
     }
@@ -35,7 +35,7 @@ public class SpaceshipHelper {
     }
 
     public static void performMove(ShipMovement shipMovement,  TurnInfo ti, Galaxy aGalaxy) {
-        Spaceship spaceship = aGalaxy.findSpaceshipByUniqueId(shipMovement.getSpaceshipKey());
+        Spaceship spaceship = aGalaxy.findSpaceshipByUuid(shipMovement.getSpaceshipKey());
         if (spaceship != null) {
             String spaceShipname = spaceship.getName();
             Logger.finest("performMove: " + spaceShipname + " destination: " + shipMovement.getDestinationName());
@@ -106,7 +106,7 @@ public class SpaceshipHelper {
     }
 
     private static void addShipLostInSpace(Spaceship ss, Report report, GameWorld gameWorld) {
-        report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), gameWorld).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
+        report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), gameWorld).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
     }
 
     public static void moveRetreatingSquadron(Spaceship spaceship, TurnInfo ti, Galaxy galaxy) {

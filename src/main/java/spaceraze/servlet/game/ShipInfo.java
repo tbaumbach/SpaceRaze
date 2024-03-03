@@ -27,11 +27,11 @@ public class ShipInfo {
 
 	ShipInfo(Spaceship aShip, GameWorld gameWorld) {
 
-		id = aShip.getKey();
-		type = SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), gameWorld).getName();
+		id = aShip.getUuid();
+		type = SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), gameWorld).getName();
 		name = aShip.getUniqueName();
 		shortName = aShip.getShortName();
-		size =SpaceshipPureFunctions.getSpaceshipTypeByKey(aShip.getTypeKey(), gameWorld).getSize();
+		size =SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), gameWorld).getSize();
 		kills = aShip.getKills();
 		currentHP = aShip.getCurrentDc();
 		retreating = aShip.isRetreating();

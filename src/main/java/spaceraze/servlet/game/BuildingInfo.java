@@ -9,8 +9,8 @@ public class BuildingInfo {
 	private String key;
 	
 	BuildingInfo(Building building){
-		typeKey = building.getTypeKey();
-		key = building.getKey();
+		typeKey = building.getTypeUuid();
+		key = building.getUuid();
 //		name = building.getName();
 	}
 

@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -20,10 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import spaceraze.servlethelper.game.TransferWrapper;
-import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Faction;
-import spaceraze.world.Galaxy;
 import spaceraze.world.Message;
 import spaceraze.world.Player;
 import sr.server.SR_Server;
@@ -284,7 +280,7 @@ public class SpaceRazeTunnel extends HttpServlet{
     		Logger.finest("serverTurn: " + serverTurn + " playerTurn: " + playerTurn);
     		if (serverTurn == playerTurn){
     			Logger.finest("Player Name: " + tw.getPlayerName());
-    			Player tempPlayer = aServer.getGalaxy().getPlayer(tw.getPlayerName());
+    			Player tempPlayer = aServer.getGalaxy().getPlayerByUserName(tw.getPlayerName());
     			tempPlayer.setOrders(tw.getOrders());
     			tempPlayer.setPlanetOrderStatuses(tw.getPlanetOrderStatuses());
     			tempPlayer.setNotes(tw.getNotes());

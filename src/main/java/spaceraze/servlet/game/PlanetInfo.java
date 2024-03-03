@@ -198,7 +198,7 @@ public class PlanetInfo {
 	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isAllied, boolean haveSpy, boolean survey, boolean haveTroopsOnTheGround){
 		
 		for (VIP aVIP : galaxy.getAllVIPs()) {
-			VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld());
+			VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld());
 			if (aVIP.getPlanetLocation() == planet){
 				if(aVIP.getBoss() == player || DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVIP.getBoss(), galaxy)){
 					vips.add(new VIPInfo(aVIP, player));

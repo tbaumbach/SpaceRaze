@@ -70,7 +70,7 @@ This faction can not build Space Stations.
 <h3>Spaceship Types</h3>
 <!-- Spaceships list -->
 <table class='ListTextRow' class="sr">
-  <%= new FactionHelper(f).getSpaceshipTypesTableContentHTML() %>
+  <!--%= new FactionHelper(f).getSpaceshipTypesTableContentHTML() %--->
 </table>
 <p>
 <h3>Start VIP Types</h3>
@@ -81,6 +81,6 @@ Number of random VIPs: <%= f.getNrStartingRandomVIPs() %>
 <p>
 <h3>Start ships</h3>
 <!-- Start ships -->
-<%= new FactionHelper(f).getStartingSpaceshipsHTML() %>
+<!--%= new FactionHelper(f).getStartingSpaceshipsHTML() %-->
 </body>
 </html>

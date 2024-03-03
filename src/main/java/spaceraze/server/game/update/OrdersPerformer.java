@@ -72,7 +72,7 @@ public class OrdersPerformer {
             checkVIPsOnAbandonedPlanet(tempPlanet, tempPlayer, galaxy);
             tempPlanet.setPlayerInControl(null);
             PlanetOrderStatusMutator.setAttackIfNeutral(false, tempPlanet.getName(), tempPlayer.getPlanetOrderStatuses());
-            if (GameWorldHandler.getFactionByKey(p.getFactionKey(), galaxy.getGameWorld()).isAlien()) {
+            if (GameWorldHandler.getFactionByUuid(p.getFactionUuid(), galaxy.getGameWorld()).isAlien()) {
                 PlanetMutator.setRazed(tempPlanet);
                 galaxy.removeBuildingsOnPlanet(tempPlanet);
                 PlanetMutator.setLastKnownOwner(tempPlanet.getName(), "Neutral", tempPlayer.getGalaxy().turn + 1, tempPlayer.getPlanetInformations());
@@ -86,7 +86,7 @@ public class OrdersPerformer {
             }
         }
         for (int i = 0; i < orders.getShipSelfDestructs().size(); i++) {
-            Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getShipSelfDestructs().get(i));
+            Spaceship tempss = galaxy.findSpaceshipByUuid(orders.getShipSelfDestructs().get(i));
             Logger.finest("shipSelfDestructs: " + orders.getShipSelfDestructs().get(i));
             if (tempss != null) {
                 SpaceshipMutator.removeShip(tempss, galaxy);
@@ -103,19 +103,19 @@ public class OrdersPerformer {
         for (int i = 0; i < orders.getBuildingSelfDestructs().size(); i++) {
             Building tempBuilding = BuildingPureFunctions.findBuilding(orders.getBuildingSelfDestructs().get(i), p, galaxy);
             if (tempBuilding != null) {
-                PlanetMutator.removeBuilding(tempBuilding.getLocation(), tempBuilding.getKey());
-                ti.addToLatestGeneralReport("On your command " + BuildingPureFunctions.getBuildingType(tempBuilding.getTypeKey(), galaxy.getGameWorld()).getName() + " at " + tempBuilding.getLocation().getName() + " has been destroyed.");
+                PlanetMutator.removeBuilding(tempBuilding.getLocation(), tempBuilding.getUuid());
+                ti.addToLatestGeneralReport("On your command " + BuildingPureFunctions.getBuildingTypeByUuid(tempBuilding.getTypeUuid(), galaxy.getGameWorld()).getName() + " at " + tempBuilding.getLocation().getName() + " has been destroyed.");
             }
         }
         for (int i = 0; i < orders.getVIPSelfDestructs().size(); i++) {
             VIP tempVIP = VipPureFunctions.findVIP(orders.getVIPSelfDestructs().get(i), galaxy);
 //        Player tempPlayer = tempow.getLocation().getPlayerInControl();
             galaxy.getAllVIPs().remove(tempVIP);
-            ti.addToLatestGeneralReport("On your command " + VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld()).getName() + " at " + VipPureFunctions.getLocation(tempVIP).getName() + " has been retired.");
+            ti.addToLatestGeneralReport("On your command " + VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld()).getName() + " at " + VipPureFunctions.getLocation(tempVIP).getName() + " has been retired.");
         }
 
         for (int i = 0; i < orders.getScreenedShips().size(); i++) {
-            Spaceship tempss = galaxy.findSpaceshipByUniqueId(orders.getScreenedShips().get(i));
+            Spaceship tempss = galaxy.findSpaceshipByUuid(orders.getScreenedShips().get(i));
             //      Player tempPlayer = tempss.getOwner();
             if (tempss != null) {
                 tempss.setScreened(!tempss.isScreened());
@@ -150,7 +150,7 @@ public class OrdersPerformer {
         List<VIP> allVIPsOnPlanet = VipPureFunctions.findAllVIPsOnPlanet(aPlanet, galaxy);
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
-            VIPType vipType =VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+            VIPType vipType =VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld());
             if (tempVIP.getBoss() == aPlayer) {
                 if (!vipType.isCanVisitNeutralPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
@@ -165,7 +165,7 @@ public class OrdersPerformer {
     public static void checkVIPsInSelfDestroyedTroops(Troop aTroop, Player aPlayer, Galaxy galaxy) {
         List<VIP> allVIPsOnTroop = VipPureFunctions.findAllVIPsOnTroop(aTroop, galaxy.getAllVIPs());
         for (VIP aVip : allVIPsOnTroop) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(aVip.getTypeKey(), galaxy.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVip.getTypeUuid(), galaxy.getGameWorld());
             TurnInfo ti = aVip.getBoss().getTurnInfo();
             // troop is aboard ship -> move VIP to ship
             if (aTroop.getShipLocation() != null) {
@@ -244,7 +244,7 @@ public class OrdersPerformer {
 
     public static void performMove(TroopToCarrierMovement troopToCarrierMovement, TurnInfo ti, Galaxy aGalaxy){
         Troop aTroop = TroopPureFunctions.findTroop(troopToCarrierMovement.getTroopKey(), aGalaxy);
-        Spaceship destinationCarrier = aGalaxy.findSpaceshipByUniqueId(troopToCarrierMovement.getDestinationCarrierKey());
+        Spaceship destinationCarrier = aGalaxy.findSpaceshipByUuid(troopToCarrierMovement.getDestinationCarrierKey());
         if(aTroop == null || destinationCarrier == null){
             Logger.severe( "performMove Error: troopId= " + troopToCarrierMovement.getTroopKey() + " destinationCarrierId= " + troopToCarrierMovement.getDestinationCarrierKey());
         }else{

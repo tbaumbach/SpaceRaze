@@ -44,7 +44,7 @@ public class PlanetUpdater {
                 // lägg till en slumpvis VIP till denna spelare
                 VIP aVIP = VipMutator.maybeAddVIP(conqueringPlayer, conqueringPlayer.getGalaxy());
                 if (aVIP != null){
-                    VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), conqueringPlayer.getGalaxy().getGameWorld());
+                    VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), conqueringPlayer.getGalaxy().getGameWorld());
                     VipMutator.setShipLocation(aVIP, planet);
                     conqueringPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + vipType.getName() + " who has joined your service.");
                     conqueringPlayer.addToHighlights(vipType.getName(),HighlightType.TYPE_VIP_JOINS);
@@ -94,7 +94,7 @@ public class PlanetUpdater {
                 // lägg till en slumpvis VIP till denna spelare
                 VIP aVIP = VipMutator.maybeAddVIP(attackingPlayer, attackingPlayer.getGalaxy());
                 if (aVIP != null){
-                    VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld());
+                    VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld());
                     VipMutator.setShipLocation(aVIP, planet);
                     attackingPlayer.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + vipType.getName() + " who has joined your service.");
                     attackingPlayer.addToHighlights(vipType.getName(),HighlightType.TYPE_VIP_JOINS);
@@ -144,20 +144,20 @@ public class PlanetUpdater {
             List<Building> removeBuildings = new ArrayList<Building>();
             List<Building> buildings = aPlanet.getBuildings();
             for (Building building : buildings) {
-                if (BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).isInOrbit()) {
+                if (BuildingPureFunctions.getBuildingTypeByUuid(building.getTypeUuid(), aPlayer.getGalaxy().getGameWorld()).isInOrbit()) {
                     removeBuildings.add(building);
                 }
             }
             for (Building building : removeBuildings) {
                 // skriva meddelanden...
                 aPlayer.getTurnInfo().addToLatestGeneralReport("You have destroyed a "
-                        + BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).getName() + " on " + aPlanet.getName() + ".");
+                        + BuildingPureFunctions.getBuildingTypeByUuid(building.getTypeUuid(), aPlayer.getGalaxy().getGameWorld()).getName() + " on " + aPlanet.getName() + ".");
                 if (aPlanet.getPlayerInControl() != null) {
                     aPlanet.getPlayerInControl().getTurnInfo()
-                            .addToLatestGeneralReport("Your " + BuildingPureFunctions.getBuildingType(building.getTypeKey(), aPlayer.getGalaxy().getGameWorld()).getName() + " on the "
+                            .addToLatestGeneralReport("Your " + BuildingPureFunctions.getBuildingTypeByUuid(building.getTypeUuid(), aPlayer.getGalaxy().getGameWorld()).getName() + " on the "
                                     + aPlanet.getName() + " has been destroyed.");
                 }
-                PlanetMutator.removeBuilding(aPlanet, building.getKey());
+                PlanetMutator.removeBuilding(aPlanet, building.getUuid());
             }
         }
     }
@@ -167,7 +167,7 @@ public class PlanetUpdater {
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
             if (tempVIP.getBoss() == aPlayer) {
-                VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld());
                 if (!vipType.isCanVisitEnemyPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
                     aPlayer.addToVIPReport("Your " + vipType.getName() + " has been killed when the planet "
@@ -182,7 +182,7 @@ public class PlanetUpdater {
         List<VIP> allVIPsOnPlanet = VipPureFunctions.findAllVIPsOnPlanet(aPlanet, galaxy);
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld());
             if (vipType.isGovernor()) {
                 galaxy.getAllVIPs().remove(tempVIP);
                 tempVIP.getBoss().addToVIPReport("Your " + vipType.getName() + " has been killed when the planet "
@@ -197,7 +197,7 @@ public class PlanetUpdater {
         for (int i = 0; i < allVIPsOnPlanet.size(); i++) {
             VIP tempVIP = allVIPsOnPlanet.get(i);
             if (tempVIP.getBoss() != aPlayer) {
-                VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld());
                 if (!vipType.isCanVisitEnemyPlanets()) {
                     galaxy.getAllVIPs().remove(tempVIP);
                     tempVIP.getBoss().addToVIPReport("Your " + vipType.getName() + " have been killed when the planet "

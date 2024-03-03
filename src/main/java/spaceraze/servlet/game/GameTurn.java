@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
-import spaceraze.world.Building;
 import spaceraze.world.Planet;
 import spaceraze.world.Player;
 import sr.server.SR_Server;
@@ -33,7 +32,7 @@ public class GameTurn {
 		planets = new ArrayList<PlanetInfo>(server.getGalaxy().getPlanets().size());
 		List<Planet> listOfPlanets = server.getGalaxy().getPlanets();
 		for (Planet planet : listOfPlanets) {
-			planets.add(new PlanetInfo(planet, server.getGalaxy().getPlayer(playerName)));
+			planets.add(new PlanetInfo(planet, server.getGalaxy().getPlayerByUserName(playerName)));
 		}
 	}
 

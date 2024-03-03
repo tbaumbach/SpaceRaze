@@ -67,7 +67,7 @@ public class ServerStatus {
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = g.getPlayers().get(i);
-        	String color = GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()).getColorHexValue();
+        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
@@ -112,7 +112,7 @@ public class ServerStatus {
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
-        	String color = GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()).getColorHexValue();
+        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 

@@ -9,7 +9,7 @@ public class PlayerInfo {
 	
 	PlayerInfo(Player player){
 		name = player.getGovernorName();
-		faction = GameWorldHandler.getFactionByKey(player.getFactionKey(), player.getGalaxy().getGameWorld()).getName();
+		faction = GameWorldHandler.getFactionByUuid(player.getFactionUuid(), player.getGalaxy().getGameWorld()).getName();
 	}
 
 	public String getName() {

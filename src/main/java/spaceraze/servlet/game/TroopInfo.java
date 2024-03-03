@@ -30,15 +30,15 @@ public class TroopInfo {
 
 	TroopInfo(Troop aTroop, GameWorld gameWorld) {
 
-		type = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getName();
+		type = TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), gameWorld).getName();
 		name = aTroop.getName();
 		shortName = aTroop.getShortName();
-		id = aTroop.getUniqueId();
-		typeOfTroop = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getTypeOfTroop();
+		id = aTroop.getProductionNumber();
+		typeOfTroop = TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), gameWorld).getTypeOfTroop();
 		kills = aTroop.getKills();
 		currentHP = aTroop.getCurrentDamageCapacity();
 		maxHP = aTroop.getDamageCapacity();
-		position = TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), gameWorld).getDefaultPosition().toString();
+		position = TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), gameWorld).getDefaultPosition().toString();
 		techWhenBuilt = aTroop.getTechWhenBuilt();
 		attackInfantry = TroopPureFunctions.getAttackInfantry(aTroop);
 		attackArmored = TroopPureFunctions.getAttackArmored(aTroop);

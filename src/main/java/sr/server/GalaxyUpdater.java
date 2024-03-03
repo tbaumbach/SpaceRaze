@@ -231,7 +231,7 @@ public class GalaxyUpdater {
                                 PHash.incCounter("game.finished.total");
                                 PHash.incCounter("game.finished.gameworld." + g.getGameWorld().getFileName());
                                 PHash.incCounter("game.finished.map." + g.getMapFileName());
-                                PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByKey(winner.getFactionKey(), g.getGameWorld()).getName());
+                                PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByUuid(winner.getFactionUuid(), g.getGameWorld()).getName());
                             } else // only one faction remains and wins the game
 //				if (g.checkSoloFactionWinner() != null){
                                 if (checkSoloConfederacyWinner(g)) {
@@ -274,7 +274,7 @@ public class GalaxyUpdater {
                                         for (int x = 0; x < g.players.size(); x++) {
                                             Player temp = (Player) g.players.get(x);
                                             if (temp != winner) {
-                                                if ((temp.getFactionKey().equals(winner.getFactionKey())) & !temp.isDefeated()) {
+                                                if ((temp.getFactionUuid().equals(winner.getFactionUuid())) & !temp.isDefeated()) {
                                                     // since player is on the same faction as the winner he gets a faction win without any
                                                     // bonus ranking points for defeated opponents
                                                     Logger.info("Player on same faction as " + g.getSingleVictory() + "% win player");
@@ -313,14 +313,14 @@ public class GalaxyUpdater {
                                         PHash.incCounter("game.finished.total");
                                         PHash.incCounter("game.finished.gameworld." + g.getGameWorld().getFileName());
                                         PHash.incCounter("game.finished.map." + g.getMapFileName());
-                                        PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByKey(winner.getFactionKey(), g.getGameWorld()).getName());
+                                        PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByUuid(winner.getFactionUuid(), g.getGameWorld()).getName());
                                     } else // one faction controls at least XX% of all pop in sector and wins the game
                                         if ((g.getDiplomacyGameType() == DiplomacyGameType.FACTION) && (GameWorldHandler.checkWinningFaction(g, g.getFactionVictory()) != null)) {
                                             Logger.info("... and we have a (faction) WINNER!");
                                             Faction winner = GameWorldHandler.checkWinningFaction(g , g.getFactionVictory());
                                             for (int x = 0; x < g.players.size(); x++) {
                                                 Player temp = g.players.get(x);
-                                                if (!temp.getFactionKey().equals(winner.getKey())) {
+                                                if (!temp.getFactionUuid().equals(winner.getUuid())) {
                                                     Logger.info("Player defeated due to " + g.getFactionVictory() + "% domination faction");
                                                     rankingLoss(temp.getName(), !temp.isDefeated());
                                                     temp.setDefeated(true);
@@ -430,7 +430,7 @@ public class GalaxyUpdater {
 
                                                         for (int x = 0; x < g.players.size(); x++) {
                                                             Player temp = (Player) g.players.get(x);
-                                                            if (!largestFactions.contains(GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()))) {
+                                                            if (!largestFactions.contains(GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()))) {
                                                                 Logger.info("Player defeated due to max");
                                                                 rankingLoss(temp.getName(), !temp.isDefeated());
                                                                 temp.setDefeated(true);
@@ -461,7 +461,7 @@ public class GalaxyUpdater {
                                                         if (g.getFactionMember(largestFactions.get(0)).size() > 1) {// Shared Victory.
                                                             for (int x = 0; x < g.players.size(); x++) {
                                                                 Player temp = (Player) g.players.get(x);
-                                                                if (!largestFactions.contains(GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()))) {
+                                                                if (!largestFactions.contains(GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()))) {
                                                                     Logger.info("Player defeated due to max turn");
                                                                     rankingLoss(temp.getName(), !temp.isDefeated());
                                                                     temp.setDefeated(true);
@@ -491,7 +491,7 @@ public class GalaxyUpdater {
                                                             Player winner = g.getFactionMember(largestFactions.get(0)).get(0);
                                                             for (int x = 0; x < g.players.size(); x++) {
                                                                 Player temp = (Player) g.players.get(x);
-                                                                if (!largestFactions.contains(GameWorldHandler.getFactionByKey(temp.getFactionKey(), g.getGameWorld()))) {
+                                                                if (!largestFactions.contains(GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()))) {
 
                                                                     Logger.info("Player defeated due to max turn");
                                                                     rankingLoss(temp.getName(), !temp.isDefeated());
@@ -519,7 +519,7 @@ public class GalaxyUpdater {
                                                             PHash.incCounter("game.finished.total");
                                                             PHash.incCounter("game.finished.gameworld." + g.getGameWorld().getFileName());
                                                             PHash.incCounter("game.finished.map." + g.getMapFileName());
-                                                            PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByKey(winner.getFactionKey(), g.getGameWorld()).getName());
+                                                            PHash.incCounter("game.finished.singlewin." + g.getGameWorld().getFileName() + "." + GameWorldHandler.getFactionByUuid(winner.getFactionUuid(), g.getGameWorld()).getName());
 
 
                                                         }
@@ -601,17 +601,17 @@ public class GalaxyUpdater {
         Map<String, Integer> factionPoints = new HashMap<>();
         String winner = null;
         for (Faction faction : galaxy.getGameWorld().getFactions()) {
-            factionPoints.put(faction.getKey(), 0);
+            factionPoints.put(faction.getUuid(), 0);
         }
         int neutralPop = 0; // räkna popen på alla neutrala planeter
         // räkna popen på alla factioner
         for (int j = 0; j < galaxy.getPlanets().size(); j++) {
             Planet tempPlanet = galaxy.getPlanets().get(j);
             if (tempPlanet.getPlayerInControl() != null) {
-                if (GameWorldHandler.getFactionByKey(tempPlanet.getPlayerInControl().getFactionKey(), galaxy.getGameWorld()).isAlien()) {
-                    factionPoints.replace(tempPlanet.getPlayerInControl().getFactionKey(), factionPoints.get(tempPlanet.getPlayerInControl().getFactionKey()) + tempPlanet.getResistance());
+                if (GameWorldHandler.getFactionByUuid(tempPlanet.getPlayerInControl().getFactionUuid(), galaxy.getGameWorld()).isAlien()) {
+                    factionPoints.replace(tempPlanet.getPlayerInControl().getFactionUuid(), factionPoints.get(tempPlanet.getPlayerInControl().getFactionUuid()) + tempPlanet.getResistance());
                 } else {
-                    factionPoints.replace(tempPlanet.getPlayerInControl().getFactionKey(), factionPoints.get(tempPlanet.getPlayerInControl().getFactionKey()) + tempPlanet.getPopulation());
+                    factionPoints.replace(tempPlanet.getPlayerInControl().getFactionUuid(), factionPoints.get(tempPlanet.getPlayerInControl().getFactionUuid()) + tempPlanet.getPopulation());
                 }
             } else {
                 neutralPop = neutralPop + tempPlanet.getPopulation();
@@ -631,7 +631,7 @@ public class GalaxyUpdater {
             }
         }
 
-        return winner != null ? GameWorldHandler.getFactionByKey(winner, g.getGameWorld()): null;
+        return winner != null ? GameWorldHandler.getFactionByUuid(winner, g.getGameWorld()): null;
 
     }
 
@@ -693,15 +693,15 @@ public class GalaxyUpdater {
                     if (enemyMilitarys.size() > 0) {
                         boolean stopRetreats = getStopRetreats(enemyMilitarys);
                         List<Player> enemyPlayers = getEnemyPlayers(enemyMilitarys);
-                        if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & !stopRetreats) {
+                        if (SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).isAlwaysRetreat() & !stopRetreats) {
                             boolean gotAway = aSpaceship.isRetreating();
                             Logger.finer("gotAway: " + gotAway);
                             if (gotAway) { // ship have retreated
                                 for (Player player : enemyPlayers) {
                                     if (aSpaceship.getOwner() != null) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " have retreated in the " + aPlanet.getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " have retreated in the " + aPlanet.getName() + " system.");
                                     } else { // civ ship is neutral
-                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " have retreated in the " + aPlanet.getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName() + " have retreated in the " + aPlanet.getName() + " system.");
                                     }
                                     player.getTurnInfo().addToLatestHighlights(aPlanet.getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_RETREATED);
                                 }
@@ -712,12 +712,12 @@ public class GalaxyUpdater {
                             } else { // ship had nowhere to retreat to, is scuttled
                                 for (Player player : enemyPlayers) {
                                     if (aSpaceship.getOwner() != null) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
                                     } else { // civ ship is neutral
-                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).getName() + " in the " + aSpaceship.getLocation().getName() + " system have been scuttled by it's own crew, when it had nowhere to retreat to.");
                                     }
                                     SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo(), g.getGameWorld());
-                                    player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
+                                    player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                                 }
                                 if (aSpaceship.getOwner() != null) {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been scuttled in the system " + aSpaceship.getLocation().getName() + " when it had nowhere to retreat to.");
@@ -731,7 +731,7 @@ public class GalaxyUpdater {
                         } else { // ship is destroyed
                             // add a general message to owner of civilian ship that the ship has been destroyed
                             if (aSpaceship.getOwner() != null) {
-                                if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
+                                if (SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been destroyed in the system " + aSpaceship.getLocation().getName() + ". It tried to retreat but was stopped by an enemy ship with the stop retreats ability.");
                                 } else {
                                     aSpaceship.getOwner().getTurnInfo().addToLatestCivilianReport("Your civilian ship " + aSpaceship.getName() + " has been destroyed in the system " + aSpaceship.getLocation().getName() + ".");
@@ -745,16 +745,16 @@ public class GalaxyUpdater {
                             for (Player player : enemyPlayers) {
                                 if (aSpaceship.getOwner() != null) {
                                     Logger.finest("addToLatestCivilianReport");
-                                    if (SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " couldn't retreat and has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                    if (SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).isAlwaysRetreat() & stopRetreats) {
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " couldn't retreat and has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                     } else {
-                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                        player.getTurnInfo().addToLatestCivilianReport("A civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName() + " from govenor " + aSpaceship.getOwner().getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                     }
                                 } else { // civ ship is neutral
-                                    player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), getGalaxy().getGameWorld()).getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
+                                    player.getTurnInfo().addToLatestCivilianReport("A neutral civilian ship of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), getGalaxy().getGameWorld()).getName() + " has been destroyed in the " + aSpaceship.getLocation().getName() + " system.");
                                 }
                                 SpaceshipHelper.addToLatestShipsLostInSpace(aSpaceship, player.getTurnInfo(), g.getGameWorld());
-                                player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByKey(aSpaceship.getTypeKey(), g.getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
+                                player.getTurnInfo().addToLatestHighlights(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), g.getGameWorld()).getName(), HighlightType.TYPE_ENEMY_CIVILIAN_SHIP_DESTROYED);
                             }
                             // destroy the civilian ship
                             VipMutator.checkVIPsInDestroyedShips(aSpaceship, aSpaceship.getOwner(), g);
@@ -955,16 +955,16 @@ public class GalaxyUpdater {
     }
 
     protected void updateWinRanking(Player p, boolean soloWin) {
-        Logger.info("updateWinRanking called: " + p.getName() + " " + p.getFactionKey() + " " + soloWin);
+        Logger.info("updateWinRanking called: " + p.getName() + " " + p.getFactionUuid() + " " + soloWin);
         int nrDefeatedOpp = 0;
-        int nrFaction = g.getFactionMemberNr(GameWorldHandler.getFactionByKey(p.getFactionKey(), g.getGameWorld()));
+        int nrFaction = g.getFactionMemberNr(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), g.getGameWorld()));
         int nrHostile = g.players.size() - nrFaction;
         Logger.finer(nrFaction + " " + nrHostile);
         if (soloWin) {
             nrDefeatedOpp = nrHostile;
             Logger.finer(nrFaction + "SoloWin: " + nrDefeatedOpp);
         } else {
-            int nrFactionUndefeated = g.getUndefeatedFactionMemberNr(GameWorldHandler.getFactionByKey(p.getFactionKey(), g.getGameWorld()));
+            int nrFactionUndefeated = g.getUndefeatedFactionMemberNr(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), g.getGameWorld()));
             double average = (double) nrHostile / (double) nrFactionUndefeated;
             nrDefeatedOpp = (int) Math.round(Math.ceil(average));
             Logger.finer(nrFaction + "Not solo win: " + nrDefeatedOpp + " " + average);
@@ -1007,7 +1007,7 @@ public class GalaxyUpdater {
     protected void addFirstTurnMessages(Player aPlayer, MessageDatabase aMessageDatabase, GameWorld gameWorld) {
         aPlayer.updateTurnInfo();
         List<VIP> vips = VipPureFunctions.findPlayersVIPsOnPlanetOrShipsOrTroops(aPlayer.getHomePlanet(), aPlayer, g);
-        int nrFaction = g.getFactionMemberNr(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()));
+        int nrFaction = g.getFactionMemberNr(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()));
         aPlayer.addToGeneral("Game has started.");
         aPlayer.addToHighlights("Game has started.", HighlightType.TYPE_SPECIAL_1);
 //  	aPlayer.addToGeneral("Welcome, Governor " + aPlayer.getGovenorName() + ".");
@@ -1029,7 +1029,7 @@ public class GalaxyUpdater {
         String unitsStr = "";
         Map<String, Integer> map = new HashMap<>();
         for (VIP aVIP : vips) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), gameWorld);
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), gameWorld);
             if (!vipType.isGovernor()) {
                 int sum = 1;
                 if (map.containsKey(vipType.getName())) {
@@ -1043,7 +1043,7 @@ public class GalaxyUpdater {
             unitsStr += "\nVIPs under your command.\n";
         }
         for (VIP aVIP : vips) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), gameWorld);
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), gameWorld);
             if (map.containsKey(vipType.getName())) {
                 if (map.get(vipType.getName()) > 1) {
                     unitsStr += map.get(vipType.getName()) + " " + vipType.getName() + ".\n";
@@ -1061,22 +1061,22 @@ public class GalaxyUpdater {
 
         for (Spaceship ss : playerShips) {
             int sum = 1;
-            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName())) {
-                sum += map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName());
+            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName())) {
+                sum += map.get(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName());
             }
-            map.put(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName(), sum);
+            map.put(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName(), sum);
         }
         if (map.size() > 0) {
             unitsStr += "\nShips under your command.\n";
         }
         for (Spaceship ss : playerShips) {
-            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName())) {
-                if (map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName()) > 1) {
-                    unitsStr += map.get(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName()) + " " + SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName() + ".\n";
+            if (map.containsKey(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName())) {
+                if (map.get(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName()) > 1) {
+                    unitsStr += map.get(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName()) + " " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName() + ".\n";
                 } else {
-                    unitsStr += SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName() + ".\n";
+                    unitsStr += SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName() + ".\n";
                 }
-                map.remove(SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getName());
+                map.remove(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getName());
             }
         }
         map.clear();
@@ -1086,27 +1086,27 @@ public class GalaxyUpdater {
 
         for (Troop aTroop : playerTroops) {
             int sum = 1;
-            if (map.containsKey(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName())) {
-                sum += map.get(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName());
+            if (map.containsKey(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName())) {
+                sum += map.get(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName());
             }
-            map.put(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName(), sum);
+            map.put(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName(), sum);
         }
         if (map.size() > 0) {
             unitsStr += "\nTroops under your command.\n";
         }
         for (Troop aTroop : playerTroops) {
-            if (map.containsKey(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName())) {
-                if (map.get(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName()) > 1) {
-                    unitsStr += map.get(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName()) + " " + TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName() + ".\n";
+            if (map.containsKey(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName())) {
+                if (map.get(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName()) > 1) {
+                    unitsStr += map.get(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName()) + " " + TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName() + ".\n";
                 } else {
-                    unitsStr += TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName() + ".\n";
+                    unitsStr += TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName() + ".\n";
                 }
-                map.remove(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName());
+                map.remove(TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName());
             }
         }
 
         // message from faction
-        Faction f = GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), aPlayer.getGalaxy().getGameWorld());
+        Faction f = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), aPlayer.getGalaxy().getGameWorld());
         aPlayer.addToGeneral("Recieved messages");
         aPlayer.addToGeneral("-----------------");
 
@@ -1127,19 +1127,19 @@ public class GalaxyUpdater {
 
         messageText += unitsStr + "\n";
 
-        if (GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getAdvantages() != null && !GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getAdvantages().equals("")) {
+        if (GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getAdvantages() != null && !GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getAdvantages().equals("")) {
             messageText += "Faction advantages: \n";
-            messageText += GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getAdvantages() + "\n\n";
+            messageText += GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getAdvantages() + "\n\n";
         }
 
-        if (GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getDisadvantages() != null && !GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getDisadvantages().equals("")) {
+        if (GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getDisadvantages() != null && !GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getDisadvantages().equals("")) {
             messageText += "Faction disadvantages: \n";
-            messageText += GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getDisadvantages() + "\n\n";
+            messageText += GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getDisadvantages() + "\n\n";
         }
 
-        if (GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getHowToPlay() != null && !GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getHowToPlay().equals("")) {
+        if (GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getHowToPlay() != null && !GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getHowToPlay().equals("")) {
             messageText += "How to play your faction: \n";
-            messageText += GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getHowToPlay() + "\n\n";
+            messageText += GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getHowToPlay() + "\n\n";
         }
 
         if (g.getGameWorld().getHowToPlay() != null && !g.getGameWorld().getHowToPlay().equals("")) {
@@ -1196,10 +1196,10 @@ public class GalaxyUpdater {
         String retText = null;
         if (g.getDiplomacyGameType() != DiplomacyGameType.DEATHMATCH) {
             if (nrFaction == 2) {
-                retText = "There are also one other " + GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getName() + " governor in this quadrant of the same faction as you.";
+                retText = "There are also one other " + GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getName() + " governor in this quadrant of the same faction as you.";
             } else {
                 if (nrFaction > 2) {
-                    retText = "There are also " + (nrFaction - 1) + " other " + GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), g.getGameWorld()).getName() + " governors in this quadrant of the same faction as you.";
+                    retText = "There are also " + (nrFaction - 1) + " other " + GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), g.getGameWorld()).getName() + " governors in this quadrant of the same faction as you.";
                 } else {
                     retText = "";
                 }
@@ -1234,7 +1234,7 @@ public class GalaxyUpdater {
         Logger.fine("checkDiplomatsOnNeutrals called");
         List<VIP> allDips = getAllDiplomatsOnNeutralPlanets();
         for (VIP tempDip : allDips) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempDip.getTypeKey(), g.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempDip.getTypeUuid(), g.getGameWorld());
             Planet tempLocation = tempDip.getPlanetLocation();
             List<VIP> hostileDips = getAllHostileDiplomatOnNeutral(tempDip, tempLocation, allDips);
             List<VIP> friendlyDips = getAllFriendlyDiplomatOnNeutral(tempDip, tempLocation, allDips);
@@ -1243,10 +1243,10 @@ public class GalaxyUpdater {
             if ((hostileDips.size() > 0) | (friendlyDips.size() > 0)) {
                 aPlayer.addToGeneral("Your " + vipType.getName() + " tries to convince the neutral planet " + tempLocation.getName() + " to join you.");
                 for (VIP aFriendlyDip : friendlyDips) {
-                    aPlayer.addToGeneral("A " + VipPureFunctions.getVipTypeByKey(aFriendlyDip.getTypeKey(), g.getGameWorld()).getName() + " from your own faction is also present at the neutral planet " + tempLocation.getName());
+                    aPlayer.addToGeneral("A " + VipPureFunctions.getVipTypeByUuid(aFriendlyDip.getTypeUuid(), g.getGameWorld()).getName() + " from your own faction is also present at the neutral planet " + tempLocation.getName());
                 }
                 for (VIP aHostileDip : hostileDips) {
-                    aPlayer.addToGeneral("A " + VipPureFunctions.getVipTypeByKey(aHostileDip.getTypeKey(), g.getGameWorld()).getName() + " from the " + GameWorldHandler.getFactionByKey(aHostileDip.getBoss().getFactionKey(), g.getGameWorld()).getName() + " faction is also present at the neutral planet " + tempLocation.getName());
+                    aPlayer.addToGeneral("A " + VipPureFunctions.getVipTypeByUuid(aHostileDip.getTypeUuid(), g.getGameWorld()).getName() + " from the " + GameWorldHandler.getFactionByUuid(aHostileDip.getBoss().getFactionUuid(), g.getGameWorld()).getName() + " faction is also present at the neutral planet " + tempLocation.getName());
                 }
                 String pluralS = "";
                 if (total > 1) {
@@ -1287,7 +1287,7 @@ public class GalaxyUpdater {
                     tempDip.setLastTurn(g.getTurn());
                     List<VIP> ownDips = getAllOwnDiplomatOnNeutral(tempDip, tempLocation, allDips);
                     for (VIP anotherDip : ownDips) {
-                        aPlayer.addToGeneral("Your " + VipPureFunctions.getVipTypeByKey(anotherDip.getTypeKey(), g.getGameWorld()).getName() + " tries to convince the neutral planet " + tempLocation.getName() + " to join you.");
+                        aPlayer.addToGeneral("Your " + VipPureFunctions.getVipTypeByUuid(anotherDip.getTypeUuid(), g.getGameWorld()).getName() + " tries to convince the neutral planet " + tempLocation.getName() + " to join you.");
                         tempDip.setGovCounter(tempDip.getGovCounter() + 1);
                         anotherDip.setLastTurn(g.getTurn());
                         anotherDip.setGovCounter(anotherDip.getGovCounter() + ownDips.size() + 1);
@@ -1321,7 +1321,7 @@ public class GalaxyUpdater {
         List<VIP> allDiplomats = new LinkedList<VIP>();
         for (int i = 0; i < g.getAllVIPs().size(); i++) {
             VIP tempVIP = g.getAllVIPs().get(i);
-            if (VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), g.getGameWorld()).isDiplomat() & !GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld()).isAlien()) { // aliens can not use diplomacy
+            if (VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), g.getGameWorld()).isDiplomat() & !GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld()).isAlien()) { // aliens can not use diplomacy
                 Planet tempLocation = tempVIP.getPlanetLocation();
                 if (tempLocation != null) { // tempVIP �r vid en planet
                     if ((tempLocation.getPlayerInControl() == null) & !PlanetPureFunctions.isRazed(tempLocation)) { // planeten �r neutral
@@ -1346,7 +1346,7 @@ public class GalaxyUpdater {
         List<VIP> allDips = new LinkedList<VIP>();
         for (int i = 0; i < g.getAllVIPs().size(); i++) {
             VIP tempVIP = (VIP) g.getAllVIPs().get(i);
-            if (VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), g.getGameWorld()).isDiplomat()) {
+            if (VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), g.getGameWorld()).isDiplomat()) {
                 Planet tempLocation = tempVIP.getPlanetLocation();
                 if (tempLocation != null) { // Gov �r vid en planet
                     if (tempLocation.getPlayerInControl() != null) { // planeten �r inte neutral
@@ -1373,7 +1373,7 @@ public class GalaxyUpdater {
         List<VIP> allInfs = new LinkedList<VIP>();
         for (int i = 0; i < g.getAllVIPs().size(); i++) {
             VIP tempVIP = g.getAllVIPs().get(i);
-            if (VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), g.getGameWorld()).isInfestate()) {
+            if (VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), g.getGameWorld()).isInfestate()) {
                 Planet tempLocation = tempVIP.getPlanetLocation();
                 if (tempLocation == null) { // inf is not at a planet
                     allInfs.add(tempVIP);
@@ -1385,9 +1385,9 @@ public class GalaxyUpdater {
                         // do nothing, ok to infestate!
                     } else if (owner == tempVIP.getBoss()) { // cannot inf own planet
                         allInfs.add(tempVIP);
-                    } else if (GameWorldHandler.getFactionByKey(owner.getFactionKey(), g.getGameWorld()).isAlien()) { // cannot inf alien planets
+                    } else if (GameWorldHandler.getFactionByUuid(owner.getFactionUuid(), g.getGameWorld()).isAlien()) { // cannot inf alien planets
                         allInfs.add(tempVIP);
-                    } else if (owner.getFactionKey().equals(tempVIP.getBoss().getFactionKey())) { // cannot inf same factions
+                    } else if (owner.getFactionUuid().equals(tempVIP.getBoss().getFactionUuid())) { // cannot inf same factions
                         // planets
                         allInfs.add(tempVIP);
                     }
@@ -1401,7 +1401,7 @@ public class GalaxyUpdater {
         Logger.fine("checkInfestationFromVIPs called");
         List<VIP> allInfs = getAllInfestatorsOnPlanets();
         for (VIP tempInf : allInfs) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempInf.getTypeKey(), g.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempInf.getTypeUuid(), g.getGameWorld());
             Logger.finer("tempInf: " + vipType.getName());
             Planet tempLocation = tempInf.getPlanetLocation();
             Player aPlayer = tempInf.getBoss();
@@ -1410,7 +1410,7 @@ public class GalaxyUpdater {
                 if (otherInfs.size() > 0) {
                     aPlayer.addToGeneral("Your " + vipType.getName() + " tries to infect the planet " + tempLocation.getName() + " to join you.");
                     for (VIP anotherInf : otherInfs) {
-                        aPlayer.addToGeneral(Functions.getDeterminedForm(VipPureFunctions.getVipTypeByKey(anotherInf.getTypeKey(), g.getGameWorld()).getName(), true) + " " + VipPureFunctions.getVipTypeByKey(anotherInf.getTypeKey(), g.getGameWorld()).getTypeName() + " from the " + GameWorldHandler.getFactionByKey(anotherInf.getBoss().getFactionKey(), g.getGameWorld()).getName() + " faction is also present at the planet " + tempLocation.getName());
+                        aPlayer.addToGeneral(Functions.getDeterminedForm(VipPureFunctions.getVipTypeByUuid(anotherInf.getTypeUuid(), g.getGameWorld()).getName(), true) + " " + VipPureFunctions.getVipTypeByUuid(anotherInf.getTypeUuid(), g.getGameWorld()).getName() + " from the " + GameWorldHandler.getFactionByUuid(anotherInf.getBoss().getFactionUuid(), g.getGameWorld()).getName() + " faction is also present at the planet " + tempLocation.getName());
                     }
                     String pluralS = "";
                     if (otherInfs.size() > 1) {
@@ -1438,7 +1438,7 @@ public class GalaxyUpdater {
                         tempInf.setLastTurn(g.getTurn());
                         List<VIP> ownInfs = getAllOwnInfestators(tempInf, tempLocation, allInfs);
                         for (VIP anotherInf : ownInfs) {
-                            aPlayer.addToGeneral("Your " + VipPureFunctions.getVipTypeByKey(anotherInf.getTypeKey(), g.getGameWorld()).getName() + " tries to infect the planet " + tempLocation.getName() + " to join you.");
+                            aPlayer.addToGeneral("Your " + VipPureFunctions.getVipTypeByUuid(anotherInf.getTypeUuid(), g.getGameWorld()).getName() + " tries to infect the planet " + tempLocation.getName() + " to join you.");
                             tempInf.setGovCounter(tempInf.getGovCounter() + 1);
                             anotherInf.setLastTurn(g.getTurn());
                             anotherInf.setGovCounter(anotherInf.getGovCounter() + ownInfs.size() + 1);
@@ -1482,15 +1482,15 @@ public class GalaxyUpdater {
         List<VIP> allInfestators = new LinkedList<VIP>();
         Logger.finest("allVIPs.size(): " + g.getAllVIPs().size());
         for (VIP tempVIP : g.getAllVIPs()) {
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), g.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), g.getGameWorld());
             Logger.finest("tempVIP: " + vipType.getName());
             Logger.finest("tempVIP.isInfestator(): " + vipType.isInfestate());
-            Logger.finest("tempVIP.getBoss().isAlien(): " + GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld()).isAlien());
+            Logger.finest("tempVIP.getBoss().isAlien(): " + GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld()).isAlien());
             Logger.finest("tempVIP.getAlignment(): " + vipType.getAlignment());
             Logger.finest(
-                    "tempVIP.getBoss().getFaction().getAlignment(): " + GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld()).getAlignment());
-            if (vipType.isInfestate() & GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld()).isAlien()
-                    & vipType.getAlignment().equals(GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld()).getAlignment())) { // only
+                    "tempVIP.getBoss().getFaction().getAlignment(): " + GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld()).getAlignment());
+            if (vipType.isInfestate() & GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld()).isAlien()
+                    & vipType.getAlignment().equals(GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld()).getAlignment())) { // only
                 // infestators
                 // with the same
                 // alignment as
@@ -1502,8 +1502,8 @@ public class GalaxyUpdater {
                     Logger.finest("tempLocation != null ");
                     Logger.finest("tempLocation: " + tempLocation.getName());
                     Player owner = tempLocation.getPlayerInControl();
-                    if ((owner == null) || ((owner != tempVIP.getBoss()) & !GameWorldHandler.getFactionByKey(owner.getFactionKey(), g.getGameWorld()).isAlien()
-                            & !(owner.getFactionKey().equals(tempVIP.getBoss().getFactionKey())))) { // planet is neutral or
+                    if ((owner == null) || ((owner != tempVIP.getBoss()) & !GameWorldHandler.getFactionByUuid(owner.getFactionUuid(), g.getGameWorld()).isAlien()
+                            & !(owner.getFactionUuid().equals(tempVIP.getBoss().getFactionUuid())))) { // planet is neutral or
                         // belongs to another
                         // non-alien player from
                         // another faction
@@ -1531,7 +1531,7 @@ public class GalaxyUpdater {
                             + " have been destroyed when the planet " + aPlanet.getName() + " was infested.");
                 }
                 // aTroop.getOwner().addToHighlights(tempVIP.getName(),HighlightType.TYPE_OWN_VIP_KILLED);
-                aPlayer.addToGeneral("An enemy " + TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName()
+                aPlayer.addToGeneral("An enemy " + TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld()).getName()
                         + " have been killed when you infested the planet " + aPlanet.getName() + ".");
                 // aPlayer.addToHighlights(tempVIP.getName(),Highlight.TYPE_ENEMY_VIP_KILLED);
             }
@@ -1553,8 +1553,8 @@ public class GalaxyUpdater {
             if (tempVIP != aDip) { // kolla om tempVIP inte �r aGov
                 Planet tempLocation = tempVIP.getPlanetLocation();
                 if (tempLocation == aPlanet) { // Dip �r vid aPlanet
-                    Faction f1 = GameWorldHandler.getFactionByKey(aDip.getBoss().getFactionKey(), g.getGameWorld());
-                    Faction f2 = GameWorldHandler.getFactionByKey(tempVIP.getBoss().getFactionKey(), g.getGameWorld());
+                    Faction f1 = GameWorldHandler.getFactionByUuid(aDip.getBoss().getFactionUuid(), g.getGameWorld());
+                    Faction f2 = GameWorldHandler.getFactionByUuid(tempVIP.getBoss().getFactionUuid(), g.getGameWorld());
                     if (f1 != f2) {
                         found.add(tempVIP);
                     }
@@ -1628,8 +1628,8 @@ public class GalaxyUpdater {
                 if (tempLocation == aPlanet) { // tempDip �r vid aPlanet
                     Player p1 = aDip.getBoss();
                     Player p2 = tempVIP.getBoss();
-                    Faction f1 = GameWorldHandler.getFactionByKey(p1.getFactionKey(), g.getGameWorld());
-                    Faction f2 = GameWorldHandler.getFactionByKey(p2.getFactionKey(), g.getGameWorld());
+                    Faction f1 = GameWorldHandler.getFactionByUuid(p1.getFactionUuid(), g.getGameWorld());
+                    Faction f2 = GameWorldHandler.getFactionByUuid(p2.getFactionUuid(), g.getGameWorld());
                     if ((f1 == f2) & (p1 != p2)) { // same faction but not same player
                         found.add(tempVIP);
                     }
@@ -1673,7 +1673,7 @@ public class GalaxyUpdater {
                 //TODO 2020-04-22 No need to get players SpaceshipType(should not use the upgrades from the new owner), check why we are creating a nwe ship instead of just changing the owner. Possible name conflict?
                 //SpaceshipType sstTemp = PlayerPureFunctions.findSpaceshipType(ss.getSpaceshipType().getName(), dip.getBoss(), g);
                 //if(sstTemp == null){
-                SpaceshipType sstTemp = SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld());
+                SpaceshipType sstTemp = SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld());
                 //}
 
                 Spaceship ssTemp = SpaceshipMutator.createSpaceShip(dip.getBoss(), sstTemp, 0, 0, ss.getTechWhenBuilt());
@@ -1704,19 +1704,16 @@ public class GalaxyUpdater {
         for (Troop aTroop : allTroops) {
             if ((aTroop.getPlanetLocation() == joiningPlanet) & (aTroop.getOwner() == null)) { //
                 // add new troop instead of the neutral one
-                //TODO 2020-05-07 No need to get players TroopType(should not use the upgrades from the new owner), check why we are creating a nwe ship instead of just changing the owner. Possible name conflict?
-                //TroopType ttTemp = PlayerPureFunctions.findOwnTroopType(aTroop.getTroopType().getUniqueName(), dip.getBoss(), g);
-                //if(ttTemp == null){
-                //  ttTemp = g.findTroopType(aTroop.getTroopType().getUniqueName());
-                //}
-                TroopType ttTemp = g.findTroopType(TroopPureFunctions.getTroopTypeByKey(aTroop.getTypeKey(), g.getGameWorld()).getName());
+                //TODO 2020-05-07 check why we are creating a new troop instead of just changing the owner. Possible name conflict?
+
+                TroopType ttTemp = TroopPureFunctions.getTroopTypeByUuid(aTroop.getTypeUuid(), g.getGameWorld());
                 Troop troopTemp = TroopMutator.createTroop(ttTemp, g);
                 troopTemp.setCurrentDamageCapacity(aTroop.getCurrentDamageCapacity());
                 troopTemp.setKills(aTroop.getKills());
                 troopTemp.setPlanetLocation(joiningPlanet);
                 troopTemp.setOwner(dip.getBoss());
                 g.getTroops().add(troopTemp);
-                // add ship to remove vector
+                // add troop to remove vector
                 removeTroops.add(aTroop);
             }
         }
@@ -1840,7 +1837,7 @@ public class GalaxyUpdater {
                 Logger.finest("in if");
                 sb.append(", ");
             }
-            sb.append(BuildingPureFunctions.getBuildingType(building.getTypeKey(), g.getGameWorld()).getShortName());
+            sb.append(BuildingPureFunctions.getBuildingTypeByUuid(building.getTypeUuid(), g.getGameWorld()).getShortName());
         }
         Logger.finer("sb.toString(): " + sb.toString());
         return sb.toString();
@@ -1869,8 +1866,8 @@ public class GalaxyUpdater {
                         VIP aVIP = VipMutator.maybeAddVIP(infestator, infestator.getGalaxy());
                         if (aVIP != null) {
                             VipMutator.setShipLocation(aVIP, planet);
-                            infestator.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), g.getGameWorld()).getName() + " who has joined your service.");
-                            infestator.addToHighlights(VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), g.getGameWorld()).getName(), HighlightType.TYPE_VIP_JOINS);
+                            infestator.addToVIPReport("When you conquered " + planet.getName() + " you have found a " + VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), g.getGameWorld()).getName() + " who has joined your service.");
+                            infestator.addToHighlights(VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), g.getGameWorld()).getName(), HighlightType.TYPE_VIP_JOINS);
                         }
                     }
                 } else if (aliensPresent.size() > 1) {
@@ -1886,11 +1883,11 @@ public class GalaxyUpdater {
         List<Player> playersPresent = new LinkedList<Player>(); // aliens with troops present
         List<Player> allPlayers = g.getPlayers();
         for (Player player : allPlayers) {
-            if (!player.isDefeated() & GameWorldHandler.getFactionByKey(player.getFactionKey(), g.getGameWorld()).isAlien()) {
+            if (!player.isDefeated() & GameWorldHandler.getFactionByUuid(player.getFactionUuid(), g.getGameWorld()).isAlien()) {
                 List<Spaceship> playersShipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(player, aPlanet, g.getSpaceships());
                 boolean pw = false;
                 for (Spaceship spaceship : playersShipsAtPlanet) {
-                    if (SpaceshipPureFunctions.getSpaceshipTypeByKey(spaceship.getTypeKey(), g.getGameWorld()).getPsychWarfare() > 0) {
+                    if (SpaceshipPureFunctions.getSpaceshipTypeByUuid(spaceship.getTypeUuid(), g.getGameWorld()).getPsychWarfare() > 0) {
                         pw = true;
                     }
                 }
@@ -1964,7 +1961,7 @@ public class GalaxyUpdater {
                 Planet location = ss.getLocation();
                 if (location != null) {  // skeppet är ej på flykt
                     if (location.getPlayerInControl() == ss.getOwner()) {  // skeppet är vid en av spelarens planeter
-                        if (SpaceshipPureFunctions.getSpaceshipTypeByKey(ss.getTypeKey(), g.getGameWorld()).getSize().getSlots() <= getMaxWharfsSize(location)) {  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
+                        if (SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), g.getGameWorld()).getSize().getSlots() <= getMaxWharfsSize(location)) {  // det finns ett skeppsvarv som är tillräckligt stort för att reparera skeppet
                             SpaceshipMutator.performRepairs(ss);
                         }
                     }
@@ -2142,7 +2139,7 @@ public class GalaxyUpdater {
                     // if the gov has been killed there might exist a lot of ships and planets
                     // that should be made neutral or be removed
                     if (VipPureFunctions.findVIPGovernor(tempPlayer, g) == null) {
-                        if (GameWorldHandler.getFactionByKey(tempPlayer.getFactionKey(), g.getGameWorld()).isAlien()) {
+                        if (GameWorldHandler.getFactionByUuid(tempPlayer.getFactionUuid(), g.getGameWorld()).isAlien()) {
                             // remove all ships
                             removeShipsDefeatedAlienPlayer(g, tempPlayer);
                             // set all players planets as razed
@@ -2208,7 +2205,7 @@ public class GalaxyUpdater {
     protected void removePlayer(Player tempPlayer) {
         // remove all vips
         g.removeVIPs(tempPlayer);
-        if (GameWorldHandler.getFactionByKey(tempPlayer.getFactionKey(), g.getGameWorld()).isAlien()) {
+        if (GameWorldHandler.getFactionByUuid(tempPlayer.getFactionUuid(), g.getGameWorld()).isAlien()) {
             removeShipsDefeatedAlienPlayer(g, tempPlayer);
             //	g.removeWharfsDefeatedAlienPlayer(tempPlayer);
             removeBuildingsDefeatedAlienPlayer(tempPlayer, g);
@@ -2702,7 +2699,7 @@ public class GalaxyUpdater {
                             //TODO Remove defending troops, no troops can survive on razed planets
                         }
                         // check if attacker is alien
-                        if (GameWorldHandler.getFactionByKey(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionKey(), g.getGameWorld()).isAlien()) {
+                        if (GameWorldHandler.getFactionByUuid(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionUuid(), g.getGameWorld()).isAlien()) {
                             boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
                             if (psychExist) { // attacker have psychWarfare ability
                                 // planet conquered by alien
@@ -2726,7 +2723,7 @@ public class GalaxyUpdater {
                                     // planet is razed
                                     (new PlanetUpdater()).razed(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()));
                                     // check if attacker is alien
-                                    if (GameWorldHandler.getFactionByKey(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionKey(), g.getGameWorld()).isAlien()) {
+                                    if (GameWorldHandler.getFactionByUuid(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionUuid(), g.getGameWorld()).isAlien()) {
                                         boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
                                         if (psychExist) { // attacker have psychWarfare ability
                                             // planet conquered by alien
@@ -2738,7 +2735,7 @@ public class GalaxyUpdater {
                                 }
                             } else { // defender is not alien
                                 // check if attacker is alien
-                                if (GameWorldHandler.getFactionByKey(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionKey(), g.getGameWorld()).isAlien()) {
+                                if (GameWorldHandler.getFactionByUuid(g.getPlayerByGovenorName(firstTF.getPlayerName()).getFactionUuid(), g.getGameWorld()).isAlien()) {
                                     // check if resistance < 1
                                     if (PlanetPureFunctions.checkSurrender(aPlanet, g)) {
                                         boolean psychExist = getMaxPsychWarfare(aPlanet, g.getPlayerByGovenorName(firstTF.getPlayerName()), g.getSpaceships(), g.getGameWorld()) > 0;
@@ -2817,19 +2814,19 @@ public class GalaxyUpdater {
             Logger.finer("psychWarfare: " + psychWarfare);
             planet.setResistance(planet.getResistance() - psychWarfare);
             if (planet.getPlayerInControl() != null){
-                planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " the psych warfare bonus in Governor " + tf.getPlayerName() + " (" + GameWorldHandler.getFactionByKey(galaxy.getPlayerByGovenorName(tf.getPlayerName()).getFactionKey(), g.getGameWorld()).getName() + ") fleet have lowered " + planet.getName() + "'s resistance by " + psychWarfare + ".");
-                galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") the psych warfare bonus of your fleets ships have lowered its resistance by " + psychWarfare + ".");
+                planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " the psych warfare bonus in Governor " + tf.getPlayerName() + " (" + GameWorldHandler.getFactionByUuid(galaxy.getPlayerByGovenorName(tf.getPlayerName()).getFactionUuid(), g.getGameWorld()).getName() + ") fleet have lowered " + planet.getName() + "'s resistance by " + psychWarfare + ".");
+                galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") the psych warfare bonus of your fleets ships have lowered its resistance by " + psychWarfare + ".");
             }else{
                 galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the neutral planet " + planet.getName() + " the psych warfare bonus of the ships in your fleet have lowered its resistance by " + psychWarfare + ".");
             }
             // VIP psychWarfare bonus
             VIP psychWarfareBonusVIP = getPsychWarfareBonusVIPs(planet, galaxy.getPlayerByGovenorName(tf.getPlayerName()), galaxy);
             if (psychWarfareBonusVIP != null){
-                VIPType vipType = VipPureFunctions.getVipTypeByKey(psychWarfareBonusVIP.getTypeKey(), g.getGameWorld());
+                VIPType vipType = VipPureFunctions.getVipTypeByUuid(psychWarfareBonusVIP.getTypeUuid(), g.getGameWorld());
                 planet.setResistance(planet.getResistance() - vipType.getPsychWarfareBonus());
                 if (planet.getPlayerInControl() != null){
-                    planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " the precence of a " + vipType.getName() + " in Governor " + tf.getPlayerName() + " (" + GameWorldHandler.getFactionByKey(galaxy.getPlayerByGovenorName(tf.getPlayerName()).getFactionKey(), g.getGameWorld()).getName() + ") fleet have lowered " + planet.getName() + "'s resistance by " + vipType.getPsychWarfareBonus() + ".");
-                    galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your " + vipType.getName() + " have lowered its resistance by " + vipType.getPsychWarfareBonus() + ".");
+                    planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " the precence of a " + vipType.getName() + " in Governor " + tf.getPlayerName() + " (" + GameWorldHandler.getFactionByUuid(galaxy.getPlayerByGovenorName(tf.getPlayerName()).getFactionUuid(), g.getGameWorld()).getName() + ") fleet have lowered " + planet.getName() + "'s resistance by " + vipType.getPsychWarfareBonus() + ".");
+                    galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your " + vipType.getName() + " have lowered its resistance by " + vipType.getPsychWarfareBonus() + ".");
                 }else{
                     galaxy.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("While besieging the neutral planet " + planet.getName() + " your " + vipType.getName() + " have lowered its resistance by " + vipType.getPsychWarfareBonus() + ".");
                 }
@@ -2891,7 +2888,7 @@ public class GalaxyUpdater {
                     int random = Functions.getRandomInt(0, 99) + 1;
                     int randomIndex = Functions.getRandomInt(0, alltf.size() - 1);
                     TaskForce tf = (TaskForce) alltf.get(randomIndex);
-                    if (random < BuildingPureFunctions.getBuildingType(aBuilding.getTypeKey(), g.getGameWorld()).getCannonHitChance()) {// hit
+                    if (random < BuildingPureFunctions.getBuildingTypeByUuid(aBuilding.getTypeUuid(), g.getGameWorld()).getCannonHitChance()) {// hit
                         tf.incomingCannonFire(aPlanet, aPlanet.getBuildings().get(i), g);
                         if (tf.getStatus().equalsIgnoreCase("destroyed")) {
                             Logger.finer("destroyed");
@@ -2903,9 +2900,9 @@ public class GalaxyUpdater {
                         }
                     } else {
                         String s = tf.getTotalNrShips() > 1 ? "s" : "";
-                        g.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("Your ship" + s + " at " + aPlanet.getName() + " was fired upon by an enemy " + BuildingPureFunctions.getBuildingType(aBuilding.getTypeKey(), g.getGameWorld()).getName() + " but it misses.");
+                        g.getPlayerByGovenorName(tf.getPlayerName()).addToGeneral("Your ship" + s + " at " + aPlanet.getName() + " was fired upon by an enemy " + BuildingPureFunctions.getBuildingTypeByUuid(aBuilding.getTypeUuid(), g.getGameWorld()).getName() + " but it misses.");
                         if (aPlanet.getPlayerInControl() != null) {
-                            aPlanet.getPlayerInControl().addToGeneral("Your " + BuildingPureFunctions.getBuildingType(aBuilding.getTypeKey(), g.getGameWorld()).getName() + " at " + aPlanet.getName() + " fires but misses the enemy ships.");
+                            aPlanet.getPlayerInControl().addToGeneral("Your " + BuildingPureFunctions.getBuildingTypeByUuid(aBuilding.getTypeUuid(), g.getGameWorld()).getName() + " at " + aPlanet.getName() + " fires but misses the enemy ships.");
                         }
                     }
                 }
@@ -2925,9 +2922,9 @@ public class GalaxyUpdater {
 
                 if (defendingPlayer != null) {
                     defendingPlayer.addToGeneral("While bombarding your planet " + aPlanet.getName() + " Governor " + attackingPlayer.getGovernorName() + "'s bombardment have attacked your troop " + bombardedTroop.getName() + " with the effect: " + returnString);
-                    attackingPlayer.addToGeneral("While bombarding the planet " + aPlanet.getName() + " belonging to Governor " + defendingPlayer.getGovernorName() + " (" + GameWorldHandler.getFactionByKey(defendingPlayer.getFactionKey(), g.getGameWorld()).getName() + ") your bombardment have attacked his troop " + TroopPureFunctions.getTroopTypeByKey(bombardedTroop.getTypeKey(), g.getGameWorld()).getName() + " with the effect: " + returnString);
+                    attackingPlayer.addToGeneral("While bombarding the planet " + aPlanet.getName() + " belonging to Governor " + defendingPlayer.getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(defendingPlayer.getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment have attacked his troop " + TroopPureFunctions.getTroopTypeByUuid(bombardedTroop.getTypeUuid(), g.getGameWorld()).getName() + " with the effect: " + returnString);
                 } else {
-                    attackingPlayer.addToGeneral("While bombarding the neutral planet " + aPlanet.getName() + " your bombardment have attacked a troop " + TroopPureFunctions.getTroopTypeByKey(bombardedTroop.getTypeKey(), g.getGameWorld()).getName() + " with the effect: " + returnString);
+                    attackingPlayer.addToGeneral("While bombarding the neutral planet " + aPlanet.getName() + " your bombardment have attacked a troop " + TroopPureFunctions.getTroopTypeByUuid(bombardedTroop.getTypeUuid(), g.getGameWorld()).getName() + " with the effect: " + returnString);
                 }
 
                 if (TroopPureFunctions.isDestroyed(bombardedTroop)) {
@@ -3015,9 +3012,9 @@ public class GalaxyUpdater {
                 winnerIndex = highVIPindex;
             }
             VIP losingVIP = vipsAtPlanet.get(loserIndex);
-            VIPType losingVipType = VipPureFunctions.getVipTypeByKey(losingVIP.getTypeKey(), galaxy.getGameWorld());
+            VIPType losingVipType = VipPureFunctions.getVipTypeByUuid(losingVIP.getTypeUuid(), galaxy.getGameWorld());
             VIP winningVIP = vipsAtPlanet.get(winnerIndex);
-            VIPType winningVIPType = VipPureFunctions.getVipTypeByKey(winningVIP.getTypeKey(), galaxy.getGameWorld());
+            VIPType winningVIPType = VipPureFunctions.getVipTypeByUuid(winningVIP.getTypeUuid(), galaxy.getGameWorld());
             winningVIP.setKills(winningVIP.getKills() + 1);
             galaxy.getAllVIPs().remove(losingVIP);
             if (losingVIP.getBoss() == winningVIP.getBoss()) {
@@ -3026,7 +3023,7 @@ public class GalaxyUpdater {
                         "Your " + losingVipType.getName() + " has been killed by your own " + winningVIPType.getName() + ".");
                 winningVIP.getBoss().addToVIPReport(
                         "Your " + winningVIPType.getName() + " has killed your own " + losingVipType.getName() + ".");
-            } else if (losingVIP.getBoss().getFactionKey().equals(winningVIP.getBoss().getFactionKey())) {
+            } else if (losingVIP.getBoss().getFactionUuid().equals(winningVIP.getBoss().getFactionUuid())) {
                 losingVIP.getBoss().addToHighlights(losingVipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                 winningVIP.getBoss().addToHighlights(losingVipType.getName(), HighlightType.TYPE_FRIENDLY_VIP_KILLED);
                 losingVIP.getBoss().addToVIPReport(
@@ -3085,7 +3082,7 @@ public class GalaxyUpdater {
         // remove hasKilled from all assassins
         for (int i = 0; i < galaxy.getAllVIPs().size(); i++) {
             VIP aVIP = galaxy.getAllVIPs().get(i);
-            if (VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld()).getAssassination() > 0) {
+            if (VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld()).getAssassination() > 0) {
                 aVIP.setHasKilled(false);
             }
         }
@@ -3099,11 +3096,11 @@ public class GalaxyUpdater {
             VIP aHighVIP = vipsAtPlanet.get(highVIP);
             VIP aLowVIP = vipsAtPlanet.get(lowVIP);
             boolean highIsHome = false;
-            if (VipPureFunctions.getVipTypeByKey(aHighVIP.getTypeKey(), galaxy.getGameWorld()).isCounterSpy()) {
+            if (VipPureFunctions.getVipTypeByUuid(aHighVIP.getTypeUuid(), galaxy.getGameWorld()).isCounterSpy()) {
                 Planet planetLocation = aHighVIP.getPlanetLocation();
                 if (planetLocation != null) {
                     if (planetLocation.getPlayerInControl() == aHighVIP.getBoss()) {
-                        if (!VipPureFunctions.getVipTypeByKey(aLowVIP.getTypeKey(), galaxy.getGameWorld()).isImmuneToCounterEspionage()) {
+                        if (!VipPureFunctions.getVipTypeByUuid(aLowVIP.getTypeUuid(), galaxy.getGameWorld()).isImmuneToCounterEspionage()) {
                             highIsHome = true;
                         }
                     }
@@ -3127,9 +3124,9 @@ public class GalaxyUpdater {
                     winnerIndex = lowVIP;
                 }
                 VIP losingVIP = vipsAtPlanet.get(loserIndex);
-                VIPType losingVipType = VipPureFunctions.getVipTypeByKey(losingVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType losingVipType = VipPureFunctions.getVipTypeByUuid(losingVIP.getTypeUuid(), galaxy.getGameWorld());
                 VIP winningVIP = vipsAtPlanet.get(winnerIndex);
-                VIPType winningVipType = VipPureFunctions.getVipTypeByKey(winningVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType winningVipType = VipPureFunctions.getVipTypeByUuid(winningVIP.getTypeUuid(), galaxy.getGameWorld());
                 galaxy.getAllVIPs().remove(losingVIP);
                 losingVIP.getBoss().addToVIPReport(
                         "Your " + losingVipType.getName() + " has been discovered by an enemy counter-spy at "
@@ -3200,11 +3197,11 @@ public class GalaxyUpdater {
                 if (randomNr <= VipPureFunctions.getExterminatorSkill(anExt, galaxy.getGameWorld())) { // the inf is killed
                     int randomIndex = Functions.getRandomInt(0, enemyInfestators.size() - 1);
                     VIP anInf = enemyInfestators.get(randomIndex);
-                    VIPType vipType = VipPureFunctions.getVipTypeByKey(anInf.getTypeKey(), galaxy.getGameWorld());
+                    VIPType vipType = VipPureFunctions.getVipTypeByUuid(anInf.getTypeUuid(), galaxy.getGameWorld());
                     anInf.getBoss().addToVIPReport(
                             "Your " + vipType.getName() + " has been discovered by an enemy exterminator at "
                                     + aPlanet.getName() + " and has been killed.");
-                    anExt.getBoss().addToVIPReport("Your " + VipPureFunctions.getVipTypeByKey(anExt.getTypeKey(), galaxy.getGameWorld()).getName() + " has discovered an enemy "
+                    anExt.getBoss().addToVIPReport("Your " + VipPureFunctions.getVipTypeByUuid(anExt.getTypeUuid(), galaxy.getGameWorld()).getName() + " has discovered an enemy "
                             + vipType.getName() + " at " + aPlanet.getName() + " and has killed him.");
                     anInf.getBoss().addToHighlights(vipType.getName(), HighlightType.TYPE_OWN_VIP_KILLED);
                     anExt.getBoss().addToHighlights(vipType.getName(), HighlightType.TYPE_ENEMY_VIP_KILLED);
@@ -3223,8 +3220,8 @@ public class GalaxyUpdater {
             VIP aHighVIP = allVIPsOnPlanetRandomized.get(highVIP);
             VIP aLowVIP = allVIPsOnPlanetRandomized.get(lowVIP);
             boolean highIsAssassin = false;
-            if (VipPureFunctions.getVipTypeByKey(aHighVIP.getTypeKey(), galaxy.getGameWorld()).getAssassination() > 0 && VipPureFunctions.getLocation(aHighVIP) == aPlanet && VipPureFunctions.getLocation(aLowVIP) == aPlanet
-                    && !VipPureFunctions.getVipTypeByKey(aLowVIP.getTypeKey(), galaxy.getGameWorld()).isWellGuarded()) {
+            if (VipPureFunctions.getVipTypeByUuid(aHighVIP.getTypeUuid(), galaxy.getGameWorld()).getAssassination() > 0 && VipPureFunctions.getLocation(aHighVIP) == aPlanet && VipPureFunctions.getLocation(aLowVIP) == aPlanet
+                    && !VipPureFunctions.getVipTypeByUuid(aLowVIP.getTypeUuid(), galaxy.getGameWorld()).isWellGuarded()) {
                 highIsAssassin = true;
             }
             // slumpa om den andra blir m�rdad
@@ -3248,9 +3245,9 @@ public class GalaxyUpdater {
                     winnerIndex = lowVIP;
                 }
                 VIP losingVIP = allVIPsOnPlanetRandomized.get(loserIndex);
-                VIPType losingVipType = VipPureFunctions.getVipTypeByKey(losingVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType losingVipType = VipPureFunctions.getVipTypeByUuid(losingVIP.getTypeUuid(), galaxy.getGameWorld());
                 VIP winningVIP = allVIPsOnPlanetRandomized.get(winnerIndex);
-                VIPType winningVipType = VipPureFunctions.getVipTypeByKey(winningVIP.getTypeKey(), galaxy.getGameWorld());
+                VIPType winningVipType = VipPureFunctions.getVipTypeByUuid(winningVIP.getTypeUuid(), galaxy.getGameWorld());
                 winningVIP.setKills(winningVIP.getKills() + 1);
                 galaxy.getAllVIPs().remove(losingVIP);
                 allVIPsOnPlanetRandomized.remove(loserIndex);
@@ -3296,7 +3293,7 @@ public class GalaxyUpdater {
         int bombardment = bombardingTaskForce.getBombardment(galaxy.getGameWorld());
         int maxBombardment = Integer.MAX_VALUE;
         Player bombardmentPlayer = galaxy.getPlayerByGovenorName(bombardingTaskForce.getPlayerName());
-        if (!GameWorldHandler.getFactionByKey(bombardmentPlayer.getFactionKey(), g.getGameWorld()).isAlien()){
+        if (!GameWorldHandler.getFactionByUuid(bombardmentPlayer.getFactionUuid(), g.getGameWorld()).isAlien()){
             maxBombardment = PlanetOrderStatusPureFunctions.getMaxBombardment(planet.getName(), bombardmentPlayer.getPlanetOrderStatuses());
         }
         if (bombardment > maxBombardment){
@@ -3312,13 +3309,13 @@ public class GalaxyUpdater {
                     if (planet.getPlayerInControl() != null){
                         planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " Governor " + bombardmentPlayer.getGovernorName() + " attampt to bombardment your planet but your planet shields stopped his attampt.");
                     }
-                    bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your bombardment was stopped by planet defence shields.");
+                    bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment was stopped by planet defence shields.");
                 }else{
                     bombardment-= shield;
                     if (planet.getPlayerInControl() != null){
                         planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " Governor " + bombardmentPlayer.getGovernorName() + " bombardment your planet, your planet shields reduced the bombardment with " + shield + ".");
                     }
-                    bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your bombardment was reduced  with " + shield + " by planet defence shields.");
+                    bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment was reduced  with " + shield + " by planet defence shields.");
                 }
             }
         }
@@ -3330,7 +3327,7 @@ public class GalaxyUpdater {
             planet.setResistance(planet.getResistance() - bombardment);
             if (planet.getPlayerInControl() != null){
                 planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " Governor " + bombardmentPlayer.getGovernorName() + "'s bombardment have lowered " + planet.getName() + "'s resistance and population by " + bombardment + ".");
-                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your bombardment have lowered its resistance and population by " + bombardment + ".");
+                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment have lowered its resistance and population by " + bombardment + ".");
 
                 // 10% chans att bomba s�nder en byggnad/bombv�rde.
                 for(int bombardmentIndex = 0; bombardmentIndex < bombardment; bombardmentIndex++){
@@ -3338,24 +3335,24 @@ public class GalaxyUpdater {
 
                         List<Building> groundBuildings = new ArrayList<>();
                         for(Building building : planet.getBuildings()){
-                            if(BuildingPureFunctions.getBuildingType(building.getTypeKey(), g.getGameWorld()).isInOrbit()){// ground buiding
+                            if(BuildingPureFunctions.getBuildingTypeByUuid(building.getTypeUuid(), g.getGameWorld()).isInOrbit()){// ground buiding
                                 groundBuildings.add(building);
                             }
                         }
                         if(groundBuildings.size() > 0){
                             int randomIndex = Functions.getRandomInt(0, groundBuildings.size()-1);
                             Building destroyedBuilding = groundBuildings.get(randomIndex);
-                            planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " Governor " + bombardmentPlayer.getGovernorName() + "'s bombardment have destoyed the building " + BuildingPureFunctions.getBuildingType(destroyedBuilding.getTypeKey(), g.getGameWorld()).getName() + ".");
+                            planet.getPlayerInControl().addToGeneral("While besieging your planet " + planet.getName() + " Governor " + bombardmentPlayer.getGovernorName() + "'s bombardment have destoyed the building " + BuildingPureFunctions.getBuildingTypeByUuid(destroyedBuilding.getTypeUuid(), g.getGameWorld()).getName() + ".");
 
 
                             if(TroopPureFunctions.getTroopsOnPlanet(planet, bombardmentPlayer, galaxy.getTroops()).size() > 0){
                                 // The attacking player have troops on the planet that can report which typ of building that was destroeyd.
-                                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your bombardment have destroyed a " + BuildingPureFunctions.getBuildingType(destroyedBuilding.getTypeKey(), g.getGameWorld()).getName() + " building.");
+                                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment have destroyed a " + BuildingPureFunctions.getBuildingTypeByUuid(destroyedBuilding.getTypeUuid(), g.getGameWorld()).getName() + " building.");
                             }else{
                                 // No troops and no report about the destoeyd buiding, just the explosion that tells about a destroyed building.
-                                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByKey(planet.getPlayerInControl().getFactionKey(), g.getGameWorld()).getName() + ") your bombardment have destroyed a building.");
+                                bombardmentPlayer.addToGeneral("While besieging the planet " + planet.getName() + " belonging to Governor " + planet.getPlayerInControl().getGovernorName() + " (" + GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).getName() + ") your bombardment have destroyed a building.");
                             }
-                            PlanetMutator.removeBuilding(planet, destroyedBuilding.getKey());
+                            PlanetMutator.removeBuilding(planet, destroyedBuilding.getUuid());
                         }
 
                     }
@@ -3386,7 +3383,7 @@ public class GalaxyUpdater {
                 if (aPlanet.getPlayerInControl() != null) {
                     int lordIndex = findPlayerLordship(aPlanet.getPlayerInControl(), allLordships);
                     if (lordIndex > -1) {
-                        if (GameWorldHandler.getFactionByKey(aPlanet.getPlayerInControl().getFactionKey(), g.getGameWorld()).isAlien()) {
+                        if (GameWorldHandler.getFactionByUuid(aPlanet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).isAlien()) {
                             lordProdTotal[lordIndex] += aPlanet.getResistance();
                         } else {
                             lordProdTotal[lordIndex] += aPlanet.getPopulation();
@@ -3490,7 +3487,7 @@ public class GalaxyUpdater {
                 if (aPlanet.getPlayerInControl() != null) {
                     int confIndex = galaxy.findPlayerConfederacy(aPlanet.getPlayerInControl(), allConfederacies);
                     if (confIndex > -1) {
-                        if (GameWorldHandler.getFactionByKey(aPlanet.getPlayerInControl().getFactionKey(), g.getGameWorld()).isAlien()) {
+                        if (GameWorldHandler.getFactionByUuid(aPlanet.getPlayerInControl().getFactionUuid(), g.getGameWorld()).isAlien()) {
                             confProdTotal[confIndex] += aPlanet.getResistance();
                         } else {
                             confProdTotal[confIndex] += aPlanet.getPopulation();
@@ -3565,7 +3562,7 @@ public class GalaxyUpdater {
             if (aVIP != null) {
                 if (highestPsychWarfareVIP == null) {
                     highestPsychWarfareVIP = aVIP;
-                } else if (VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld()).getPsychWarfareBonus() > VipPureFunctions.getVipTypeByKey(highestPsychWarfareVIP.getTypeKey(), galaxy.getGameWorld()).getPsychWarfareBonus()) {
+                } else if (VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld()).getPsychWarfareBonus() > VipPureFunctions.getVipTypeByUuid(highestPsychWarfareVIP.getTypeUuid(), galaxy.getGameWorld()).getPsychWarfareBonus()) {
                     highestPsychWarfareVIP = aVIP;
                 }
             }
@@ -3578,7 +3575,7 @@ public class GalaxyUpdater {
         int highestPsychWarfareBonus = 0;
         for (int i = 0; i < galaxy.getAllVIPs().size(); i++) {
             VIP tempVIP = galaxy.getAllVIPs().get(i);
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), galaxy.getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), galaxy.getGameWorld());
             if (vipType.getPsychWarfareBonus() > 0 && tempVIP.getBoss() == aPlayer
                     && tempVIP.getShipLocation() == aShip) {
                 if (vipType.getPsychWarfareBonus() > highestPsychWarfareBonus) {
@@ -3606,7 +3603,7 @@ public class GalaxyUpdater {
         for (int j = 0; j < galaxy.getPlanets().size(); j++) {
             Planet tempPlanet = galaxy.getPlanets().get(j);
             if (tempPlanet.getPlayerInControl() != null) {
-                if (GameWorldHandler.getFactionByKey(tempPlanet.getPlayerInControl().getFactionKey(), galaxy.getGameWorld()).isAlien()) {
+                if (GameWorldHandler.getFactionByUuid(tempPlanet.getPlayerInControl().getFactionUuid(), galaxy.getGameWorld()).isAlien()) {
                     tempPlanet.getPlayerInControl()
                             .setTotalPop(tempPlanet.getPlayerInControl().getTotalPop() + tempPlanet.getResistance());
                 } else {

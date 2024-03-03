@@ -86,7 +86,7 @@ public class LandBattleHelper {
             players = getAttackingPlayersWithTroopsOnPlanet(aPlanet, galaxy);
             if(TroopPureFunctions.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl(), galaxy.getTroops()).size() == 0){ // Försvarande spelar har inga trupper kvar.
                 if(players.size() == 1){// only one attacker and the planet should change owner.
-                    if (GameWorldHandler.getFactionByKey(players.get(0).getFactionKey(), galaxy.getGameWorld()).isAlien()){
+                    if (GameWorldHandler.getFactionByUuid(players.get(0).getFactionUuid(), galaxy.getGameWorld()).isAlien()){
                         Logger.finer("Attacker is alien");
                         // planet conquered by alien
                         (new PlanetUpdater()).razed(aPlanet, players.get(0));
@@ -128,7 +128,7 @@ public class LandBattleHelper {
         List<VIP> VIPs = new LinkedList<VIP>();
         for (VIP aVIP : galaxy.getAllVIPs()) {
 
-            if (VipPureFunctions.isLandBattleVip(VipPureFunctions.getVipTypeByKey(aVIP.getTypeKey(), galaxy.getGameWorld())) & (aVIP.getTroopLocation() != null
+            if (VipPureFunctions.isLandBattleVip(VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld())) & (aVIP.getTroopLocation() != null
                     && aVIP.getTroopLocation().getName().equalsIgnoreCase(aTroop.getName()))) {
                 VIPs.add(aVIP);
             }

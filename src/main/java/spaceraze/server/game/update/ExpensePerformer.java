@@ -25,13 +25,13 @@ public class ExpensePerformer {
 
         Logger.finer("Expense.performExpense(TurnInfo ti, Player p, Orders o) type: " +  expense.getType());
         Galaxy g = p.getGalaxy();
-        Player playerToResive = g.getPlayer(expense.getPlayerName());
+        Player playerToResive = g.getPlayerByUserName(expense.getPlayerName());
         Planet planet = null;
         if(expense.getPlanetName() != null && !expense.getPlanetName().equalsIgnoreCase("")){
             planet = g.getPlanet(expense.getPlanetName());
         }
         if (expense.getType().equalsIgnoreCase("pop")){
-            g.getPlayer(expense.getPlayerName()).removeFromTreasury(planet.getPopulation());
+            g.getPlayerByUserName(expense.getPlayerName()).removeFromTreasury(planet.getPopulation());
             planet.setPopulation(planet.getPopulation() + 1);
             ti.addToLatestExpenseReport(planet.getName() + " has increased its production from " + (planet.getPopulation() - 1) + " to " + planet.getPopulation() + ".");
             ti.addToLatestExpenseReport("Cost to increase production: " + planet.getPopulation() + ".");
@@ -44,7 +44,7 @@ public class ExpensePerformer {
         }else
         if (expense.getType().equalsIgnoreCase("building")){
 
-            BuildingType buildingType = PlayerPureFunctions.findOwnBuildingType(expense.getBuildingTypeName(), g.getPlayer(expense.getPlayerName()));
+            BuildingType buildingType = PlayerPureFunctions.findOwnBuildingTypeByUuid(expense.getBuildingTypeUuid(), g.getPlayerByUserName(expense.getPlayerName()));
 
             String uniqueBuildingString="";
             boolean buildBuilding = true;
@@ -68,7 +68,7 @@ public class ExpensePerformer {
                 }
             }else
             if(buildingType.isPlanetUnique()){
-                if(buildingType.isPlanetUnique() && BuildingPureFunctions.hasBuilding(planet, buildingType.getKey())){
+                if(buildingType.isPlanetUnique() && BuildingPureFunctions.hasBuilding(planet, buildingType.getUuid())){
                     buildBuilding =  false;
                     uniqueBuildingString = "You can not build an already existing planet unique building: " + buildingType.getName() + ".";
                 }
@@ -84,7 +84,7 @@ public class ExpensePerformer {
             }
 
             if(buildBuilding){
-                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), p.getGalaxy().getGameWorld()).getBuildingBuildBonus();
+                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), p.getGalaxy().getGameWorld()).getBuildingBuildBonus();
                 planet.getPlayerInControl().removeFromTreasury(BuildingPureFunctions.getBuildCost(buildingType, vipBuildBonus));
 
                 Building tempBuilding = null;
@@ -96,7 +96,7 @@ public class ExpensePerformer {
                     ti.addToLatestExpenseReport("You have upgraded a " + buildingType.getParentBuildingName() + " to a " + buildingType.getName() + " at the planet " + planet.getName() + ".");
                     ti.addToLatestExpenseReport("Cost to upgrade " + buildingType.getName() + ": " + BuildingPureFunctions.getBuildCost(buildingType, vipBuildBonus) + ".");
                     //planet.removeBuilding(tempBuilding.getBuildingType().getName());
-                    PlanetMutator.removeBuilding(planet, expense.getBuildingKey());
+                    PlanetMutator.removeBuilding(planet, expense.getBuildingUuid());
                 }else{
                     ti.addToLatestExpenseReport("You have built a new " + buildingType.getName() + ") at the planet " + planet.getName() + ".");
                     ti.addToLatestExpenseReport("Cost to build new " + buildingType.getName() + ": " + BuildingPureFunctions.getBuildCost(buildingType, vipBuildBonus) + ".");
@@ -111,7 +111,7 @@ public class ExpensePerformer {
             String uniqueBuildingString="";
             boolean buildShip = true;
 
-            SpaceshipType sst = PlayerPureFunctions.findOwnSpaceshipType(expense.getSpaceshipTypeName(), p, galaxy);
+            SpaceshipType sst = PlayerPureFunctions.findOwnSpaceshipType(expense.getSpaceshipTypeUuid(), p, galaxy);
 
             if(sst.isWorldUnique()){
                 if(!SpaceshipPureFunctions.isWorldUniqueBuild(p.getGalaxy(), sst)){
@@ -142,19 +142,19 @@ public class ExpensePerformer {
             if(buildShip){
                 Spaceship sstemp = null;
                 VIP tempVIP = VipPureFunctions.findVIPShipBuildBonus(planet,p,o, p.getGalaxy());
-                int vipTechBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), p.getGalaxy().getGameWorld()).getTechBonus();
+                int vipTechBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), p.getGalaxy().getGameWorld()).getTechBonus();
                 int factionTechBonus = p.getTechBonus();
 
                 sstemp = SpaceshipMutator.createSpaceShip(p, sst, vipTechBonus, factionTechBonus, PlanetPureFunctions.getBuildingTechBonus(planet, g.getGameWorld()));
                 //sstemp = sst.getShip(tempVIP2,factionTechBonus,planet.getBuildingTechBonus());
                 //sstemp = ow.buildShip(sst,tempVIP2,factionTechBonus);
-                Logger.finest(" -buildship planet: " + SpaceshipPureFunctions.getSpaceshipTypeByKey(sstemp.getTypeKey(), galaxy.getGameWorld()).getName());
+                Logger.finest(" -buildship planet: " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(sstemp.getTypeUuid(), galaxy.getGameWorld()).getName());
                 sstemp.setOwner(planet.getPlayerInControl());
                 sstemp.setLocation(planet);
                 g.addSpaceship(sstemp);
                 ti.addToLatestExpenseReport("You have built a new " + sst.getName() + " (named " + sstemp.getName() + ") at " + planet.getName() + ".");
                 // TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
-                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), p.getGalaxy().getGameWorld()).getShipBuildBonus();
+                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), p.getGalaxy().getGameWorld()).getShipBuildBonus();
                 planet.getPlayerInControl().removeFromTreasury(SpaceshipPureFunctions.getBuildCost(sst, vipBuildBonus));
                 Logger.finest(" -buildship loc name: " + planet.getName());
                 ti.addToLatestExpenseReport("Cost to build new " + sst.getName() + ": " + SpaceshipPureFunctions.getBuildCost(sst, vipBuildBonus) + ".");
@@ -170,7 +170,7 @@ public class ExpensePerformer {
             String uniqueBuildingString="";
             boolean buildTroop = true;
 
-            TroopType troopType = PlayerPureFunctions.findOwnTroopType(expense.getTroopTypeName(), g.getPlayer(expense.getPlayerName()), g);
+            TroopType troopType = PlayerPureFunctions.findOwnTroopType(expense.getTroopTypeUuid(), g.getPlayerByUserName(expense.getPlayerName()), g);
 
             if(troopType.isWorldUnique()){
                 if(!TroopPureFunctions.isWorldUniqueBuild(p.getGalaxy(), troopType)){
@@ -204,7 +204,7 @@ public class ExpensePerformer {
 
                 VIP tempVIP = VipPureFunctions.findVIPTroopBuildBonus(planet,p,o, p.getGalaxy());
                 VIP vipWithTechBonus = VipPureFunctions.findVIPTechBonus(planet, p, o, p.getGalaxy());
-                int vipTechBonus = vipWithTechBonus != null ? VipPureFunctions.getVipTypeByKey(vipWithTechBonus.getTypeKey(), p.getGalaxy().getGameWorld()).getTechBonus() : 0;
+                int vipTechBonus = vipWithTechBonus != null ? VipPureFunctions.getVipTypeByUuid(vipWithTechBonus.getTypeUuid(), p.getGalaxy().getGameWorld()).getTechBonus() : 0;
                 int factionTechBonus = p.getTechBonus();
 
                 tempTroop = TroopMutator.createTroop(p, troopType, vipTechBonus, factionTechBonus, PlanetPureFunctions.getBuildingTechBonus(planet, g.getGameWorld()), UniqueIdHandler.getUniqueIdCounter(galaxy, CounterType.TROOP).getUniqueId(), galaxy.getGameWorld());
@@ -215,7 +215,7 @@ public class ExpensePerformer {
                 g.addTroop(tempTroop);
                 ti.addToLatestExpenseReport("You have built a new " + troopType.getName() + " (named " + tempTroop.getName() + ") at " + planet.getName() + ".");
                 // TODO (Tobbe) lägg bonusen för buildings.  Skall bonus addas eller skall den som är störst gälla.
-                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByKey(tempVIP.getTypeKey(), p.getGalaxy().getGameWorld()).getTroopBuildBonus();
+                int vipBuildBonus = tempVIP == null ? 0 : VipPureFunctions.getVipTypeByUuid(tempVIP.getTypeUuid(), p.getGalaxy().getGameWorld()).getTroopBuildBonus();
                 planet.getPlayerInControl().removeFromTreasury(TroopPureFunctions.getCostBuild(troopType, vipBuildBonus));
                 Logger.finest(" -buildtroop loc name: " + planet.getName());
                 ti.addToLatestExpenseReport("Cost to build new " + troopType.getName() + ": " + TroopPureFunctions.getCostBuild(troopType, vipBuildBonus) + ".");
@@ -232,14 +232,14 @@ public class ExpensePerformer {
             String uniqueVIPString="";
             boolean buildVIP = true;
 
-            VIPType vipType = VipPureFunctions.getVipTypeByKey(expense.getTypeVIPKey(), p.getGalaxy().getGameWorld());
+            VIPType vipType = VipPureFunctions.getVipTypeByUuid(expense.getTypeVIPUuid(), p.getGalaxy().getGameWorld());
 
             if(vipType.isWorldUnique()){
                 if(!VipPureFunctions.isWorldUniqueBuild(vipType, p.getGalaxy())){
-                    uniqueVIPString = "Congratulations you have build the world unique " + expense.getTypeVIPName() + ".";
+                    uniqueVIPString = "Congratulations you have build the world unique " + VipPureFunctions.getVipTypeByUuid(expense.getTypeVIPUuid(), p.getGalaxy().getGameWorld()).getName() + ".";
                 }else{// The VIP can't be build.
                     buildVIP =  false;
-                    uniqueVIPString = "You can not build the world unique " + expense.getTypeVIPName() + " VIP. Some other organisation was faster then you.";
+                    uniqueVIPString = "You can not build the world unique " + VipPureFunctions.getVipTypeByUuid(expense.getTypeVIPUuid(), p.getGalaxy().getGameWorld()).getName() + " VIP. Some other organisation was faster then you.";
                 }
             }else
             if(vipType.isFactionUnique()){ // används inte så länge alignment finns kvar. eller alla VIPar ligger i GW
@@ -266,7 +266,7 @@ public class ExpensePerformer {
                 VIP vip = null;
 
                 vip = VipMutator.createNewVIP(vipType, planet.getPlayerInControl(), planet, false);
-                Logger.finest(" -buildVIP planet: " + VipPureFunctions.getVipTypeByKey(vip.getTypeKey(), galaxy.getGameWorld()).getName());
+                Logger.finest(" -buildVIP planet: " + VipPureFunctions.getVipTypeByUuid(vip.getTypeUuid(), galaxy.getGameWorld()).getName());
                 g.getAllVIPs().add(vip);
                 ti.addToLatestExpenseReport("You have recruited a new " + vipType.getName() + " at " + planet.getName() + ".");
                 planet.getPlayerInControl().removeFromTreasury(vip.getBuildCost());

@@ -6,7 +6,6 @@ import java.util.List;
 import spaceraze.servlethelper.game.GameWorldCreator;
 import spaceraze.servlethelper.game.StatisticsHandler;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
-import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.handlers.GameWorldHandler;
@@ -156,10 +155,10 @@ public class GalaxyCreator{
         // create new diplomacy states to all other players (that have already joined this game)
         GameWorldDiplomacy diplomacy = gw.getDiplomacy();
         for (Player aPlayer : galaxy.getPlayers()) {
-            DiplomacyRelation tmpRelation = GameWorldCreator.getRelation(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), gw), GameWorldHandler.getFactionByKey(p.getFactionKey(), gw), gw);
+            DiplomacyRelation tmpRelation = GameWorldCreator.getRelation(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), gw), GameWorldHandler.getFactionByUuid(p.getFactionUuid(), gw), gw);
             GameDiplomacyRelation gameDiplomacyRelation = GameDiplomacyRelation.builder()
-                    .faction1(tmpRelation.getFaction1())
-                    .faction2(tmpRelation.getFaction2())
+                    .factionOne(tmpRelation.getFactionOne())
+                    .factionTwo(tmpRelation.getFactionTwo())
                     .lowestRelation(tmpRelation.getLowestRelation())
                     .highestRelation(tmpRelation.getHighestRelation())
                     .startRelation(tmpRelation.getStartRelation())

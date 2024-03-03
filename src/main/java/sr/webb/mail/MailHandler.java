@@ -201,7 +201,7 @@ public class MailHandler {
 
 	private static boolean isOwnedByFaction(CanBeLostInSpace canBeLostInSpace, String aFactionName, Galaxy galaxy) {
 		if (canBeLostInSpace.getOwner() != null){
-			if (GameWorldHandler.getFactionByKey(galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFactionKey(), galaxy.getGameWorld()).getName().equalsIgnoreCase(aFactionName)){
+			if (GameWorldHandler.getFactionByUuid(galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFactionUuid(), galaxy.getGameWorld()).getName().equalsIgnoreCase(aFactionName)){
 				return true;
 			}
 		}else
@@ -218,7 +218,7 @@ public class MailHandler {
 		List<CanBeLostInSpace> lostShips = lastReport.getLostShips();
 		List<CanBeLostInSpace> lostTrops = lastReport.getLostTroops();
 		// print players own losses
-  		String playerFactionName = GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()).getName();
+  		String playerFactionName = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()).getName();
   		List<CanBeLostInSpace> tmpList = getLostInSpaceByFaction(lostShips, playerFactionName, galaxy);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own ships lost"));
@@ -241,7 +241,7 @@ public class MailHandler {
   			lisExist = true;
   		}
   		// print ships from other factions
-  		List<Faction> allFactions = galaxy.getActiveFactions(GameWorldHandler.getFactionByKey(aPlayer.getFactionKey(), galaxy.getGameWorld()));
+  		List<Faction> allFactions = galaxy.getActiveFactions(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()));
   		for (Faction aFaction : allFactions) {
 
   			tmpList = getLostInSpaceByFaction(lostShips,aFaction.getName(), galaxy);

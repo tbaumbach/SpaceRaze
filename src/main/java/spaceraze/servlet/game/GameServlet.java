@@ -19,12 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 
-import spaceraze.world.EconomyReport;
-import spaceraze.world.Player;
-import spaceraze.world.Report;
 import spaceraze.world.StatisticGameType;
-import spaceraze.world.TurnInfo;
-import spaceraze.world.orders.Expense;
 import spaceraze.world.orders.Orders;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
@@ -114,7 +109,7 @@ public class GameServlet {
 		if(server != null){
 			if(server.isPlayerParticipating(user)){
 				
-				Orders orders = server.getGalaxy().getPlayer(user.getName()).getOrders();
+				Orders orders = server.getGalaxy().getPlayerByUserName(user.getName()).getOrders();
 				
 				return orders;
 			}
@@ -152,7 +147,7 @@ public class GameServlet {
 				// Skriv om Blackmarket bid så att bara namn på skepp/blueprints skickas med, detta medför omskrivning av serven och vi väntar med det så länge vi är beroende av det gamla projektet.
 				// Finns risk att hela Orders måste skrivas om, dock är dagens Orders skriver just för att undervika att skicka med hela galaxy(serven).
 				// Fortsätter och kodar mot dagens Orders då vi klara oss undan t.ex. BlackMarket.
-				server.getGalaxy().getPlayer(user.getName()).setOrders(newOrders);
+				server.getGalaxy().getPlayerByUserName(user.getName()).setOrders(newOrders);
 				
 				
 				return "Ok";

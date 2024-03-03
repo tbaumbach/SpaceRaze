@@ -14,7 +14,8 @@ public class FactionHelper {
 	public FactionHelper(Faction faction) {
 		this.faction = faction;
 	}
-	
+
+	/*
 	public String getSpaceshipTypesTableContentHTML(){
 		StringBuffer retHTML = new StringBuffer();
 		retHTML.append(SpaceShipHelper.getHTMLHeaderRow());
@@ -25,6 +26,9 @@ public class FactionHelper {
 		return retHTML.toString();
 	}
 
+	 */
+
+	/*
 	public String getStartingSpaceshipsHTML(){
 		StringBuffer retHTML = new StringBuffer();
 		for (SpaceshipType sst : faction.getStartingShipTypes()) {
@@ -32,6 +36,7 @@ public class FactionHelper {
 		}
 		return retHTML.toString();
 	}
+	 */
 
 
 }

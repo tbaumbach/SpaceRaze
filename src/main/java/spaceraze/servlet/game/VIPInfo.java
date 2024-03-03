@@ -13,7 +13,7 @@ public class VIPInfo {
 	private String key;
 	
 	VIPInfo(VIP aVip, Player player){
-		VIPType vipType = VipPureFunctions.getVipTypeByKey(aVip.getTypeKey(), player.getGalaxy().getGameWorld());
+		VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVip.getTypeUuid(), player.getGalaxy().getGameWorld());
 		type = vipType.getName();
 					
 		if(aVip.getBoss() != null){
@@ -22,7 +22,7 @@ public class VIPInfo {
 				owner = aVip.getBoss().getGovernorName();
 				name = vipType.getName();
 				shortName = vipType.getShortName();
-				key = aVip.getKey();
+				key = aVip.getUuid();
 				kills = aVip.getKills();
 			}else if(DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVip.getBoss(), player.getGalaxy())){
 				// Ägaren till VIPen är en allierad vilket betyder att spelarn får veta vem som äger VIPen.
