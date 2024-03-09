@@ -263,7 +263,7 @@ public class BlackMarketPerformer {
                 }else{ // is troop
                     Logger.finest( "performSelling: troop: " + blackMarketOffer.getTroopType().getName());
                     //Create troop without player bonus/research
-                    Troop newTroop = TroopMutator.createTroop(TroopPureFunctions.getTroopTypeByUuid(blackMarketOffer.getTroopType().getName(), winningPlayer.getGalaxy().getGameWorld()), winningPlayer.getGalaxy());
+                    Troop newTroop = TroopMutator.createTroop(TroopPureFunctions.getTroopTypeByUuid(blackMarketOffer.getTroopType().getUuid(), winningPlayer.getGalaxy().getGameWorld()), winningPlayer.getGalaxy());
                     newTroop.setOwner(winningPlayer);
                     newTroop.setPlanetLocation(destinationPlanet);
                     galaxy.addTroop(newTroop);

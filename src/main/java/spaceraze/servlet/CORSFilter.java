@@ -1,17 +1,17 @@
 package spaceraze.servlet;
 
-import java.io.IOException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.ext.Provider;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Provider
 public class CORSFilter implements ContainerResponseFilter {
 
     public void filter(ContainerRequestContext request,
-            ContainerResponseContext response) throws IOException {
+                       ContainerResponseContext response) throws IOException {
         response.getHeaders().add("Access-Control-Allow-Origin", "*");
         response.getHeaders().add("Access-Control-Allow-Headers",
                 "origin, content-type, accept, authorization");

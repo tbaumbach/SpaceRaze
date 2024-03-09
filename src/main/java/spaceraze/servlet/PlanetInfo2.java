@@ -1,16 +1,12 @@
 package spaceraze.servlet;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import jakarta.servlet.ServletContext;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.world.GameWorld;
 import spaceraze.world.Planet;
@@ -20,7 +16,8 @@ import sr.server.ServerHandler;
 @Path("/PlanetInfo2")
 public class PlanetInfo2{
 	
-	@Context ServletContext context;
+	@Context
+	ServletContext context;
 	
 	
 	@GET

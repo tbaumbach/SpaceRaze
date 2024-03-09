@@ -9,20 +9,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.servlethelper.CreateNewGameData;
 import spaceraze.servlethelper.ReturnGames;
 import spaceraze.util.general.Logger;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
-import spaceraze.util.properties.RankingHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
 
@@ -31,14 +30,14 @@ import sr.webb.users.UserHandler;
  *
  * Used to tunnel calls from notifier to the server
  */
-public class NotifierTunnel extends HttpServlet{
+public class NotifierTunnel extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public void init(ServletConfig c) throws ServletException {
 		super.init (c);
 	}
 
-	public void doGet( HttpServletRequest request,HttpServletResponse response )throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response )throws ServletException, IOException {
 		doPost(request, response);
 	}
 	

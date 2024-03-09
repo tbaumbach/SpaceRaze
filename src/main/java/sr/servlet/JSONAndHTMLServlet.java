@@ -2,23 +2,23 @@ package sr.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.world.GameWorld;
 import spaceraze.world.Planet;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 
 @SuppressWarnings("serial")
-public class JSONAndHTMLServlet extends HttpServlet{
+public class JSONAndHTMLServlet extends HttpServlet {
 	
 	
-	public void doGet( HttpServletRequest request,HttpServletResponse response )throws IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response )throws IOException {
 		doPost(request, response);
 	}
 	

@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.servlethelper.map.TransferWrapper;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
@@ -30,13 +30,13 @@ import sr.webb.users.UserHandler;
  * Used to tunnel calls from map editors to the server
  */
 @SuppressWarnings("serial")
-public class MapEditorTunnel extends HttpServlet{
+public class MapEditorTunnel extends HttpServlet {
 
 	public void init(ServletConfig c) throws ServletException {
 		super.init (c);
 	}
 
-	public void doGet( HttpServletRequest request,HttpServletResponse response )throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response )throws ServletException, IOException {
 		doPost(request, response);
 	}
 	

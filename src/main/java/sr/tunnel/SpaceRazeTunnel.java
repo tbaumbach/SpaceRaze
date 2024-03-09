@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.servlethelper.game.TransferWrapper;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Message;
@@ -31,7 +31,7 @@ import sr.server.ServerHandler;
  * Used to tunnel calls from clients to the server
  */
 @SuppressWarnings("serial")
-public class SpaceRazeTunnel extends HttpServlet{
+public class SpaceRazeTunnel extends HttpServlet {
 	public static final String NOT_SAVED_ALREADY_UPDATED = "Player not saved by tunnel, server has already updated";
 	public static final String SERVER_ERROR = "Player saved, but error occured in server when updating";
 
@@ -39,7 +39,7 @@ public class SpaceRazeTunnel extends HttpServlet{
 		super.init (c);
 	}
 
-	public void doGet( HttpServletRequest request,HttpServletResponse response )throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response )throws ServletException, IOException {
 		doPost(request, response);
 	}
 	

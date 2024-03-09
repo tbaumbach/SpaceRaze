@@ -1,17 +1,18 @@
 package spaceraze.servlet;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.ServletContext;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import spaceraze.world.GameWorld;
 import spaceraze.world.Planet;
 import spaceraze.servlethelper.gameworlds.TheLastGreatWar;
@@ -21,7 +22,8 @@ import sr.server.ServerHandler;
 @Path("/PlanetInfo")
 public class PlanetInfo{
 	
-	@Context ServletContext context;
+	@Context
+	ServletContext context;
 	
 	
 	@GET
