@@ -251,7 +251,7 @@ public class StartGameHandler {
         Logger.finer("create gov");
 //        VIP tempVip = ((VIPType)vipTypes.elementAt(0)).createNewVIP(p,homeplanet);
 //        allVIPs.addElement(tempVip);
-        galaxy.getAllVIPs().add(VipMutator.createNewVIP(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), galaxy.getGameWorld()).getGovernorVIPType(), p, homeplanet, true));
+        galaxy.getAllVIPs().add(VipMutator.createNewVIP(VipPureFunctions.getVipTypeByUuid(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), galaxy.getGameWorld()).getGovernorVIPType(), galaxy.getGameWorld()), p, homeplanet, true));
         // create 1 random VIP
 //        tempVip = this.createRandomVIP();
 //        tempVip.setBoss(p);

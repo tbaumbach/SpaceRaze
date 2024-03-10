@@ -35,7 +35,6 @@ TechBonus: <%= f.getTechBonus() %><br>
 <%--
 Siege bonus: <%= f.getSiegeBonus() %><br>
  --%>
-Alignment: <%= f.getAlignment() %><br>
 <%--
 Start wharf size: <%= OrbitalWharf.getSizeString(f.getStartingWharfSize()) %><br>
 WharfBuildCost: <%= f.getWharfBuildCost() %><br>

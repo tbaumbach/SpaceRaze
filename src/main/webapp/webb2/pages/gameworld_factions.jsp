@@ -49,7 +49,7 @@ function OnMouseOut(Control)
 	</div></div>
 		<div class="List" style="width:718">
 <table class="ListTable">
-	<%String factionTable = new GameWorldHelper(gw).getFactionsTableContentHTMLNO(); %>
+	<!--%String factionTable = new GameWorldHelper(gw).getFactionsTableContentHTMLNO(); %-->
   <%= factionTable%>
 </table>
   </div>

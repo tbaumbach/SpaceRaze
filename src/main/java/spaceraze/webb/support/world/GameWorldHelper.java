@@ -46,28 +46,6 @@ public class GameWorldHelper {
 		}
 		return newList;
 	}
-	
-	public String getFactionsTableContentHTML(){
-		StringBuffer retHTML = new StringBuffer();
-		retHTML.append(Faction.getHTMLHeaderRow());
-		for (Faction tmpf : gameWorld.getFactions()) {
-			retHTML.append(tmpf.getHTMLTableRow(gameWorld.getFileName()));
-		}
-		return retHTML.toString();
-	}
-	
-	public String getFactionsTableContentHTMLNO(){
-		StringBuffer retHTML = new StringBuffer();
-		retHTML.append(Faction.getHTMLHeaderRowNO());
-		int i = 0;
-		for (Faction tmpf : gameWorld.getFactions()) {
-			i = i + 1;
-			String RowName = i + "GameWorldListRow";
-			retHTML.append(tmpf.getHTMLTableRowNO(gameWorld.getFileName(),RowName,i));
-		}
-		return retHTML.toString();
-	}
-	
 	public String getFactionsCheckboxesHTML(){
 		StringBuffer retHTML = new StringBuffer();
 		for (Faction tmpf : gameWorld.getFactions()) {

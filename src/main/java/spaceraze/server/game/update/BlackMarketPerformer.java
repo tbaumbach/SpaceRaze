@@ -1,5 +1,6 @@
 package spaceraze.server.game.update;
 
+import spaceraze.servlethelper.game.AlignmentPureFunctions;
 import spaceraze.servlethelper.game.BlackMarketPureFunctions;
 import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
@@ -9,7 +10,6 @@ import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
-import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
@@ -98,7 +98,7 @@ public class BlackMarketPerformer {
         List<Player> activePlayers = PlayerPureFunctions.getActivePlayers(galaxy);
         while (!found & (index < activePlayers.size())) {
             Player aPlayer = activePlayers.get(index);
-            if (GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()).getAlignment().canHaveVip(aVIPType.getAlignment().getName())) {
+            if (AlignmentPureFunctions.canHaveVip(aVIPType.getAlignment(), AlignmentPureFunctions.getPlayerAlignment(aPlayer, galaxy.getGameWorld()))) {
                 found = true;
             } else {
                 index++;

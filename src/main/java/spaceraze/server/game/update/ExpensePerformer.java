@@ -92,8 +92,8 @@ public class ExpensePerformer {
                 // add the building to the planet.
                 planet.getBuildings().add(tempBuilding);
                 // if the building have any parent building this is a upgrade and the parent building should be removed
-                if(buildingType.getParentBuildingName() != null){
-                    ti.addToLatestExpenseReport("You have upgraded a " + buildingType.getParentBuildingName() + " to a " + buildingType.getName() + " at the planet " + planet.getName() + ".");
+                if(buildingType.getParentBuildingType() != null){
+                    ti.addToLatestExpenseReport("You have upgraded a " + BuildingPureFunctions.getBuildingTypeByUuid(buildingType.getParentBuildingType(), galaxy.getGameWorld()).getName() + " to a " + buildingType.getName() + " at the planet " + planet.getName() + ".");
                     ti.addToLatestExpenseReport("Cost to upgrade " + buildingType.getName() + ": " + BuildingPureFunctions.getBuildCost(buildingType, vipBuildBonus) + ".");
                     //planet.removeBuilding(tempBuilding.getBuildingType().getName());
                     PlanetMutator.removeBuilding(planet, expense.getBuildingUuid());
