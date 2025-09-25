@@ -15,7 +15,7 @@ public class GameListObject {
 	public GameListObject(SR_Server aServer) {
 		
 		gameName = aServer.getGameName();
-		mapName = aServer.getGalaxy().getMapNameFull();
+		mapName = aServer.getMapFileName();
 		turn = aServer.getTurn();
 		status = aServer.getStatus();
 		startedByPlayerName = aServer.getStartedByPlayerName();

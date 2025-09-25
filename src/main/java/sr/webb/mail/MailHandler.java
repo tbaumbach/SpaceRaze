@@ -68,7 +68,7 @@ public class MailHandler {
 		String content = "A new game has been started and is open to join.\n"; 
 		content = content + "Game name is: " + aNewServer.getGameName() + "\n";
 		content = content + "GameWorld: " + aNewServer.getGalaxy().getGameWorld().getFullName() + "\n";
-		content = content + "Game map is: " + aNewServer.getGalaxy().getMapNameFull() + "\n";
+		content = content + "Game map is: " + aNewServer.getGalaxy().mapVersion() + "\n";
 		content = content + "Max # players: " + aNewServer.getGalaxy().getNrStartPlanets() + "\n";
 		content = content + "Autobalance: " + Functions.getYesNo(aNewServer.getAutoBalance()) + "\n";
 		content = content + "Min number of steps: " + aNewServer.getGalaxy().getSteps() + "\n";

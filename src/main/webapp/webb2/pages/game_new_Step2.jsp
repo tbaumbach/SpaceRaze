@@ -6,6 +6,7 @@
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="spaceraze.webb.support.world.GameWorldHelper"%>
 <%@ page import="java.io.*"%>
+<%@ page import="spaceraze.map.GalaxyMap" %>
 
 <!DOCTYPE html>
 <html>
@@ -52,7 +53,7 @@
 	ServerHandler sh = (ServerHandler)application.getAttribute("serverhandler");
 	String todoStr = request.getParameter("todo");
 
-	Map aMap = MapHandler.getMap(mapName);
+	GalaxyMap aMap = MapHandler.getMap(mapName);
 	int maxPlayers = aMap.getMaxNrStartPlanets();
 //		String login = tmpUser.getLogin();
 %>

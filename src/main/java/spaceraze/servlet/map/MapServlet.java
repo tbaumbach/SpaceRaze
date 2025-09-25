@@ -11,7 +11,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 import sr.server.map.MapHandler;
 
 @Path("/maps")
@@ -26,8 +26,8 @@ public class MapServlet{
 		
 		
 		List<MapLight> mapLights = new ArrayList<MapLight>();
-		List<Map> maps = MapHandler.getAllMaps();
-		for (Map aMap : maps) {
+		List<GalaxyMap> maps = MapHandler.getAllMaps();
+		for (GalaxyMap aMap : maps) {
 			mapLights.add(new MapLight(aMap));
 		}
 				
@@ -38,14 +38,14 @@ public class MapServlet{
 	@GET
 	@Path("/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map getmap(@PathParam("name") String fileName) throws JsonProcessingException {
+	public GalaxyMap getmap(@PathParam("name") String fileName) throws JsonProcessingException {
 		
 		
 		System.out.println("Call aginst maps/name");
 		
 		
-		List<Map> maps = MapHandler.getAllMaps();
-		for (Map aMap : maps) {
+		List<GalaxyMap> maps = MapHandler.getAllMaps();
+		for (GalaxyMap aMap : maps) {
 			if(aMap.getFileName().equalsIgnoreCase(fileName)){
 				return aMap;
 			}

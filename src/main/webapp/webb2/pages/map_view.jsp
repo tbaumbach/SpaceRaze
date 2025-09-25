@@ -1,6 +1,7 @@
 <%@ page import="sr.server.map.*"%>
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.webb.users.*"%>
+<%@ page import="spaceraze.map.GalaxyMap" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +14,7 @@
 
 <%
 	String mapName = request.getParameter("mapname");
-	Map aMap = MapHandler.getMap(mapName);
+	GalaxyMap aMap = MapHandler.getMap(mapName);
 	
 	User theUserNO = null;
 	

@@ -2,7 +2,7 @@
 <%@ page import="sr.webb.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.server.map.*"%>
-<%@ page import="spaceraze.world.Map"%>
+<%@ page import="spaceraze.map.GalaxyMap"%>
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>

@@ -17,7 +17,7 @@ import spaceraze.servlethelper.map.TransferWrapper;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.util.properties.PropertiesReader;
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 import sr.server.MapFileNameFilter;
 import sr.server.persistence.PHash;
 import sr.webb.users.User;
@@ -28,17 +28,17 @@ import sr.webb.users.User;
  * Handles reading of map files and showing data about the maps available
  */
 public class MapHandler {
-	private static List<Map> allMaps;
+	private static List<GalaxyMap> allMaps;
 	private static String dataPath; // inlagd för att fixa skum bugg, borde egentligen inte behövas...
 
 	/**
 	 * 
 	 * @return
 	 */
-	public static List<Map> getAllMaps(){
+	public static List<GalaxyMap> getAllMaps(){
 		Logger.finer("getAllMaps() called");
 		if (allMaps == null){
-			allMaps = new LinkedList<Map>();
+			allMaps = new LinkedList<GalaxyMap>();
 			// read maps from file and create allMaps List
 			if (dataPath == null){
 				dataPath = PropertiesHandler.getProperty("datapath");
@@ -47,15 +47,15 @@ public class MapHandler {
 			String completePath = dataPath + "maps\\";
 			List<String> allMapNames = getProps(completePath);
 			for (String mapName : allMapNames) {
-				allMaps.add(new Map(mapName));
+				allMaps.add(new GalaxyMap(mapName));
 			}
 		}
 		return allMaps;
 	}
 
-	private static List<Map> getMapDrafts(String playerLogin){
+	private static List<GalaxyMap> getMapDrafts(String playerLogin){
 		Logger.finer("getMapDrafts() called");
-		List<Map> allDrafts = new LinkedList<Map>();
+		List<GalaxyMap> allDrafts = new LinkedList<GalaxyMap>();
 		// read maps from file and create allMaps List
 		if (dataPath == null){
 			dataPath = PropertiesHandler.getProperty("datapath");
@@ -64,7 +64,7 @@ public class MapHandler {
 		String completePath = dataPath + "maps\\" + playerLogin + "\\";
 		List<String> allMapNames = getProps(completePath);
 		for (String mapName : allMapNames) {
-			allDrafts.add(new Map(playerLogin + "." + mapName));
+			allDrafts.add(new GalaxyMap(playerLogin + "." + mapName));
 		}
 		return allDrafts;
 	}
@@ -87,13 +87,13 @@ public class MapHandler {
 		getAllMaps();
 	}
 	
-	public static Map getMap(String aMapFileName){
+	public static GalaxyMap getMap(String aMapFileName){
 		return getMap(aMapFileName,null);
 	}
 
-	public static Map getMap(String aMapFileName, String playerLogin){
-		Map found = null;
-		List<Map> maps = null;
+	public static GalaxyMap getMap(String aMapFileName, String playerLogin){
+		GalaxyMap found = null;
+		List<GalaxyMap> maps = null;
 		if (playerLogin == null){
 			maps = getAllMaps();
 		}else{
@@ -101,7 +101,7 @@ public class MapHandler {
 		}
 		int index = 0;
 		while ((found == null) & (index < maps.size())){
-			Map tmpMap = (Map)maps.get(index);
+			GalaxyMap tmpMap = (GalaxyMap)maps.get(index);
 			if (tmpMap.getFileName().equalsIgnoreCase(aMapFileName)){
 				found = tmpMap;
 			}else{
@@ -119,7 +119,7 @@ public class MapHandler {
 	 */
 	public static String getMapName(String mapFileName){
 		String tmpMapName = mapFileName;
-		Map aMap = getMap(mapFileName);
+		GalaxyMap aMap = getMap(mapFileName);
 		if (aMap != null){
 			tmpMapName = aMap.getNameFull();
 		}
@@ -129,11 +129,11 @@ public class MapHandler {
 	public static String getMapFilesNO(){
 		Logger.finer("getMapFiles called");
 		String retStr = "";
-		List<Map> allMapNames = MapHandler.getAllMaps();
+		List<GalaxyMap> allMapNames = MapHandler.getAllMaps();
 		Collections.sort(allMapNames);
 		Logger.finer("allMapNames.size(): " + allMapNames.size());
 		int i=0;
-		for (Map aMap : allMapNames) {
+		for (GalaxyMap aMap : allMapNames) {
 			i = i +1;
 			String RowName = i + "MapListNORow";
 			String editStr = "Denied";
@@ -145,11 +145,11 @@ public class MapHandler {
 	public static String getMapFiles(User aUser){
 		Logger.finer("getMapFiles called");
 		String retStr = "";
-		List<Map> allMapNames = MapHandler.getAllMaps();
+		List<GalaxyMap> allMapNames = MapHandler.getAllMaps();
 		Collections.sort(allMapNames);
 		Logger.finer("allMapNames.size(): " + allMapNames.size());
 		int i=0;
-		for (Map aMap : allMapNames) {
+		for (GalaxyMap aMap : allMapNames) {
 			i = i + 1;
 			String RowName = i + "MapListRow";
 //			LoggingHandler.finer("in loop: " + aMap.getName());
@@ -170,10 +170,10 @@ public class MapHandler {
 	public static String getMapDraftFiles(User aUser){
 		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
 		String retStr = "";
-		List<Map> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
 		Collections.sort(tmpMaps);
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
-		for (Map aMap : tmpMaps) {
+		for (GalaxyMap aMap : tmpMaps) {
 //			LoggingHandler.finer("in loop: " + aMap.getName());
 			retStr = retStr + "<tr><td></td><td>" + aMap.getNameFull() + "</td><td>" + aMap.getFileName() + "</td><td>" + aMap.getNrPlanets() + "</td><td>" + aMap.getChangedDate() + "</td><td><a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a> / <a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getAuthor() + "." + aMap.getFileName() + "\">Delete</a></td></tr>\n";
 		}
@@ -183,11 +183,11 @@ public class MapHandler {
 	public static String getMapDraftFilesNO(User aUser){
 		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
 		String retStr = "";
-		List<Map> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
 		Collections.sort(tmpMaps);
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
 		int i=0;
-		for (Map aMap : tmpMaps) {
+		for (GalaxyMap aMap : tmpMaps) {
 			i = i + 1;
 			String RowName = i + "MapDraftListRow";
 			String editStr = "";
@@ -209,10 +209,10 @@ public class MapHandler {
 	public static String getMapHTML(){
 		Logger.finer("getMapHTML called");
 		String retStr = "";
-		List<Map> allMapNames = MapHandler.getAllMaps();
+		List<GalaxyMap> allMapNames = MapHandler.getAllMaps();
 		Collections.sort(allMapNames);
 		Logger.finer("allMapNames.size(): " + allMapNames.size());
-		for (Map aMap : allMapNames) {
+		for (GalaxyMap aMap : allMapNames) {
 			retStr = retStr + "<option value=\"" + aMap.getFileName() + "\">" + aMap.getNameFull() + " (" + aMap.getFileName() + ")</option>\n";
 		}
 		return retStr;
@@ -247,8 +247,8 @@ public class MapHandler {
 	}
 
 	public static void main(String[] args){
-		List<Map> aList = getAllMaps();
-		for (Map aMap : aList) {
+		List<GalaxyMap> aList = getAllMaps();
+		for (GalaxyMap aMap : aList) {
 			System.out.println(aMap.getFileName());
 		}
 //		double sqrt = Math.sqrt(16);
@@ -258,7 +258,7 @@ public class MapHandler {
 
 	public static String showMapNO(String mapName){
 		MapImageCreator mic = new MapImageCreator();
-		Map aMap = getMap(mapName,null);
+		GalaxyMap aMap = getMap(mapName,null);
 //		Dimension d = mic.createGifAndGetSize(mapName,aMap); verkar inte som om d beh�vs?
 		mic.createGifAndGetSize(mapName,aMap);
 		String retStr = "<img src=\"images/maps/" + mapName + ".gif\" width=\"700\">";
@@ -268,7 +268,7 @@ public class MapHandler {
 	
 	public static String showMap(String mapName){
 		MapImageCreator mic = new MapImageCreator();
-		Map aMap = getMap(mapName,null);
+		GalaxyMap aMap = getMap(mapName,null);
 		Dimension d = mic.createGifAndGetSize(mapName,aMap);
 		String retStr = "<img src=\"images/maps/" + mapName + ".gif\" width=\"" + d.width + "\" height=\"" + d.height + "\">";
 		return retStr;
@@ -280,7 +280,7 @@ public class MapHandler {
 	 * @param path
 	 * @return
 	 */
-	public static String saveMapToFile(Map aMap, String path){
+	public static String saveMapToFile(GalaxyMap aMap, String path){
 		Logger.fine("saveMapToFile called(): " + path + " " + aMap.getFileName());
 		Logger.fine("playerLogin:: " + aMap.getAuthor());
 		String success = null;
@@ -363,7 +363,7 @@ public class MapHandler {
 	
 	public static int getMapsNr(){
 		int nr = 0;
-		List<Map> maps = getAllMaps();
+		List<GalaxyMap> maps = getAllMaps();
 		if (maps != null){
 			nr = maps.size();
 		}
@@ -374,11 +374,11 @@ public class MapHandler {
 	 * Returns the first of the maps with the highest counter 
 	 * @return
 	 */
-	public static Map getMostUsedMap(){
-		List<Map> maps = getAllMaps();
-		Map foundMap = null;
+	public static GalaxyMap getMostUsedMap(){
+		List<GalaxyMap> maps = getAllMaps();
+		GalaxyMap foundMap = null;
 		int foundCounter = -1;
-		for (Map aMap : maps) {
+		for (GalaxyMap aMap : maps) {
 			int tmpCounter = PHash.getCounter("game.finished.map." + aMap.getFileName());
 			if (foundMap == null){
 				foundMap = aMap;
@@ -393,7 +393,7 @@ public class MapHandler {
 	}
 
 	public static String getMostUsedMapName(){
-		Map foundMap = getMostUsedMap();
+		GalaxyMap foundMap = getMostUsedMap();
 		String mapName = "No maps found";
 		if (foundMap != null){
 			mapName = foundMap.getNameFull();
@@ -404,7 +404,7 @@ public class MapHandler {
 	public static int getSteps(String mapName, String maxNrPlayersString){
 		int steps = 0;
 		int maxNrPlayers = Integer.parseInt(maxNrPlayersString);
-    	Map theMap = MapHandler.getMap(mapName);
+    	GalaxyMap theMap = MapHandler.getMap(mapName);
     	int nrPlanets = theMap.getNrPlanets();
     	double planetsPerPlayerRatio = nrPlanets*1.0/maxNrPlayers;
     	if (planetsPerPlayerRatio < 2){
@@ -433,7 +433,7 @@ public class MapHandler {
 		return getSizeText(MapHandler.getMap(mapName));
 	}
 
-	public static String getSizeText(Map map){
+	public static String getSizeText(GalaxyMap map){
 		String sizeText = null;
 		int nrPlayersMax = map.getMaxNrStartPlanets();
 		switch (nrPlayersMax){

@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import spaceraze.map.GalaxyMap;
+import spaceraze.map.MapPlanet;
 import spaceraze.servlethelper.game.BuildingPureFunctions;
 import spaceraze.servlethelper.game.UniqueIdHandler;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
@@ -24,7 +26,7 @@ import spaceraze.world.*;
 import spaceraze.server.world.comparator.PlanetRangeComparator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
-import sr.server.GalaxyCreator;
+import spaceraze.servlethelper.game.GalaxyCreator;
 import sr.server.GalaxyUpdater;
 
 public class StartGameHandler {
@@ -89,7 +91,8 @@ public class StartGameHandler {
 	    			planet.setPlayerInControl(randomPlayer);
 	    		}else{
 	    			VIP guvenor = VipPureFunctions.findVIPGovernor(randomPlayer, galaxy);
-	    			PlanetMutator.joinsVisitingDiplomat(planet, guvenor, false, galaxy.getGameWorld());
+                    MapPlanet mapPlanet = PlanetPureFunctions.getMapPlanet(galaxyUpdater.getGalaxyMap(), planet.getMapPlanetUuid());
+                    PlanetMutator.joinsVisitingDiplomat(planet, mapPlanet, guvenor, false, galaxy.getGameWorld());
 	    			galaxyUpdater.shipsJoinGovenor(planet,guvenor);
 	    			galaxyUpdater.troopsJoinGovenor(planet, guvenor);
 	    		}
@@ -107,15 +110,15 @@ public class StartGameHandler {
 		}
 	}
 	
-	public Player getNewPlayer(String name, String password, String govenorName, String factionName, Galaxy galaxy){
+	public Player getNewPlayer(String name, String password, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap){
     	Logger.finer("getNewPlayer: " + name + " " + password + " " + govenorName);
         Player p;
         if (galaxy.getNrStartPlanets() == galaxy.getPlayers().size()){
             p = new Player("All starting planets already taken");
         }else{
         	Faction playerFaction = galaxy.findFaction(factionName);
-            Planet homeplanet = getStartPlanet(galaxy.getSteps(),playerFaction, galaxy);
-            p = createPlayer(name,password,homeplanet,govenorName,factionName, galaxy);
+            Planet homeplanet = getStartPlanet(galaxy.getSteps(),playerFaction, galaxy, galaxyMap);
+            p = createPlayer(name,password,homeplanet,govenorName,factionName, galaxy, galaxyMap);
             Logger.finer("Galaxy.getNewPlayer");
             homeplanet.setPlayerInControl(p);
             Logger.finer("Galaxy.getNewPlayer2");
@@ -145,17 +148,17 @@ public class StartGameHandler {
 	}
 	
 //  @SuppressWarnings("unchecked")
-  private Planet getStartPlanet(int steps, Faction playerFaction, Galaxy galaxy){
+  private Planet getStartPlanet(int steps, Faction playerFaction, Galaxy galaxy, GalaxyMap galaxyMap){
 	Logger.finer("getStartPlanet steps: " + steps);
     Planet foundPlanet = null;
-    List<Planet> tempplanets = getStarPlanets(galaxy);
+    List<Planet> tempplanets = getStarPlanets(galaxy, galaxyMap);
     // slumpa om den
     Collections.shuffle(tempplanets);
 //    Functions.randomize(tempplanets);
     // if group players, sort the planets with planets close to planets with 
     // players from the same faction first
     if (galaxy.isGroupSameFaction()){
-    	setPlanetRangeToClosestFriendly(tempplanets,playerFaction, galaxy);
+    	setPlanetRangeToClosestFriendly(tempplanets,playerFaction, galaxy, galaxyMap);
     }
     // loopa igenom planeterna tills listan är slut eller en lämplig hemplanet hittats
     int i = 0;
@@ -176,16 +179,17 @@ public class StartGameHandler {
     }
     if ((foundPlanet == null) & (steps > 0)){
       // om inte, returnera resultatet av nytt anrop till getStartPlanet med steps = steps - 1
-      foundPlanet = getStartPlanet(steps - 1,playerFaction, galaxy);
+      foundPlanet = getStartPlanet(steps - 1,playerFaction, galaxy, galaxyMap);
     }
     return foundPlanet;
   }
   
-  private List<Planet> getStarPlanets(Galaxy galaxy) {
-	  LinkedList<Planet>  tempList = new LinkedList<Planet>();
+  private List<Planet> getStarPlanets(Galaxy galaxy, GalaxyMap galaxyMap) {
+	  LinkedList<Planet>  tempList = new LinkedList<>();
 	  for (Planet aPlanet : galaxy.getPlanets()) {
-		  if(aPlanet.isPossibleStartPlanet()){
-			  Logger.finer("Possible startplanet " + aPlanet.getName());
+          MapPlanet mapPlanet = PlanetPureFunctions.getMapPlanet(galaxyMap, aPlanet.getMapPlanetUuid());
+          if(mapPlanet.isPossibleStartPlanet()){
+			  Logger.finer("Possible startplanet " + mapPlanet.getName());
 			  tempList.add(aPlanet);
 		  }
 	  }  
@@ -194,10 +198,10 @@ public class StartGameHandler {
 }
 	
 //  gissar att TurnInfo texten inte visas någon stan?  den är tok fel i alla fall.
-    private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy){
+    private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap){
 		Player p = new Player(name,password,galaxy, govenorName, GameWorldHandler.getFactionByName(factionName, galaxy.getGameWorld()) , homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
         p.getTurnInfo().addToLatestGeneralReport("Welcome to this SpaceRaze Game.");
-        p.getTurnInfo().addToLatestGeneralReport("You have 1 planet under your control - the planet " + homeplanet.getName() + ".");
+        p.getTurnInfo().addToLatestGeneralReport("You have 1 planet under your control - the planet " + PlanetPureFunctions.getPlanetName(galaxyMap, homeplanet.getMapPlanetUuid()) + ".");
         p.getTurnInfo().addToLatestGeneralReport("");
         p.getTurnInfo().addToLatestGeneralReport("This is turn 0, which is while all players join the game.");
         p.getTurnInfo().addToLatestGeneralReport("You will have to wait until it becomes turn 1 before you can play.");
@@ -304,7 +308,7 @@ public class StartGameHandler {
      * @param allPlanets all planets in the game
      * @param playersFaction the faction of the new player
      */
-    private void setPlanetRangeToClosestFriendly(List<Planet> allPlanets, Faction playersFaction, Galaxy galaxy){
+    private void setPlanetRangeToClosestFriendly(List<Planet> allPlanets, Faction playersFaction, Galaxy galaxy, GalaxyMap galaxyMap){
   	  Logger.finer("setPlanetRangeToClosestFriendly faction: " + playersFaction.getName());
   	  // count the number of players from the same faction as the player
   	  int nrSameFaction = 0;
@@ -323,13 +327,13 @@ public class StartGameHandler {
   			  if (planet.getPlayerInControl() != null){
   				  // if planet already is a startplanet, set range to maxint
   				  planet.setRangeToClosestFriendly(Integer.MAX_VALUE);
-  				  Logger.finer("planet max value: " + planet.getName());
+  				  Logger.finer("planet max value: " + PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid()));
   			  }else{
   				  // sök i grafen tills man hittar en planet som är samma faction, spara hur många 
   				  //   steg dit det är i rangeToClosestFriendly
   				  int steps = getStepsToClosestFriendly(allPlanets,planet,playersFaction, galaxy);
   				  planet.setRangeToClosestFriendly(steps);
-  				  Logger.finest("planet: " + planet.getName() + " value: " + planet.getRangeToClosestFriendly());
+  				  Logger.finest("planet: " + PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid()) + " value: " + planet.getRangeToClosestFriendly());
   			  }
   		  }
   		  // sortera om listan m.ha. rangeToClosestFriendly, lägst först
@@ -337,7 +341,7 @@ public class StartGameHandler {
   		  // trace...
   		  Logger.finest("planets sorted");
   		  for (Planet planet : allPlanets) {
-  			  Logger.finest("planet: " + planet.getName() + " value: " + planet.getRangeToClosestFriendly());
+  			  Logger.finest("planet: " + PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid()) + " value: " + planet.getRangeToClosestFriendly());
   		  }
   	  }
     }
@@ -345,10 +349,10 @@ public class StartGameHandler {
     private int getStepsToClosestFriendly(List<Planet> planets, Planet aPlanet, Faction playerFaction, Galaxy galaxy){
 	    boolean planetFound = false;
 	    // skapa tom vektor över hittade planeter
-	    List<Planet> edgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
+	    List<Planet> edgePlanets = new ArrayList<>(); // de planeter som är på gränsen till det genomsökta området
 	    edgePlanets.add(aPlanet);
-	    List<Planet> newEdgePlanets = new ArrayList<Planet>(); // de planeter som är på gränsen till det genomsökta området
-	    List<Planet> searchedPlanets = new ArrayList<Planet>();  // lägg in alla som genomsökts + startplaneten
+	    List<Planet> newEdgePlanets = new ArrayList<>(); // de planeter som är på gränsen till det genomsökta området
+	    List<Planet> searchedPlanets = new ArrayList<>();  // lägg in alla som genomsökts + startplaneten
 	    searchedPlanets.add(aPlanet);
 	    List<Planet> allNeighbours;
 	    int tempSteps = 0;
@@ -359,7 +363,7 @@ public class StartGameHandler {
 	      for (int i = 0; i < edgePlanets.size(); i++){
 	        Planet tempPlanet = edgePlanets.get(i);
 	        // Hämta alla grannar till tempPlanet, både short & long range
-	        allNeighbours = galaxy.getAllDestinations(tempPlanet,false);
+	        allNeighbours = PlanetPureFunctions.getAllDestinations(galaxy, tempPlanet,false);
 	        // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
 	        for (int j = 0; j < allNeighbours.size(); j++){
 	          Planet tempNeighbourPlanet = allNeighbours.get(j);
@@ -369,7 +373,7 @@ public class StartGameHandler {
 	            newEdgePlanets.add(tempNeighbourPlanet);
 	          }
 	        }
-	        allNeighbours = galaxy.getAllDestinations(tempPlanet,true);
+	        allNeighbours = PlanetPureFunctions.getAllDestinations(galaxy, tempPlanet,true);
 	        // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
 	        for (int j = 0; j < allNeighbours.size(); j++){
 	          Planet tempNeighbourPlanet = allNeighbours.get(j);
@@ -424,7 +428,7 @@ public class StartGameHandler {
           for (int i = 0; i < edgePlanets.size(); i++){
             Planet tempPlanet = edgePlanets.get(i);
             // Hämta alla grannar till tempPlanet
-            allNeighbours = galaxy.getAllDestinations(tempPlanet,longRange);
+            allNeighbours = PlanetPureFunctions.getAllDestinations(galaxy, tempPlanet,longRange);
             // Gå igenom alla allNeighbours  (lägg i newEdgePlanets)
             for (int j = 0; j < allNeighbours.size(); j++){
               Planet tempNeighbourPlanet = allNeighbours.get(j);

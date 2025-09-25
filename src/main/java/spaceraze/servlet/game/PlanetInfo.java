@@ -3,13 +3,14 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.servlethelper.game.vip.VipPureFunctions;
-import spaceraze.servlethelper.map.MapPureFunctions;
+import spaceraze.servlethelper.map.GalaxyMapPureFunctions;
 import spaceraze.world.*;
 import spaceraze.world.enums.SpaceShipSize;
 
@@ -26,6 +27,7 @@ import spaceraze.world.enums.SpaceShipSize;
 public class PlanetInfo {
 	
 	private String name;
+    private String uuid;
 	private String owner;// namnet på gov som äger planeten, "neutral" om neutral. null om okänd(closed planets the players haven't get any information from).
 	// behövs faction? annars får det hämtas från spelarnas info.
 	private boolean open, razed, besieged;
@@ -61,21 +63,22 @@ public class PlanetInfo {
 	//PlanetInfo(){};
 	
 	
-	PlanetInfo(Planet planet, Player player){
-		buildings = new ArrayList<BuildingInfo>();
-		vips = new ArrayList<VIPInfo>();
-		ships = new ArrayList<ShipInfo>();
-		troops = new ArrayList<TroopInfo>();
-		fleets = new ArrayList<FleetInfo>();
-		armys = new ArrayList<ArmyInfo>();
+	PlanetInfo(Planet planet, Player player, GalaxyMap galaxyMap) {
+		buildings = new ArrayList<>();
+		vips = new ArrayList<>();
+		ships = new ArrayList<>();
+		troops = new ArrayList<>();
+		fleets = new ArrayList<>();
+		armys = new ArrayList<>();
 		
-		name = planet.getName();
+		name = PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid());
+        uuid = planet.getMapPlanetUuid();
 		razed = PlanetPureFunctions.isRazed(planet);
 		//TODO klasserna PlanerInfos och sr.world.PlanetInfo ska ersättas av denna klass enligt samma model som MapPLanetInfo.
 		// Frågan är då om notes här kommer bli orginalet? Annars är all information här hämtad från andra källor.
 		// Kanske enkelt att bara skapa en länkad list i player med planet name som nyckel. Vänta med att göra det tills det går att spela på siten.
 		// Vill inte förstöra möjligheten att använda spel körde i swing klienten.
-		notes = PlanetPureFunctions.findPlanetInfo(planet.getName(), player.getPlanetInformations()).getNotes();
+		notes = PlanetPureFunctions.findPlanetInfo(planet.getMapPlanetUuid(), player.getPlanetInformations()).getNotes();
 		
 		Galaxy galaxy = player.getGalaxy();
 		boolean haveSpy = VipPureFunctions.findVIPSpy(planet,player, galaxy) != null;
@@ -137,7 +140,7 @@ public class PlanetInfo {
 					addBuildings(planet.getBuildings());
 				} else if(open || shipInSystem || alliedShipsInSystem){// Information from orbit, can't see cloaked units.
 					getOthersArmys(planet, player, galaxy, false);
-					addBuildings(MapPureFunctions.getBuildingsByVisibility(planet, true)); // bara buildings som syns på kartan.
+					addBuildings(GalaxyMapPureFunctions.getBuildingsByVisibility(planet, true)); // bara buildings som syns på kartan.
 				}
 				
 				
@@ -162,8 +165,8 @@ public class PlanetInfo {
         // loopa igenom alla spelare och kolla efter flottor
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
-        		int shipSize = MapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer, g);
-        		boolean civilianExists = !MapPureFunctions.getLargestShipSizeOnPlanet(planet,tempPlayer,true, player.getGalaxy()).equals("");
+        		int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer, g);
+        		boolean civilianExists = !GalaxyMapPureFunctions.getLargestShipSizeOnPlanet(planet,tempPlayer,true, player.getGalaxy()).equals("");
         		if ((shipSize > -1) | civilianExists){
         			FleetInfo fleet = new FleetInfo(tempPlayer.getGovernorName(),shipSize,civilianExists);
         			fleets.add(fleet);
@@ -171,7 +174,7 @@ public class PlanetInfo {
         	}
         }
         // kolla efter neutrala skepp
-        int shipSize = MapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,null, g);
+        int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,null, g);
         if (shipSize > -1){
         	FleetInfo fleet = new FleetInfo(null,shipSize,false);
     		fleets.add(fleet);

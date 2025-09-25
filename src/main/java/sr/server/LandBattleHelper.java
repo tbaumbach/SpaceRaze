@@ -3,6 +3,8 @@ package sr.server;
 import spaceraze.battlehandler.landbattle.LandBattle;
 import spaceraze.battlehandler.landbattle.TaskForceTroop;
 import spaceraze.battlehandler.spacebattle.TaskForceHandler;
+import spaceraze.map.GalaxyMap;
+import spaceraze.map.MapPlanet;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetMutator;
 import spaceraze.servlethelper.game.planet.PlanetOrderStatusPureFunctions;
@@ -25,12 +27,13 @@ import java.util.stream.Collectors;
 
 public class LandBattleHelper {
 
-    public static void troopFight(Planet aPlanet, Galaxy galaxy){
-        if (!PlanetPureFunctions.isRazedAndUninfected(aPlanet)){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
+    public static void troopFight(Planet planet, Galaxy galaxy, GalaxyMap galaxyMap){
+        MapPlanet mapPlanet = PlanetPureFunctions.getMapPlanet(galaxyMap, planet.getMapPlanetUuid());
+        if (!PlanetPureFunctions.isRazedAndUninfected(planet)){ // first check that the planet isn't razed and uninhabited. Otherwise there are no siege
 
             //Get all non planet owner players that have troops on the planet.
             // If more than one attacking = blocking attack on defending troops.
-            List<Player> players = getAttackingPlayersWithTroopsOnPlanet(aPlanet, galaxy);
+            List<Player> players = getAttackingPlayersWithTroopsOnPlanet(planet, galaxy);
             if(players.size() > 1){
 
                 int index= 0;
@@ -45,17 +48,17 @@ public class LandBattleHelper {
                     // one of the players i hostile.
                     if(i < players.size()){
                         //TODO 2020-01-04 kolla att detta fungerar som det ska, varför används attacking(Player) för att hämta försvarande troops?
-                        List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
-                        List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,players.get(i));
+                        List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, planet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
+                        List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), planet, galaxy); //g.findTroopsOnPlanet(aPlanet,players.get(i));
 
 
                         Logger.finer("perform land battle between " + attacking.getGovernorName() + " and " + players.get(i).getGovernorName());
-                        performLandBattle(attacking, defendingTroops, players.get(i), attackingTroops, aPlanet, galaxy);
-                        defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
-                        attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,players.get(i));
+                        performLandBattle(attacking, defendingTroops, players.get(i), attackingTroops, planet, galaxy, galaxyMap);
+                        defendingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, planet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
+                        attackingTroops = getPlayerTroopsAndVipsOnPlanet(players.get(i), planet, galaxy); //g.findTroopsOnPlanet(aPlanet,players.get(i));
 
                         //TODO 2020-01-05 Se till att detta läggs in i nya rapporteringen
-                        addLandBattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,attacking,players.get(i),aPlanet.getName());
+                        addLandBattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,attacking,players.get(i),mapPlanet.getName());
                         // Remove players that have fight this turn.
                         players.remove(i);
                         players.remove(index);
@@ -66,54 +69,54 @@ public class LandBattleHelper {
                 }
             }else if (players.size() == 1){
                 // Only one attacking player. Check if any defender and perform a battle or change planet owner to attcking player.
-                if(galaxy.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl()).size() > 0){// Defening troops perform a battle.
+                if(!galaxy.findTroopsOnPlanet(planet,planet.getPlayerInControl()).isEmpty()){// Defening troops perform a battle.
                     Logger.finer("perform land battle aginst defender");
                     Player attacking = players.get(0);
                     // get both defending player/troops and attackning player/troops
-                    List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(aPlanet.getPlayerInControl(), aPlanet, galaxy);// g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-                    List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
-                    LandBattleHelper.performLandBattle(aPlanet.getPlayerInControl(),defendingTroops,attacking,attackingTroops,aPlanet, galaxy);
-                    defendingTroops = getPlayerTroopsAndVipsOnPlanet(aPlanet.getPlayerInControl(), aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
-                    attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, aPlanet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
+                    List<TaskForceTroop> defendingTroops = getPlayerTroopsAndVipsOnPlanet(planet.getPlayerInControl(), planet, galaxy);// g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
+                    List<TaskForceTroop> attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, planet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
+                    LandBattleHelper.performLandBattle(planet.getPlayerInControl(),defendingTroops,attacking,attackingTroops,planet, galaxy, galaxyMap);
+                    defendingTroops = getPlayerTroopsAndVipsOnPlanet(planet.getPlayerInControl(), planet, galaxy); //g.findTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl());
+                    attackingTroops = getPlayerTroopsAndVipsOnPlanet(attacking, planet, galaxy); //g.findTroopsOnPlanet(aPlanet,attacking);
 
                     //TODO 2020-01-05 Se till att detta läggs in i nya rapporteringen
-                    addLandBattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,aPlanet.getPlayerInControl(),attacking,aPlanet.getName());
+                    addLandBattleHighlights(defendingTroops.size() > 0,attackingTroops.size() > 0,planet.getPlayerInControl(),attacking,mapPlanet.getName());
                 }
             }
 
 
             // get all players with troops after the battles.
-            players = getAttackingPlayersWithTroopsOnPlanet(aPlanet, galaxy);
-            if(TroopPureFunctions.getTroopsOnPlanet(aPlanet,aPlanet.getPlayerInControl(), galaxy.getTroops()).size() == 0){ // Försvarande spelar har inga trupper kvar.
+            players = getAttackingPlayersWithTroopsOnPlanet(planet, galaxy);
+            if(TroopPureFunctions.getTroopsOnPlanet(planet,planet.getPlayerInControl(), galaxy.getTroops()).isEmpty()){ // Försvarande spelar har inga trupper kvar.
                 if(players.size() == 1){// only one attacker and the planet should change owner.
-                    if (GameWorldHandler.getFactionByUuid(players.get(0).getFactionUuid(), galaxy.getGameWorld()).isAlien()){
+                    if (GameWorldHandler.getFactionByUuid(players.getFirst().getFactionUuid(), galaxy.getGameWorld()).isAlien()){
                         Logger.finer("Attacker is alien");
                         // planet conquered by alien
-                        (new PlanetUpdater()).razed(aPlanet, players.get(0));
-                        PlanetMutator.infectedByAttacker(aPlanet, players.get(0), galaxy.getGameWorld());
+                        (new PlanetUpdater()).razed(planet, mapPlanet, players.getFirst(), galaxyMap);
+                        PlanetMutator.infectedByAttacker(planet, mapPlanet, players.getFirst(), galaxy.getGameWorld());
                     }else{ // attacker is not alien
                         Logger.finer("Attacker is not alien");
                         // check if defender is alien
-                        if (PlanetPureFunctions.getInfectedByAlien(aPlanet, galaxy)){
+                        if (PlanetPureFunctions.getInfectedByAlien(planet, galaxy)){
                             // planet is razed
-                            (new PlanetUpdater()).razed(aPlanet, players.get(0));
+                            (new PlanetUpdater()).razed(planet, mapPlanet, players.getFirst(), galaxyMap);
                         }else{ // defender is not alien
                             // planet conquered
 
-                            (new PlanetUpdater()).conqueredByTroops(aPlanet, players.get(0), galaxy.getGameWorld());
-                            List<TaskForce> taskForces = TaskForceHandler.getTaskForces(aPlanet, false, galaxy);
-                            List<TaskForce> countBesiegingTFs = countBesiegingTFs(taskForces, aPlanet, galaxy);
+                            (new PlanetUpdater()).conqueredByTroops(planet, mapPlanet, players.getFirst(), galaxy.getGameWorld(), galaxyMap);
+                            List<TaskForce> taskForces = TaskForceHandler.getTaskForces(planet, false, galaxy);
+                            List<TaskForce> countBesiegingTFs = countBesiegingTFs(taskForces, planet, galaxy);
                             if(countBesiegingTFs.size() == 0){
-                                aPlanet.setBesieged(false);
+                                planet.setBesieged(false);
                             }else{
-                                aPlanet.setBesieged(true);
+                                planet.setBesieged(true);
                             }
                         }
                     }
                 }
             }else{
-                if(players.size() >= 1){ // at least one player still have troops on the planet.
-                    aPlanet.setBesieged(true);
+                if(!players.isEmpty()){ // at least one player still have troops on the planet.
+                    planet.setBesieged(true);
                 }
             }
 
@@ -189,9 +192,9 @@ public class LandBattleHelper {
 
      */
 
-    public static void performLandBattle(Player defendingPlayer, List<TaskForceTroop> defendingTroops, Player attackingPlayer, List<TaskForceTroop> attackingTroops, Planet aPlanet, Galaxy galaxy){
+    public static void performLandBattle(Player defendingPlayer, List<TaskForceTroop> defendingTroops, Player attackingPlayer, List<TaskForceTroop> attackingTroops, Planet planet, Galaxy galaxy, GalaxyMap galaxyMap) {
 
-        LandBattle battle = new LandBattle(defendingTroops, attackingTroops, aPlanet.getName(), aPlanet.getResistance(), galaxy.getTurn(), galaxy.getGameWorld());
+        LandBattle battle = new LandBattle(defendingTroops, attackingTroops, PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid()), planet.getResistance(), galaxy.getTurn(), galaxy.getGameWorld(), galaxyMap);
         battle.performBattle();
 
         if(attackingPlayer!= null) {
@@ -204,21 +207,21 @@ public class LandBattleHelper {
         }
 
         // Om en VIP var på en troop ska den då dö? eller görs det senare i koden när VIPar gås igenom?
-        battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy));
-        battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy));
+        battle.getAttBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy, galaxyMap));
+        battle.getDefBG().getTroops().stream().map(TaskForceTroop::getTroop).filter(troop -> TroopPureFunctions.isDestroyed(troop)).forEach(troop -> TroopMutator.removeTroop(troop, galaxy, galaxyMap));
 
-        addLandBattleReport(attackingPlayer, battle.getAttBG().getReport(), aPlanet, galaxy);
-        addLandBattleReport(defendingPlayer, battle.getDefBG().getReport(), aPlanet, galaxy);
+        addLandBattleReport(attackingPlayer, battle.getAttBG().getReport(), planet, galaxy, galaxyMap);
+        addLandBattleReport(defendingPlayer, battle.getDefBG().getReport(), planet, galaxy, galaxyMap);
     }
 
-    private static void addLandBattleReport(Player player, spaceraze.world.report.landbattle.LandBattleReport landBattleReport, Planet planet, Galaxy galaxy) {
+    private static void addLandBattleReport(Player player, spaceraze.world.report.landbattle.LandBattleReport landBattleReport, Planet planet, Galaxy galaxy, GalaxyMap galaxyMap) {
         if(player != null) {
             Optional<PlanetReport> optional = player.getPlayerReports().get(galaxy.getTurn()-1).getChildReportsOfType(PlanetReport.class).stream()
-                    .filter(planetReport -> planetReport.getPlanetName().equals(planet.getName())).findAny();
+                    .filter(planetReport -> planetReport.getMapPlanetUuid().equals(planet.getMapPlanetUuid())).findAny();
             if(optional.isPresent()) {
                 optional.get().getLandBattleReports().add(landBattleReport);
             }else {
-                PlanetReport planetReport = new PlanetReport(planet.getName());
+                PlanetReport planetReport = new PlanetReport(PlanetPureFunctions.getPlanetName(galaxyMap, planet.getMapPlanetUuid()), planet.getMapPlanetUuid());
                 planetReport.getLandBattleReports().add(landBattleReport);
                 player.getPlayerReports().get(galaxy.getTurn()-1).getPlanetReports().add(planetReport);
 
@@ -227,10 +230,10 @@ public class LandBattleHelper {
     }
 
     public static List<TaskForce> countBesiegingTFs(List<TaskForce> taskforces, Planet aPlanet, Galaxy galaxy){
-        List<TaskForce> tfsWantinToBesiege = new LinkedList<TaskForce>();
+        List<TaskForce> tfsWantinToBesiege = new LinkedList<>();
         for (int i = 0; i < taskforces.size(); i++){
-            TaskForce temptf = (TaskForce)taskforces.get(i);
-            if (hostile(temptf,aPlanet, galaxy) && !PlanetOrderStatusPureFunctions.isDoNotBesiege(aPlanet.getName(), galaxy.getPlayerByGovenorName(temptf.getPlayerName()).getPlanetOrderStatuses())){ // kolla om de är fientligt inställda
+            TaskForce temptf = taskforces.get(i);
+            if (hostile(temptf,aPlanet, galaxy) && !PlanetOrderStatusPureFunctions.isDoNotBesiege(aPlanet.getMapPlanetUuid(), galaxy.getPlayerByGovenorName(temptf.getPlayerName()).getPlanetOrderStatuses())){ // kolla om de är fientligt inställda
                 tfsWantinToBesiege.add(temptf);
             }
         }
@@ -238,7 +241,7 @@ public class LandBattleHelper {
     }
 
     public static boolean hostile(TaskForce tf, Planet aPlanet, Galaxy galaxy){
-        Logger.finer("hostile (planet): " + aPlanet.getName());
+        Logger.finer("hostile (planet): " + aPlanet.getMapPlanetUuid());
         if (tf.getPlayerName() != null){
             Logger.finer("hostile (governor): " + tf.getPlayerName());
         }else{
@@ -247,10 +250,10 @@ public class LandBattleHelper {
         boolean hostile = false;
         if (tf.getPlayerName() != null && tf.canBesiege()){
             if (aPlanet.getPlayerInControl() == null || !tf.getPlayerName().equalsIgnoreCase(aPlanet.getPlayerInControl().getGovernorName())){
-                Logger.finer("Planet does not belong to player: " + aPlanet.getName());
+                Logger.finer("Planet does not belong to player: " + aPlanet.getMapPlanetUuid());
                 if (aPlanet.getPlayerInControl() == null){  // kolla om den är neutral
                     Logger.finer("Planet is neutral");
-                    hostile = PlanetOrderStatusPureFunctions.isAttackIfNeutral(aPlanet.getName(), galaxy.getPlayerByGovenorName(tf.getPlayerName()).getPlanetOrderStatuses());
+                    hostile = PlanetOrderStatusPureFunctions.isAttackIfNeutral(aPlanet.getMapPlanetUuid(), galaxy.getPlayerByGovenorName(tf.getPlayerName()).getPlanetOrderStatuses());
                     Logger.finer("Planet is neutral, hostile = " + hostile);
                 }else  // kolla om det är fred med planet ägare.
 //    				if (aPlanet.getPlayerInControl().getFaction() != tf.getPlayer().getFaction()){

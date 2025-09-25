@@ -7,7 +7,7 @@ import spaceraze.servlethelper.CreateNewGameData;
 import spaceraze.servlethelper.GameListData;
 import spaceraze.util.general.RankedPlayer;
 import spaceraze.servlethelper.ReturnGames;
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 
 public class NotifierTransferWrapper implements Serializable {
 	static final long serialVersionUID = 1L;
@@ -24,7 +24,7 @@ public class NotifierTransferWrapper implements Serializable {
 	// response data
 	private String returnCode;
 	private GameListData gameListData;
-	private List<Map> allMaps;
+	private List<GalaxyMap> allMaps;
 	private RankedPlayer rankingData;
 	private int gameId; // används av Android för att veta id på ett nyskapat spel
 
@@ -100,11 +100,11 @@ public class NotifierTransferWrapper implements Serializable {
 		this.getAllMaps = getAllMaps;
 	}
 
-	public List<Map> getAllMaps() {
+	public List<GalaxyMap> getAllMaps() {
 		return allMaps;
 	}
 
-	public void setAllMaps(List<Map> allMaps) {
+	public void setAllMaps(List<GalaxyMap> allMaps) {
 		this.allMaps = allMaps;
 	}
 	

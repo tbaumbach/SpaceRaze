@@ -80,6 +80,21 @@
 			<artifactId>world</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>spaceraze</groupId>
+            <artifactId>map</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>spaceraze</groupId>
+            <artifactId>user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>spaceraze</groupId>
+            <artifactId>game</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 		<dependency>
 			<groupId>spaceraze</groupId>
 			<artifactId>battlehandler</artifactId>

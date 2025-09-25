@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.servlethelper.map.TransferWrapper;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 import sr.server.map.MapHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
@@ -58,7 +58,7 @@ public class MapEditorTunnel extends HttpServlet {
 				}else
 				if(action.equals(TransferWrapper.LOAD_PUB)){
 					tw.setMessage(TransferWrapper.LOAD_PUB);
-					Map aMap = MapHandler.getMap(tw.getMapFileName(),null).getCopyFromFile();
+					GalaxyMap aMap = MapHandler.getMap(tw.getMapFileName(),null).getCopyFromFile();
 					// always set author, since the map can be a "copy" of another players published map
 					User curUser = UserHandler.findUser(tw.getPlayerLogin());
 					aMap.setAuthor(curUser.getLogin());
@@ -79,14 +79,14 @@ public class MapEditorTunnel extends HttpServlet {
 					// create success string variable
 					String success = null;
 					// check if file exists with same name
-					Map existingMap = MapHandler.getMap(tw.getMapFileName(),tw.getPlayerLogin());
+					GalaxyMap existingMap = MapHandler.getMap(tw.getMapFileName(),tw.getPlayerLogin());
 					if ((existingMap == null) || tw.isOwerwriteConfirm()){
 						System.out.println("existingMap: " + existingMap);
 						System.out.println("tw.isOwerwriteConfirm(): " + tw.isOwerwriteConfirm());
 						// save map
 						String path = tw.getPlayerLogin() + File.separator + tw.getMapFileName() + ".properties";
 						// set user name
-						Map theMap = tw.getMap();
+						GalaxyMap theMap = tw.getMap();
 						User curUser = UserHandler.findUser(theMap.getAuthor());
 						theMap.setAuthorName(curUser.getName());
 						// save the map
@@ -98,11 +98,11 @@ public class MapEditorTunnel extends HttpServlet {
 				}else
 				if(action.equals(TransferWrapper.SAVE_PUB)){
 					// set user name
-					Map theMap = tw.getMap();
+					GalaxyMap theMap = tw.getMap();
 					User curUser = UserHandler.findUser(theMap.getAuthor());
 					String success = null;
 					// check that there are not already a published map from another player with the same name
-					Map anotherMap = MapHandler.getMap(tw.getMapFileName());
+					GalaxyMap anotherMap = MapHandler.getMap(tw.getMapFileName());
 					if (anotherMap == null){ // ok to save map
 						theMap.setAuthorName(curUser.getName());
 						theMap.incVersionId();

@@ -1,5 +1,6 @@
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.server.map.*"%>
+<%@ page import="spaceraze.map.GalaxyMap" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,7 +20,7 @@ table.sr td {
 <%@ include file="checklogin2.jsp" %>
 <%
 	String mapName = request.getParameter("mapname");
-	Map aMap = MapHandler.getMap(mapName);
+	GalaxyMap aMap = MapHandler.getMap(mapName);
 %>
 <body background="images/spaze.gif">
 <!-- <%= mapName %> -->

@@ -3,6 +3,8 @@ package spaceraze.server.game.update;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import spaceraze.map.GalaxyMap;
+import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
@@ -20,9 +22,11 @@ import sr.server.SpaceshipHelper;
 public class CheckAbandonedSquadrons {
 	
 	Galaxy galaxy;
+    GalaxyMap galaxyMap;
 	
-	public CheckAbandonedSquadrons(Galaxy galaxy) {
+	public CheckAbandonedSquadrons(Galaxy galaxy, GalaxyMap galaxyMap) {
 		this.galaxy = galaxy;
+        this.galaxyMap = galaxyMap;
 	}
 	
 	/**
@@ -68,7 +72,7 @@ public class CheckAbandonedSquadrons {
 								Spaceship aCarrier = carriersWithFreeSlots.get(0);
 								aShip.setCarrierLocation(aCarrier);
 								aShip.setOldLocation(aShip.getLocation());
-								String oldLocString = aShip.getLocation().getName();
+								String oldLocString = PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid());
 								Logger.finer("TaskForce CarrierLocation: " + aShip.getCarrierLocation());
 								if (aShip.getOwner() != null) {
 									aShip.getOwner()
@@ -98,7 +102,7 @@ public class CheckAbandonedSquadrons {
 								Spaceship aCarrier = carriersWithFreeSlots.get(0);
 								aShip.setCarrierLocation(aCarrier);
 								aShip.setOldLocation(aShip.getLocation());
-								String oldLocString = aShip.getLocation().getName();
+								String oldLocString = PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid());
 								Logger.finer("Carrier Location: " + aCarrier);
 								if (aShip.getOwner() != null) {
 									aShip.getOwner()
@@ -126,9 +130,9 @@ public class CheckAbandonedSquadrons {
 			if (owner != null) {
 				owner.addToGeneral("Your sguadron " + aShip.getName()
 						+ " has been scuttled by it's crew because they had no supporting carrier in the system "
-						+ aShip.getLocation().getName() + ".");
+						+ PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid()) + ".");
 				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo(), galaxy.getGameWorld());
-				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy);
+				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap);
 			}
 			Player controllingPlayer = thePlanet.getPlayerInControl();
 			if (controllingPlayer != null) {
@@ -136,7 +140,7 @@ public class CheckAbandonedSquadrons {
 					if (aShip.getOwner() != null) {
 						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName(), true) + " "
 								+ SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
-								+ " has been scuttled in the " + thePlanet.getName()
+								+ " has been scuttled in the " + PlanetPureFunctions.getPlanetName(galaxyMap, thePlanet.getMapPlanetUuid())
 								+ " system, due to lack of carrier.");
 					} else {
 						// neutral forces cannot besiege other planets, this should not happen
@@ -172,7 +176,7 @@ public class CheckAbandonedSquadrons {
 	  							Spaceship aCarrier = carriersWithFreeSlots.get(0);
 	  							aShip.setCarrierLocation(aCarrier);
 	  							aShip.setOldLocation(aShip.getLocation());
-	  							String oldLocString = aShip.getLocation().getName();
+                                String oldLocString = PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid());
 	  							Logger.finer("CarrierLocation: " + aShip.getCarrierLocation());
 	  							if (aShip.getOwner() != null){
 	  								aPlayer.addToGeneral("Your sguadron " + aShip.getName() + " has been attached to a nearby carrier (" + aCarrier.getName() + ") in the system " + oldLocString + ".");
@@ -198,7 +202,7 @@ public class CheckAbandonedSquadrons {
 	  							Spaceship aCarrier = carriersWithFreeSlots.get(0);
 	  							aShip.setCarrierLocation(aCarrier);
 	  							aShip.setOldLocation(aShip.getLocation());
-	  							String oldLocString = aShip.getLocation().getName();
+                                String oldLocString = PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid());
 	  							Logger.finer("Carrier Location: " + aCarrier);
 	  							if (aShip.getOwner() != null){
 	  								aPlayer.addToGeneral("Your sguadron " + aShip.getName() + " has been attached to a nearby carrier (" + aCarrier.getName() + ") in the system " + oldLocString + ".");
@@ -221,11 +225,12 @@ public class CheckAbandonedSquadrons {
 	  	  for (Spaceship aShip : removeShips) {
 	  			// destroy ship
 	  			if (aShip.getOwner() != null){
-	  				aPlayer.addToGeneral("Your sguadron " + aShip.getName() + " has been scuttled by it's crew because they had no supporting carrier in the system " + aShip.getLocation().getName() + ".");
+                    String planetName = PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid());
+	  				aPlayer.addToGeneral("Your sguadron " + aShip.getName() + " has been scuttled by it's crew because they had no supporting carrier in the system " + planetName + ".");
 	  			}
 	  			Player owner = aShip.getOwner();
 	  			if (owner != null) {
-					VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy);
+					VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap);
 	  			}
 			  SpaceshipMutator.removeShip(aShip, galaxy);
 	  	  }
@@ -235,7 +240,7 @@ public class CheckAbandonedSquadrons {
 	    }
 
 	public List<Spaceship> getOtherCarriersWithFreeSlotsInSystem(Planet aLocation, Player aPlayer, Spaceship aCarrier, Galaxy galaxy) {
-		List<Spaceship> carriersWithFreeSlots = new ArrayList<Spaceship>();
+		List<Spaceship> carriersWithFreeSlots = new ArrayList<>();
 		List<Spaceship> shipsAtPlanet = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(aPlayer, aLocation, galaxy.getSpaceships());
 		for (Spaceship spaceship : shipsAtPlanet) {
 			if (SpaceshipPureFunctions.isCarrier(spaceship)) {

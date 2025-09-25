@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import spaceraze.map.GalaxyMap;
 import spaceraze.server.game.StartGameHandler;
+import spaceraze.servlethelper.game.GalaxyCreator;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
-import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Faction;
 import spaceraze.world.Galaxy;
@@ -22,6 +23,7 @@ import spaceraze.world.enums.DiplomacyGameType;
 import sr.message.MessageDataBaseLoader;
 import sr.message.MessageDataBaseSaver;
 import sr.message.MessageDatabase;
+import sr.server.map.MapHandler;
 import sr.webb.mail.MailHandler;
 import sr.webb.users.User;
 import sr.webb.users.UserHandler;
@@ -39,7 +41,8 @@ public class SR_Server {
 	private String command, nameOfGame, nameOfMap;
 	// private String startedByPlayer;
 	private long time = 0;
-	private Galaxy g;
+	private Galaxy galaxy;
+    private GalaxyMap galaxyMap;
 	private GalaxyCreator gc = new GalaxyCreator();
 	private GalaxyLoader gl = new GalaxyLoader();
 	private GalaxySaver gs = new GalaxySaver();
@@ -100,7 +103,7 @@ public class SR_Server {
 	}
 
 	public String getStartedByPlayer() {
-		return g.getStartedByPlayer();
+		return galaxy.getStartedByPlayer();
 	}
 
 	public String getStartedByPlayerName() {
@@ -116,22 +119,22 @@ public class SR_Server {
 	}
 
 	public void setStartedByPlayer(String startedByPlayer) {
-		g.setStartedByPlayer(startedByPlayer);
+		galaxy.setStartedByPlayer(startedByPlayer);
 	}
 
 	public String getMapFileName() {
-		return g.getMapFileName();
+		return galaxyMap.getFileName();
 	}
 
 	public String getLastUpdatedString() {
-		return g.getLastUpdatedString();
+		return galaxy.getLastUpdatedString();
 	}
 
 	public boolean isPlayerParticipating(User aUser) {
 		boolean found = false;
 		if (aUser != null) {
 			Logger.finest("isPlayerParticipating - User: " + aUser.getLogin());
-			List<Player> players = g.getPlayers();
+			List<Player> players = galaxy.getPlayers();
 			int index = 0;
 			while ((!found) && (index < players.size())) {
 				Player tmpPlayer = (Player) players.get(index);
@@ -222,34 +225,35 @@ public class SR_Server {
 			int factionVictory, int endTurn, int numberOfStartPlanet, StatisticGameType statisticGameType) {
 		// when planetlist is in a file, send the filename as the second parameter
 		// filename can be a parameter to the .bat file
-		g = gc.createGalaxy(nameOfGame, nameOfMap, steps, aGameWorld, singleVictory, factionVictory, endTurn,
+        galaxyMap = MapHandler.getMap(nameOfMap);
+		galaxy = GalaxyCreator.createGalaxy(nameOfGame, galaxyMap, steps, aGameWorld, singleVictory, factionVictory, endTurn,
 				numberOfStartPlanet, statisticGameType);
-		g.setAutoBalance(autoBalance);
-		g.setTime(time);
-		g.setMaxNrStartPlanets(maxPlayers);
-		g.setStartedByPlayer(startedByPlayer);
-		g.setGroupSameFaction(groupFaction);
+		galaxy.setAutoBalance(autoBalance);
+		galaxy.setTime(time);
+		galaxy.setMaxNrStartPlanets(maxPlayers);
+		galaxy.setStartedByPlayer(startedByPlayer);
+		galaxy.setGroupSameFaction(groupFaction);
 		Logger.finest("gamePassword: " + gamePassword);
-		g.setPassword(gamePassword);
-		g.setRandomFaction(randomGame);
-		g.setRanked(ranked);
+		galaxy.setPassword(gamePassword);
+		galaxy.setRandomFaction(randomGame);
+		galaxy.setRanked(ranked);
 		if (selectableFactionNames == null) {
 			// all factions should be selectable
-			g.setAllFactionsSelectable();
+			galaxy.setAllFactionsSelectable();
 		} else {
-			g.setSelectableFactionNames(selectableFactionNames);
+			galaxy.setSelectableFactionNames(selectableFactionNames);
 		}
-		g.setDiplomacyGameType(diplomacyGameType);
-		gs.saveGalaxy(nameOfGame, "saves", g);
-		gs.saveGalaxy(nameOfGame + "_" + g.getTurn(), "saves/previous", g);
+		galaxy.setDiplomacyGameType(diplomacyGameType);
+		gs.saveGalaxy(nameOfGame, "saves", galaxy);
+		gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
 	}
 
 	private void loadGalaxy() {
-		g = gl.loadGalaxy(nameOfGame);
-		time = g.getTime();
-		Logger.finer("loadGalaxy, time=" + time + " g.gameEnded=" + g.gameEnded + " Gamename=" + nameOfGame);
-		if (!g.gameEnded) {
-			if (g.getTurn() > 0) {
+		galaxy = gl.loadGalaxy(nameOfGame);
+		time = galaxy.getTime();
+		Logger.finer("loadGalaxy, time=" + time + " g.gameEnded=" + galaxy.gameEnded + " Gamename=" + nameOfGame);
+		if (!galaxy.gameEnded) {
+			if (galaxy.getTurn() > 0) {
 				if (time > 0) {
 					// start the update scheduler
 					Logger.fine("Time > 0, starting ur");
@@ -260,20 +264,21 @@ public class SR_Server {
 	}
 
 	public void setGalaxy(Galaxy newGalaxy) {
-		this.g = newGalaxy;
+		this.galaxy = newGalaxy;
 	}
 
 	public void updateGalaxy(boolean hasAutoUpdated) throws Exception {
-		g = gl.loadGalaxy(nameOfGame);
-		Logger.info("Galaxy loaded. Turn is " + g.getTurn());
-		updateGalaxy(g);
-		g.setHasAutoUpdated(hasAutoUpdated);
-		gs.saveGalaxy(nameOfGame, "saves", g);
-		gs.saveGalaxy(nameOfGame + "_" + g.getTurn(), "saves/previous", g);
+		galaxy = gl.loadGalaxy(nameOfGame);
+        galaxyMap = MapHandler.getMap(getMapFileName());
+		Logger.info("Galaxy loaded. Turn is " + galaxy.getTurn());
+		updateGalaxy(galaxy, galaxyMap);
+		galaxy.setHasAutoUpdated(hasAutoUpdated);
+		gs.saveGalaxy(nameOfGame, "saves", galaxy);
+		gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
 	}
 
-	private void updateGalaxy(Galaxy g) throws Exception {
-		GalaxyUpdater gu = new GalaxyUpdater(g);
+	private void updateGalaxy(Galaxy g, GalaxyMap galaxyMap) throws Exception {
+		GalaxyUpdater gu = new GalaxyUpdater(g, galaxyMap);
 		gu.performUpdate(this);
 	}
 
@@ -285,7 +290,7 @@ public class SR_Server {
 	public boolean tooOld() {
 		boolean isTooOld = false;
 		// create last updated calendar object
-		Date lastUpdatedDate = g.getLastUpdated();
+		Date lastUpdatedDate = galaxy.getLastUpdated();
 		Calendar lastUpdatedCal = Calendar.getInstance();
 		lastUpdatedCal.setTimeInMillis(lastUpdatedDate.getTime());
 		// calculate when a game is too old
@@ -300,11 +305,11 @@ public class SR_Server {
 	}
 
 	public int getTurn() {
-		return g.getTurn();
+		return galaxy.getTurn();
 	}
 
 	public int getEndTurn() {
-		return g.getEndTurn();
+		return galaxy.getEndTurn();
 	}
 
 	public String getGameName() {
@@ -312,13 +317,13 @@ public class SR_Server {
 	}
 
 	public String getStatus() {
-		return g.getStatus();
+		return galaxy.getStatus();
 	}
 
 	public boolean canBeDeletedByPlayer() {
 		boolean okToDelete = false;
 		Calendar gameCal = Calendar.getInstance();
-		gameCal.setTime(g.getLastUpdated());
+		gameCal.setTime(galaxy.getLastUpdated());
 		gameCal.roll(Calendar.DATE, 7);
 		Calendar nowCal = Calendar.getInstance();
 		if (nowCal.after(gameCal)) {
@@ -334,16 +339,16 @@ public class SR_Server {
 
 		String message = "";
 
-		if (g.getTurn() > 0) {
+		if (galaxy.getTurn() > 0) {
 			message = "Game has already begun. No more players can join.";
 		} else { // turn == 0
-			if ((g.getPlayer(name, "")).getErrorMessage() == null) {
+			if ((galaxy.getPlayer(name, "")).getErrorMessage() == null) {
 				Logger.fine("Player already exists.");
 				message = "Player already exists.";
 			} else if (!factionIsOpenAndSelectable(factionName)) {
 				message = "All slots in the " + factionName + " faction have just been taken. Choose another faction.";
 			} else {
-				Player player = (new StartGameHandler()).getNewPlayer(name, "", govenorName, factionName, g);
+				Player player = (new StartGameHandler()).getNewPlayer(name, "", govenorName, factionName, galaxy, galaxyMap);
 
 				if (player.getErrorMessage() != null) {
 					message = player.getErrorMessage();
@@ -354,7 +359,7 @@ public class SR_Server {
 	}
 
 	public Player getPlayer(String pName, String pPassword) {
-		return g.getPlayer(pName, pPassword);
+		return galaxy.getPlayer(pName, pPassword);
 	}
 
 	public Player getPlayer(String message) throws Exception {
@@ -383,26 +388,26 @@ public class SR_Server {
 				// Thread.dumpStack();
 			}
 			if (command.equalsIgnoreCase("newplayer")) {
-				if (g.getTurn() > 0) {
+				if (galaxy.getTurn() > 0) {
 					p = new Player("Game has already begun. No more players can join.");
 				} else { // turn == 0
-					if ((g.getPlayer(name, password)).getErrorMessage() == null) {
+					if ((galaxy.getPlayer(name, password)).getErrorMessage() == null) {
 						Logger.fine("Player already exists.");
 						p = new Player("Player already exists.");
 					} else if (!factionIsOpenAndSelectable(factionName)) {
 						p = new Player("All slots in the " + factionName
 								+ " faction have just been taken. Choose another faction.");
 					} else {
-						p = (new StartGameHandler()).getNewPlayer(name, password, govenorName, factionName, g);
+						p = (new StartGameHandler()).getNewPlayer(name, password, govenorName, factionName, galaxy, galaxyMap);
 					}
 				}
 			} else {
-				p = g.getPlayer(name, password);
+				p = galaxy.getPlayer(name, password);
 			}
 		} else if ((st.countTokens() == 1) && st.nextToken().equals("checkStatus")) {
-			p = new Player("Returning status.", g);
+			p = new Player("Returning status.", galaxy);
 		} else if ((st.countTokens() == 2) && st.nextToken().equals("update")) {
-			p = new Player("Updating server.", g);
+			p = new Player("Updating server.", galaxy);
 			// update server
 			int turns = Integer.parseInt(st.nextToken());
 			for (int i = 0; i < turns; i++) {
@@ -419,26 +424,26 @@ public class SR_Server {
 	}
 
 	public void setHasAutoUpdated(boolean newValue) {
-		g.setHasAutoUpdated(newValue);
+		galaxy.setHasAutoUpdated(newValue);
 	}
 
 	public boolean hasAutoUpdated() {
-		return g.hasAutoUpdated();
+		return galaxy.hasAutoUpdated();
 	}
 
 	public String updatePlayer(Player p) throws Exception {
 		if (p.getName() != null) {
 			Logger.info("updatePlayer(server): " + p.getName());
 		}
-		String msg = g.replacePlayer(p);
+		String msg = galaxy.replacePlayer(p);
 		if (msg.equalsIgnoreCase("Player data inserted successfully.")) {
-			gs.saveGalaxy(nameOfGame, "saves", g);
-			gs.saveGalaxy(nameOfGame + "_" + g.getTurn(), "saves/previous", g);
-			if (g.gameEnded) {
+			gs.saveGalaxy(nameOfGame, "saves", galaxy);
+			gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
+			if (galaxy.gameEnded) {
 				Logger.info("Game is ended, no update or mails will be performed.");
-			} else if (g.turn > 0) {
-				int nrActive = PlayerPureFunctions.getActivePlayers(g).size();
-				int nrUpdated = g.getNrFinishedPlayers();
+			} else if (galaxy.turn > 0) {
+				int nrActive = PlayerPureFunctions.getActivePlayers(galaxy).size();
+				int nrUpdated = galaxy.getNrFinishedPlayers();
 				Logger.info(nrUpdated + "/" + nrActive + " players updated.");
 				if (nrActive == nrUpdated) {
 					// skriv ut i konsolen...
@@ -452,9 +457,9 @@ public class SR_Server {
 				}
 			} else {
 				// ta reda på antalet spelare
-				int nrPlayers = g.getNrPlayers();
+				int nrPlayers = galaxy.getNrPlayers();
 				// ta reda på max antalet spelare
-				int maxNrStartPlanets = g.getNrStartPlanets();
+				int maxNrStartPlanets = galaxy.getNrStartPlanets();
 				Logger.info(nrPlayers + "/" + maxNrStartPlanets + " players created.");
 				// om alla har skapat sina guvenörer..
 
@@ -505,7 +510,7 @@ public class SR_Server {
 	}
 
 	public Galaxy getGalaxy() {
-		return g;
+		return galaxy;
 	}
 
 	private boolean factionIsOpenAndSelectable(String factionName) {
@@ -531,18 +536,18 @@ public class SR_Server {
 	 */
 	public List<Faction> getOpenSelectableFactions() {
 		List<Faction> openFactions = new LinkedList<Faction>();
-		List<Faction> allFactions = g.getFactions();
+		List<Faction> allFactions = galaxy.getFactions();
 		// List<Player> allPlayers = g.getPlayers();
-		int maxPlayers = g.getNrStartPlanets();
-		int nrSelectableFactions = g.getSelectableFactionNames().size();
+		int maxPlayers = galaxy.getNrStartPlanets();
+		int nrSelectableFactions = galaxy.getSelectableFactionNames().size();
 		Logger.finer("maxPlayers: " + maxPlayers);
 		int maxFactionNr = (int) Math.ceil((1.0 * maxPlayers) / nrSelectableFactions);
 		Logger.finer("maxFactionNr: " + maxFactionNr);
 		for (Faction aFaction : allFactions) {
 			Logger.finer("Faction found: " + aFaction.getName());
-			int factionNr = g.getFactionMemberNr(aFaction);
+			int factionNr = galaxy.getFactionMemberNr(aFaction);
 			Logger.finer("factionNr: " + factionNr);
-			if ((factionNr < maxFactionNr) & g.isFactionSelectable(aFaction)) {
+			if ((factionNr < maxFactionNr) & galaxy.isFactionSelectable(aFaction)) {
 				openFactions.add(aFaction);
 				Logger.finest("faction added: " + aFaction.getName());
 			}
@@ -557,14 +562,14 @@ public class SR_Server {
 	 */
 	public List<Faction> getSelectableFactions() {
 		List<Faction> selectableFactions = new LinkedList<Faction>();
-		for (String factionName : g.getSelectableFactionNames()) {
-			selectableFactions.add(g.findFaction(factionName));
+		for (String factionName : galaxy.getSelectableFactionNames()) {
+			selectableFactions.add(galaxy.findFaction(factionName));
 		}
 		return selectableFactions;
 	}
 
 	public boolean getAutoBalance() {
-		return g.getAutoBalance();
+		return galaxy.getAutoBalance();
 	}
 
 	public UpdateRunner getUpdateRunner() {
@@ -572,19 +577,19 @@ public class SR_Server {
 	}
 
 	public void newPlayerPassword(String login, String newPassword) {
-		g.newPlayerPassword(login, newPassword);
+		galaxy.newPlayerPassword(login, newPassword);
 		Logger.info("Saving Galaxy after changing password");
-		gs.saveGalaxy(nameOfGame, "saves", g);
-		gs.saveGalaxy(nameOfGame + "_" + g.getTurn(), "saves/previous", g);
+		gs.saveGalaxy(nameOfGame, "saves", galaxy);
+		gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
 
 	}
 
 	public boolean getLastUpdateComplete() {
-		return g.getLastUpdateComplete();
+		return galaxy.getLastUpdateComplete();
 	}
 
 	public String getLastLog() {
-		String lastLog = g.getLastLog();
+		String lastLog = galaxy.getLastLog();
 		lastLog = lastLog.replaceAll("\n", "<br>");
 		return lastLog;
 	}
@@ -604,27 +609,27 @@ public class SR_Server {
 	 */
 	public boolean isPasswordProtected() {
 		boolean passwordProtected = false;
-		if ((g.getPassword() != null) && (!g.getPassword().equals(""))) {
+		if ((galaxy.getPassword() != null) && (!galaxy.getPassword().equals(""))) {
 			passwordProtected = true;
 		}
 		return passwordProtected;
 	}
 
 	public int getSoloWin() {
-		return g.getSingleVictory();
+		return galaxy.getSingleVictory();
 	}
 
 	public int getNumberOfStartPlanet() {
-		return g.getNumberOfStartPlanet();
+		return galaxy.getNumberOfStartPlanet();
 	}
 
 	public int getFactionWin() {
-		return g.getFactionVictory();
+		return galaxy.getFactionVictory();
 	}
 
 	public boolean checkGamePassword(String aPassword) {
 		boolean passwordOk = false;
-		if (g.getPassword().equals(aPassword)) {
+		if (galaxy.getPassword().equals(aPassword)) {
 			passwordOk = true;
 		}
 		return passwordOk;
@@ -641,4 +646,8 @@ public class SR_Server {
 		}
 		return messageDatabase;
 	}
+
+    public GalaxyMap getGalaxyMap() {
+        return galaxyMap;
+    }
 }

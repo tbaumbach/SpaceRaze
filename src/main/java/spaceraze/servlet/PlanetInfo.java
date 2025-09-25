@@ -63,7 +63,7 @@ public class PlanetInfo{
 		
 		Planet planet1 = aGame.getGalaxy().getPlanets().get(0);
 		
-		System.out.println("Planet1 name: " + planet1.getName());
+		System.out.println("Planet1 name: " + planet1.getMapPlanetUuid());
 		
 		
 		

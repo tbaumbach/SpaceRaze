@@ -1,5 +1,6 @@
 package sr.server;
 
+import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.StatisticsHandler;
 import spaceraze.servlethelper.game.player.CostPureFunctions;
 import spaceraze.servlethelper.game.player.IncomePureFunctions;
@@ -16,8 +17,8 @@ public class StatisticsUpdater {
 
     private StatisticsUpdater(){}
 
-    public static void performStatistics(Galaxy galaxy) {
-        setStatisticsIncome(galaxy);
+    public static void performStatistics(Galaxy galaxy, GalaxyMap galaxyMap) {
+        setStatisticsIncome(galaxy, galaxyMap);
         setStatisticsProduction(galaxy);
         setStatisticsVIPs(galaxy);
         setStatisticsShipSize(galaxy);
@@ -28,11 +29,11 @@ public class StatisticsUpdater {
         setStatisticsShipKills(galaxy);
     }
 
-    private static void setStatisticsIncome(Galaxy galaxy) {
+    private static void setStatisticsIncome(Galaxy galaxy, GalaxyMap galaxyMap) {
         int tempIncome;
         for (Player player : galaxy.getPlayers()) {
             if (!player.isDefeated()) {
-                tempIncome = IncomePureFunctions.getPlayerIncome(player, false);
+                tempIncome = IncomePureFunctions.getPlayerIncome(player, false, galaxyMap);
                 tempIncome -= CostPureFunctions.getPlayerUpkeepShips(player, galaxy.getPlanets(), galaxy.getSpaceships(), galaxy.getGameWorld());
                 tempIncome -= CostPureFunctions.getPlayerUpkeepTroops(player, galaxy.getPlanets(), galaxy.getTroops());
                 tempIncome -= CostPureFunctions.getPlayerUpkeepVIPs(player, galaxy.getAllVIPs());

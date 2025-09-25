@@ -18,7 +18,7 @@ import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.Faction;
 import spaceraze.world.Galaxy;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 import spaceraze.world.Player;
 import spaceraze.world.StatisticGameType;
 import spaceraze.world.enums.DiplomacyGameType;
@@ -606,7 +606,8 @@ public class ServerHandler {
 		gameData.setGameName(aServer.getGameName());
 		Logger.finer("Notifier returning game: " + aServer.getGameName());
 		gameData.setGameWorldName(aServer.getGalaxy().getGameWorld().getFullName());
-		gameData.setMapName(aServer.getGalaxy().getMapNameFull());
+        GalaxyMap map = MapHandler.getMap(aServer.getMapFileName());
+		gameData.setMapName(map.getName());
 		gameData.setMaxTurn(aServer.getEndTurn());
 		String nextUpdate = "None";
 		UpdateRunner ur = aServer.getUpdateRunner();
@@ -616,7 +617,7 @@ public class ServerHandler {
 		}
 		gameData.setNextUpdate(nextUpdate);
 		gameData.setNrPlayers(PlayerPureFunctions.getActivePlayers(aServer.getGalaxy()).size());
-		Map map = MapHandler.getMap(aServer.getMapFileName());
+
 		gameData.setMapMaxPlayers(map.getMaxNrStartPlanets());
 		if (aServer.getTurn() > 0){
 			gameData.setNrPlayersMax(aServer.getGalaxy().getNrPlayers());

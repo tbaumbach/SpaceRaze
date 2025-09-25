@@ -1,6 +1,6 @@
 package spaceraze.servlet.map;
 
-import spaceraze.world.Map;
+import spaceraze.map.GalaxyMap;
 
 public class MapLight {
 	
@@ -13,7 +13,7 @@ public class MapLight {
 	
 	public MapLight(){}
 	
-	public MapLight(Map map){
+	public MapLight(GalaxyMap map){
 		
 		fileName = map.getFileName();
 		name = map.getNameFull();

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -18,12 +19,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.TransferWrapper;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Message;
 import spaceraze.world.Player;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
+import sr.server.map.MapHandler;
 
 /**
  * @author WMPABOD
@@ -168,7 +171,10 @@ public class SpaceRazeTunnel extends HttpServlet {
 				}else if(tw.getMessage().equals("addMessage")){
 					List<Message> newMessages = addMessage(tw, sh);
 					tw.setReturnObject(newMessages);
-				}else if(tw.isGetPlayer()){
+				} else if (tw.getMessage().startsWith("getMap")) {
+                    GalaxyMap map = getMap(tw.getMessage());
+                    tw.setReturnObject(map);
+                }else if(tw.isGetPlayer()){
 					// client logging in
 					String message = tw.getMessage();
 					Logger.fine(message);
@@ -241,6 +247,12 @@ public class SpaceRazeTunnel extends HttpServlet {
 		oos.close();
 		Logger.fine("Output closed");
 	}
+
+    private GalaxyMap getMap(String message){
+        StringTokenizer st = new StringTokenizer(message);
+
+        return MapHandler.getAllMaps().stream().filter(m -> m.getUuid().equals(st.nextToken()) && m.getVersionId() == Long.parseLong(st.nextToken())).findFirst().orElse(null);
+    }
 	
 	private Player getPlayer2(String message,int port,ServerHandler sh){
 		Logger.fine(message);

@@ -29,10 +29,10 @@ public class GameTurn {
 	}
 
 	private void addPlanets(SR_Server server, String playerName) {
-		planets = new ArrayList<PlanetInfo>(server.getGalaxy().getPlanets().size());
+		planets = new ArrayList<>(server.getGalaxy().getPlanets().size());
 		List<Planet> listOfPlanets = server.getGalaxy().getPlanets();
 		for (Planet planet : listOfPlanets) {
-			planets.add(new PlanetInfo(planet, server.getGalaxy().getPlayerByUserName(playerName)));
+			planets.add(new PlanetInfo(planet, server.getGalaxy().getPlayerByUserName(playerName), server.getGalaxyMap()));
 		}
 	}
 
