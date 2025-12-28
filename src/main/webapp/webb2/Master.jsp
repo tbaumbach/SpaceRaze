@@ -1,3 +1,4 @@
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 <html>
 <head>

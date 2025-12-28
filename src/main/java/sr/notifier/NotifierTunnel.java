@@ -22,7 +22,7 @@ import spaceraze.util.general.Logger;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
-import sr.webb.users.User;
+import spaceraze.user.User;
 import sr.webb.users.UserHandler;
 
 /**

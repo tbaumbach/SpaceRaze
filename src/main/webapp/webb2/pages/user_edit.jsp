@@ -19,15 +19,15 @@
 		selectAdmin = "selected";
 	}
 	String turnChecked = "";
-	if (aUser.getRecieveMail(User.WANT_EMAIL_TURN)){
+	if (UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_TURN)){
 		turnChecked = " checked";
 	}
 	String gameChecked = "";
-	if (aUser.getRecieveMail(User.WANT_EMAIL_GAME)){
+	if (UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_GAME)){
 		gameChecked = " checked";
 	}
 	String adminChecked = "";
-	if (aUser.getRecieveMail(User.WANT_EMAIL_ADMIN)){
+	if (UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_ADMIN)){
 		adminChecked = " checked";
 	}
 	

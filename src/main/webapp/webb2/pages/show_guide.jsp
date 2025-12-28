@@ -5,6 +5,7 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 <!DOCTYPE html>
 <html>

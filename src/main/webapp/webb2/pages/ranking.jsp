@@ -4,6 +4,7 @@
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 <html>
 <head>

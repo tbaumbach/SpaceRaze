@@ -16,7 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 import spaceraze.world.Player;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.webb.users.User;
+import spaceraze.user.User;
 
 @Path("/games")
 public class GamesServlet{

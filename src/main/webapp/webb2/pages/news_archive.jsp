@@ -7,6 +7,7 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">

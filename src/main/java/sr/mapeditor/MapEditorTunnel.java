@@ -21,7 +21,7 @@ import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.map.GalaxyMap;
 import sr.server.map.MapHandler;
-import sr.webb.users.User;
+import spaceraze.user.User;
 import sr.webb.users.UserHandler;
 
 /**
@@ -60,9 +60,11 @@ public class MapEditorTunnel extends HttpServlet {
 					tw.setMessage(TransferWrapper.LOAD_PUB);
 					GalaxyMap aMap = MapHandler.getMap(tw.getMapFileName(),null).getCopyFromFile();
 					// always set author, since the map can be a "copy" of another players published map
-					User curUser = UserHandler.findUser(tw.getPlayerLogin());
-					aMap.setAuthor(curUser.getLogin());
-					aMap.setAuthorName(curUser.getName());
+                    if (tw.getPlayerLogin() != null) {
+                        User curUser = UserHandler.findUser(tw.getPlayerLogin());
+                        aMap.setAuthor(curUser.getLogin());
+                        aMap.setAuthorName(curUser.getName());
+                    }
 					// set map
 					tw.setMap(aMap);
 				}else

@@ -3,6 +3,7 @@
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="com.amarantin.imagepack.*"%>
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 
 <script>

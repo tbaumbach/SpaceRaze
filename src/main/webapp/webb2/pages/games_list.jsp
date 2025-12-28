@@ -3,6 +3,7 @@
 <%@ page import="java.io.*"%>
 <%@ page import="sr.server.*"%>
 <%@ page import="com.amarantin.imagepack.*"%>
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 <html>
 <head>

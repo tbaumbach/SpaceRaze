@@ -1,5 +1,5 @@
  <%@page import="java.io.IOException"%>
-<%@page import="sr.webb.users.User"%>
+<%@page import="spaceraze.user.User"%>
 <%
 	System.out.println("checklogin.jsp");
 	// the page that includes this code must import java.io.*

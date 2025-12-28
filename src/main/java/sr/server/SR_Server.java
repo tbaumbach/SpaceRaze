@@ -25,7 +25,7 @@ import sr.message.MessageDataBaseSaver;
 import sr.message.MessageDatabase;
 import sr.server.map.MapHandler;
 import sr.webb.mail.MailHandler;
-import sr.webb.users.User;
+import spaceraze.user.User;
 import sr.webb.users.UserHandler;
 
 /**
@@ -250,6 +250,7 @@ public class SR_Server {
 
 	private void loadGalaxy() {
 		galaxy = gl.loadGalaxy(nameOfGame);
+        galaxyMap = MapHandler.getMap(galaxy.getMapFileName());
 		time = galaxy.getTime();
 		Logger.finer("loadGalaxy, time=" + time + " g.gameEnded=" + galaxy.gameEnded + " Gamename=" + nameOfGame);
 		if (!galaxy.gameEnded) {
@@ -269,7 +270,7 @@ public class SR_Server {
 
 	public void updateGalaxy(boolean hasAutoUpdated) throws Exception {
 		galaxy = gl.loadGalaxy(nameOfGame);
-        galaxyMap = MapHandler.getMap(getMapFileName());
+        galaxyMap = MapHandler.getMap(galaxy.getMapFileName());
 		Logger.info("Galaxy loaded. Turn is " + galaxy.getTurn());
 		updateGalaxy(galaxy, galaxyMap);
 		galaxy.setHasAutoUpdated(hasAutoUpdated);

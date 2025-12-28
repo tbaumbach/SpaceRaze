@@ -12,10 +12,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import spaceraze.user.User;
+import spaceraze.user.UserRole;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
+import spaceraze.util.general.StringTokenizerPlusPlus;
 import spaceraze.util.properties.PropertiesHandler;
 import sr.server.ServerHandler;
+import sr.webb.mail.Base64;
 import sr.webb.mail.MailHandler;
 
 /**
@@ -33,6 +37,9 @@ public class UserHandler {
 //	private static final String COOKIE_TEMP_LOGIN = "sr_temp_user";
 //	private static final String COOKIE_TEMP_TIMESTAMP = "sr_temp_id";
 	private static Map<String,Long> sessions = new HashMap<>();
+    public static final int WANT_EMAIL_TURN = 0;
+    public static final int WANT_EMAIL_GAME = 1;
+    public static final int WANT_EMAIL_ADMIN = 2;
 
 	private UserHandler () {}
 	
@@ -164,7 +171,7 @@ public class UserHandler {
 		String message = "";
 		User foundUser = findUser(userLogin);
 		if (foundUser != null){
-			boolean passwordOk = foundUser.checkPassword(password);
+			boolean passwordOk = checkPassword(foundUser, password);
 			if (passwordOk){
 				message = "yes";
 			}else{
@@ -175,12 +182,25 @@ public class UserHandler {
 		}
 		return message;
 	}
+
+    public static boolean checkPassword(User user, String aPassword){
+        boolean same = false;
+        if (user.getPassword() != null && aPassword != null){
+            if (!user.getPassword().equalsIgnoreCase(aPassword)){ // password may be encrypted
+                // encrypt password
+                byte[] passwordBytes = user.getPassword().getBytes();
+                String encPassword = Base64.encodeBytes(passwordBytes);
+                same = aPassword.equals(encPassword);
+            }
+        }
+        return same;
+    }
 	
 	public static String isTempUser(String userLogin, String password){
 		String message = "";
 		User foundUser = findTempUser(userLogin);
 		if (foundUser != null){
-			boolean passwordOk = foundUser.checkPassword(password);
+			boolean passwordOk = checkPassword(foundUser, password);
 			if (passwordOk){
 				message = "yes";
 			}else{
@@ -201,25 +221,48 @@ public class UserHandler {
 		User foundUser = findTempUser(userLogin);
 		return foundUser;
 	}
+
+    public static boolean isUser(User user, String aUserLogin){
+        if (user.getLogin() != null && aUserLogin != null){
+            return user.getLogin().equalsIgnoreCase(aUserLogin);
+        }
+        return false;
+    }
 	
 	public static User findUser(String userLogin){
 //		System.out.println("findUser: " + userLogin);
 		User foundUser = null;
 		List<User> users = getList();
 		for (User aUser : users) {
-			if (aUser.isUser(userLogin)){
+			if (isUser(aUser, userLogin)){
 				foundUser = aUser;
 			}
 		}
 //		System.out.println("findUser, found: " + foundUser);
 		return foundUser;
 	}
+
+    public static boolean getReceiveMail(User user, int type) {
+        boolean retVal = false;
+        switch (type) {
+            case WANT_EMAIL_TURN:
+                retVal = user.isReceiveTurnMail();
+                break;
+            case WANT_EMAIL_GAME:
+                retVal = user.isReceiveGameMail();
+                break;
+            case WANT_EMAIL_ADMIN:
+                retVal = user.isReceiveAdminMail();
+                break;
+        }
+        return retVal;
+    }
 	
 	private static User findTempUser(String userLogin){
 		User foundUser = null;
 		List<User> users = getTempList();
 		for (User aUser : users) {
-			if (aUser.isUser(userLogin)){
+			if (isUser(aUser, userLogin)){
 				foundUser = aUser;
 			}
 		}
@@ -281,12 +324,34 @@ public class UserHandler {
 		
 		getTempList();
 		String userString = UUID.randomUUID().toString() + "\t" + userName + "\t" + userLogin + "\t" + userPassword + "\t" + userRole + "\t" + email + "\t" + turnEmail + "\t" + gameEmail + "\t" + adminEmail;
-		User newUser = new User(userString);
+		User newUser = UserHandler.createUser(userString);
 		allTempUsers.add(newUser);
 		saveTempUsers();
 		// email the new user
 		MailHandler.sendNewPlayerMessage(newUser);
 	}
+
+    public static User createUser(String userData) {
+        StringTokenizerPlusPlus stpp = new StringTokenizerPlusPlus(userData,"\t");
+        User user = new User();
+        user.setUuid(stpp.nextToken());
+        user.setName(stpp.nextToken());
+        user.setLogin(stpp.nextToken());
+        user.setPassword(stpp.nextToken());
+        user.setRole(UserRole.getUserRoleByOldId(stpp.nextToken()));
+        if (stpp.hasMoreTokens()){
+            user.setEmails(stpp.nextToken());
+            user.setReceiveTurnMail(stpp.nextToken().equals("true"));
+            user.setReceiveGameMail(stpp.nextToken().equals("true"));
+            user.setReceiveAdminMail(stpp.nextToken().equals("true"));
+        }else{
+            user.setEmails("");
+            user.setReceiveTurnMail(true);
+            user.setReceiveGameMail(true);
+            user.setReceiveAdminMail(true);
+        }
+        return user;
+    }
 	
 	public static String activateUser(String userLogin, String userPassword,  String userPassword2){
 		String message = "";
@@ -411,8 +476,15 @@ public class UserHandler {
 
 	public static void saveUser(String userName, String userLogin, String userPassword, String userRole,String email,String turnEmail,String gameEmail,String adminEmail,ServerHandler sh){
 		getList();
-		User tmpUser = findUser(userLogin);
-		tmpUser.setAllFields(userName,userLogin,userPassword,userRole,email,turnEmail,gameEmail,adminEmail);
+		User user = findUser(userLogin);
+        user.setName(userName);
+        user.setLogin(userLogin);
+        user.setPassword(userPassword);
+        user.setRole(UserRole.getUserRoleByOldId(userRole));
+        user.setEmails(email);
+        user.setReceiveTurnMail("true".equals(turnEmail));
+        user.setReceiveGameMail("true".equals(gameEmail));
+        user.setReceiveAdminMail("true".equals(adminEmail));
 		saveUsers();
 		sh.newPlayerPassword(userLogin,userPassword);
 	}
@@ -499,7 +571,7 @@ public class UserHandler {
 				if (index < 0){
 					index++;
 				}else{
-					pw.println(aUser.getSaveString(counter));
+					pw.println(getSaveString(aUser, counter));
 					counter++;
 				}
 			}
@@ -512,6 +584,20 @@ public class UserHandler {
 		}
 
 	}
+
+    public static String getSaveString(User user, int index){
+        String saveString = "user" + index + " = ";
+        saveString = saveString + user.getName() + "\t";
+        saveString = saveString + user.getLogin() + "\t";
+        saveString = saveString + user.getPassword() + "\t";
+        saveString = saveString + user.getRole().getOldId() + "\t";
+        saveString = saveString + UserRole.getUserRoleByLevel(user.getAccessLevel()).getOldId() + "\t";
+        saveString = saveString + user.getEmails() + "\t";
+        saveString = saveString + user.isReceiveTurnMail() + "\t";
+        saveString = saveString + user.isReceiveGameMail() + "\t";
+        saveString = saveString + user.isReceiveAdminMail() + "\t";
+        return saveString;
+    }
 	
 	private static void saveTempUsers(){
 		String dataPath = PropertiesHandler.getProperty("datapath");
@@ -527,7 +613,7 @@ public class UserHandler {
 				if (index < 0){
 					index++;
 				}else{
-					pw.println(aUser.getSaveString(counter));
+					pw.println(getSaveString(aUser, counter));
 					counter++;
 				}
 			}
@@ -569,7 +655,7 @@ public class UserHandler {
 		if (allUsers == null){
 			allUsers = new ArrayList<User>();
 			// add default users
-			guestUser = new User(UUID.randomUUID().toString() +"\tAnonymous\tguest\tguest\tguest");
+			guestUser = UserHandler.createUser(UUID.randomUUID().toString() +"\tAnonymous\tguest\tguest\tguest");
 			allUsers.add(guestUser);
 //			allUsers.add(new User("Administrator\tadmin\toverlord\tadmin"));
 //			properties = UserHandler.getInstance();
@@ -580,7 +666,7 @@ public class UserHandler {
 				if (!tmpStr.equals("")){
 //				if ((tmpStr != null) && (!tmpStr.equals(""))){
 					Logger.finest("adding user: " + tmpStr);
-					User tmpUser = new User(tmpStr);
+					User tmpUser = UserHandler.createUser(tmpStr);
 					allUsers.add(tmpUser);
 					index++;
 				}else{
@@ -593,13 +679,13 @@ public class UserHandler {
 	
 	private static List<User> getTempList(){
 		if (allTempUsers == null){
-			allTempUsers = new ArrayList<User>();
+			allTempUsers = new ArrayList<>();
 			int index = 0;
 			boolean continueLoop = true;
 			while (continueLoop){
 				String tmpStr = UserHandler.getTempUserProperty("user" + index);
-				if (!tmpStr.equals("")){
-					User tmpUser = new User(tmpStr);
+				if (!tmpStr.isEmpty()){
+					User tmpUser = UserHandler.createUser(tmpStr);
 					allTempUsers.add(tmpUser);
 					index++;
 				}else{
@@ -647,7 +733,7 @@ public class UserHandler {
 		List<User> allUsers = getList();
 		List<User> foundUsers = new LinkedList<User>();
 		for (User aUser : allUsers) {
-			if (aUser.getRecieveMail(type)){
+			if (getReceiveMail(aUser, type)){
 				foundUsers.add(aUser);
 			}
 		}

@@ -25,7 +25,7 @@ import spaceraze.world.enums.DiplomacyGameType;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
 import sr.webb.mail.MailHandler;
-import sr.webb.users.User;
+import spaceraze.user.User;
 
 /**
  * @author WMPABOD

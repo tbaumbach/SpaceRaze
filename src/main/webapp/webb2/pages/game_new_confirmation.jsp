@@ -7,6 +7,7 @@
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 <!DOCTYPE html>
 <html>

@@ -1,3 +1,4 @@
+<%@ page import="spaceraze.user.User" %>
 <!-- Start register.jsp fragment -->
 
 <%

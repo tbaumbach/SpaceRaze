@@ -2,6 +2,7 @@
 <%@ page import="spaceraze.world.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="spaceraze.map.GalaxyMap" %>
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 <html>
 <head>

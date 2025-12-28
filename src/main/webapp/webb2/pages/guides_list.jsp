@@ -5,8 +5,9 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
+    <%@ page import="spaceraze.user.User" %>
 
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
 <title>View Map files</title>

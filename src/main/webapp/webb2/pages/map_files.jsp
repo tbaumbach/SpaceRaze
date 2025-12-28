@@ -1,5 +1,6 @@
 <%@ page import="sr.server.map.*"%>
 <%@ page import="sr.webb.users.*"%>
+<%@ page import="spaceraze.user.User" %>
 <!DOCTYPE html>
 <html>
 <head>

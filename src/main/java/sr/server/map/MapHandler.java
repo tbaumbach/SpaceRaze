@@ -20,7 +20,7 @@ import spaceraze.util.properties.PropertiesReader;
 import spaceraze.map.GalaxyMap;
 import sr.server.MapFileNameFilter;
 import sr.server.persistence.PHash;
-import sr.webb.users.User;
+import spaceraze.user.User;
 
 /**
  * @author WMPABOD

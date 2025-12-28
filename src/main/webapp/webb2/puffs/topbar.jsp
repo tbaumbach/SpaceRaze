@@ -30,7 +30,7 @@
 		User:
 	</td>
     <td valign="top">
-		<%= user.getName() %>&nbsp;(<%= user.getRole() %>)
+		<%= user.getName() %>&nbsp;(<%= user.getRole().getOldId() %>)
 	</td>
   </tr>
   <tr>

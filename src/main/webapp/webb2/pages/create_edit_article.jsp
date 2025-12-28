@@ -4,6 +4,7 @@
 <%@ page import="sr.webb.news.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="spaceraze.user.User" %>
 <%
 	// get PageURL
 	String PageURL = request.getParameter("action"); 

@@ -2,6 +2,7 @@
 <%@ page import="sr.server.*"%>
 <%@ page import="sr.webb.users.*"%>
 <%@ page import="java.io.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">
@@ -44,7 +45,7 @@ This page allows administrators to view the data of a user.
 </tr>
 <tr>
 <td>Role:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getRole() %></td>
+<td><%= aUser.getRole().getOldId() %></td>
 </tr>
 <tr>
 <td>E-mail (separate multiple addresses with blanks):&nbsp;&nbsp;&nbsp;</td>
@@ -52,15 +53,15 @@ This page allows administrators to view the data of a user.
 </tr>
 <tr>
 <td>Turn email:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getRecieveMail(User.WANT_EMAIL_TURN) %></td>
+<td><%= UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_TURN) %></td>
 </tr>
 <tr>
 <td>New game email:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getRecieveMail(User.WANT_EMAIL_GAME) %></td>
+<td><%= UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_GAME) %></td>
 </tr>
 <tr>
 <td>Admin email:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getRecieveMail(User.WANT_EMAIL_ADMIN) %></td>
+<td><%= UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_ADMIN) %></td>
 </tr>
 </table>
 <br>

@@ -5,6 +5,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="sr.server.ranking.*"%>
 <%@ page import="sr.server.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 
 <%

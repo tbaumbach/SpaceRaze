@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import sr.webb.users.User;
+import spaceraze.user.User;
 import sr.webb.users.UserHandler;
 
 @Path("/user")

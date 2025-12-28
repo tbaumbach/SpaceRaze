@@ -2,7 +2,7 @@
 
 
 <%@page import="sr.webb.users.UserHandler"%>
-<%@page import="sr.webb.users.User"%>
+<%@page import="spaceraze.user.User"%>
 <%
 User userAdminMeny = session.getAttribute("user") != null ? (User)session.getAttribute("user") : UserHandler.getUser(session,request,response);
 %>
@@ -24,7 +24,7 @@ User userAdminMeny = session.getAttribute("user") != null ? (User)session.getAtt
 	<tr><td><A href="Master.jsp?action=ranking"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_ranking.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_ranking.jpg','Ranking: List all players SpaceRaze ranking','GuideArea');" height=21 alt="Ranking" hspace=0 src="images/btn_Blue_ranking.jpg" width=85 vspace=0 border=0></A></td></tr>
 	<tr><td><A href="Master.jsp?action=map_files"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_maps.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_maps.jpg','Maps: List, Create and view all maps that are active in SpaceRaze ','GuideArea');" height=21 alt="Maps" hspace=0 src="images/btn_Blue_maps.jpg" width=85 vspace=0 border=0></A></td></tr>
 	<tr><td><A href="Master.jsp?action=gameworlds_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_gameworlds.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_gameworlds.jpg','Gameworlds: Read history and get all facts about each GW','GuideArea');" height=21 alt="Gameworlds" hspace=0 src="images/btn_Blue_gameworlds.jpg" width=85 vspace=0 border=0></A></td></tr>
-	<!-- Fungerar inte och ingen bra ide att ha på serven.
+	<!-- Fungerar inte och ingen bra ide att ha pï¿½ serven.
 	<tr><td><A href="Master.jsp?action=battle_sim_list"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_battlesim.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_battlesim.jpg','Battle sim: Simulate epic or future battles.','GuideArea');" height=21 alt="Battle simulator" hspace=0 src="images/btn_Blue_battlesim.jpg" width=85 vspace=0 border=0></A></td></tr>
 	-->
 	<!-- 
@@ -46,7 +46,7 @@ User userAdminMeny = session.getAttribute("user") != null ? (User)session.getAtt
 	<br>
 	<span class=h2>Admin</span><br>
 	<A href="Master.jsp?action=admin_users"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_adminusers.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_adminusers.jpg','Admin Users:','GuideArea');" height=21 alt="Administrate Users" hspace=0 src="images/btn_Blue_adminusers.jpg" width=85 vspace=0 border=0></A><BR>
-	<!-- Kan inte hitta dessa sidor, inte utvecklade eller ligger de på någon server, leta lite i gamla tomtcats
+	<!-- Kan inte hitta dessa sidor, inte utvecklade eller ligger de pï¿½ nï¿½gon server, leta lite i gamla tomtcats
 	<A href="Master.jsp?action=admin_games"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_admingames.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_admingames.jpg','Admin games:','GuideArea');" height=21 alt="Administrate Games" hspace=0 src="images/btn_Blue_admingames.jpg" width=85 vspace=0 border=0></A><BR>
 	<A href="Master.jsp?action=admin_mail"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_adminmail.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_adminmail.jpg','Admin Mail:','GuideArea');" height=21 alt="Administrate Mail" hspace=0 src="images/btn_Blue_adminmail.jpg" width=85 vspace=0 border=0></A><BR>
 	<A href="Master.jsp?action=admin_saves"><IMG onmouseout="OnMouseOverNOut_Image(this,'images/btn_Blue_adminsaves.jpg','&nbsp;','GuideArea');" onmouseover="OnMouseOverNOut_Image(this,'images/btn_Blue_Over_adminsaves.jpg','Admin Saves:','GuideArea');" height=21 alt="Administrate Saves" hspace=0 src="images/btn_Blue_adminsaves.jpg" width=85 vspace=0 border=0></A><BR>

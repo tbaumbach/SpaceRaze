@@ -6,6 +6,7 @@
 <%@ page import="java.io.*"%>
 <%@ page import="com.amarantin.imagepack.*"%>
 <%@ page import="spaceraze.util.general.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 <link REL="STYLESHEET" HREF="CSS/style.css">
 <link REL="STYLESHEET" HREF="CSS/styleDiv.css">

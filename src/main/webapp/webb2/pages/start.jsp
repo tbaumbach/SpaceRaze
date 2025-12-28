@@ -1,6 +1,7 @@
 <!-- Start start.jsp fragment -->
 <%@page import="spaceraze.servlethelper.handlers.GameWorldHandler"%>
 <%@page import="sr.server.map.MapHandler"%>
+<%@ page import="spaceraze.user.User" %>
 <div style="left: 132px;width: 450px;position: absolute;top: 90px;">
 	
 	
@@ -12,14 +13,14 @@
 		<div class="Form_Text" style="width:450">
 		<div class="SolidText">
 		 <b>Important fixes:</b><br>
-			* INGAME Mail, det fungerar att skicka mail som kommer fram direkt, så man kan prata diplomati med sina medspelare innan varje drag<br>
-			* Möjligheten att ha fler än en startplanet.<br>
-			* Man kan sätta ett parti turnbaserat<br>
+			* INGAME Mail, det fungerar att skicka mail som kommer fram direkt, sï¿½ man kan prata diplomati med sina medspelare innan varje drag<br>
+			* Mï¿½jligheten att ha fler ï¿½n en startplanet.<br>
+			* Man kan sï¿½tta ett parti turnbaserat<br>
 			* Fixxar av klient layout<br>
 			* Fixxar av Webb Layout<br><br>
 			
-			<a href="http://www.spaceraze.com/webb2/Master.jsp?action=guides_list"> * Guides: Läs nya guides, Klicka här</a><br>		
-			 <a href="http://www.spaceraze.com/webb2/Master.jsp?action=gameworlds_list">* Gameworlds: Lär dig nya spelvärldar, Klicka här</a><br>		
+			<a href="http://www.spaceraze.com/webb2/Master.jsp?action=guides_list"> * Guides: Lï¿½s nya guides, Klicka hï¿½r</a><br>		
+			 <a href="http://www.spaceraze.com/webb2/Master.jsp?action=gameworlds_list">* Gameworlds: Lï¿½r dig nya spelvï¿½rldar, Klicka hï¿½r</a><br>		
 		</div>
 		</div>
 

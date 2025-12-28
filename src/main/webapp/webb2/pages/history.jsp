@@ -4,6 +4,7 @@
 <%@ page import="java.text.*"%>
 <%@ page import="java.util.*"%>
 <%@ page import="sr.server.ranking.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 
 <%
@@ -59,7 +60,7 @@ In Raze countries could be "Razed" by enemy armies and those countries could not
 <br><br><b>SpaceRaze tabletop game</b><br>
 The first SpaceRaze game saw the light of day in 1997 as a tabletop game, with a large paper starmap and markers cut from a pizza box for the different units of the game - spaceships, starfighters (there were a lot of these...), planets, wharfs etc.<br>
 The game was played by 4-6 people and no single game was ever finished due to the amount of time the game took to play as the complexity increased with each turn.<br>
-Most of the game was created by Paul Bodin and Mats Johansson, with the added help from Robert Weitz, Roger Heinänän, Savina Fornsäter and Otto Björkström.
+Most of the game was created by Paul Bodin and Mats Johansson, with the added help from Robert Weitz, Roger Heinï¿½nï¿½n, Savina Fornsï¿½ter and Otto Bjï¿½rkstrï¿½m.
 
 <br><br><b>SpaceRaze play by mail</b><br>
 In 1998 Mats Johansson took SpaceRaze to a new level as he transformed it into a play by mail game, where the central information about the state of the game was a continually updated website, where a hard-coded starmap (see image below) and <a href="issue5.htm">newspaper</a> about the progress of the game was kept.<br>

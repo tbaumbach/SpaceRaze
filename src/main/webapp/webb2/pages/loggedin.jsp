@@ -1,7 +1,7 @@
 <!-- Start loggedin.jsp fragment -->
 
 <%@page import="sr.webb.users.UserHandler"%>
-<%@page import="sr.webb.users.User"%>
+<%@page import="spaceraze.user.User"%>
 <%
 User userLoggedin = session.getAttribute("user") != null ? (User)session.getAttribute("user") : UserHandler.getUser(session,request,response);
 %>

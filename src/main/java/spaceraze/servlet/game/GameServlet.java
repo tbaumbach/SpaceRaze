@@ -16,7 +16,7 @@ import spaceraze.world.StatisticGameType;
 import spaceraze.world.orders.Orders;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
-import sr.webb.users.User;
+import spaceraze.user.User;
 
 @Path("/games/game")
 public class GameServlet {

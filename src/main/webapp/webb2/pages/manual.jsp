@@ -5,7 +5,8 @@
 <%@ page import="java.util.*"%>
 <%@ page import="sr.server.ranking.*"%>
 <%@ page import="sr.server.*"%>
-<%@ page import="spaceraze.world.diplomacy.*"%> 
+<%@ page import="spaceraze.world.diplomacy.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 <%
 	// get PageURL
@@ -697,7 +698,7 @@ Diplomatic state between vassals to the same lord are not affected by the fact t
 <b>VIP conflicts</b><br>
 VIPs (assassins, counter-spies, infestators, duellists etc) will only be hostile if state is cease fire, war or eternal war.<br> 
 <b>Civilian ships</b><br>
-Civilian shiåps will only be attacked and destroyed if state is war or eternal war.<br>
+Civilian shiï¿½ps will only be attacked and destroyed if state is war or eternal war.<br>
 <b>Sieges</b><br>
 Ships will only besiege planets if a state is war or eternal war.<br>
 <b>Traders</b><br>

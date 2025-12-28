@@ -21,7 +21,7 @@ import spaceraze.world.*;
 import spaceraze.world.spacebattle.ReportLevel;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
-import sr.webb.users.User;
+import spaceraze.user.User;
 import sr.webb.users.UserHandler;
 
 /**
@@ -40,7 +40,7 @@ public class MailHandler {
 	 */
 	public static void sendAdminMessage(String title, String content, User theAdmin){
 		// get users who want admin mails
-		List<User> users = UserHandler.getUsers(User.WANT_EMAIL_ADMIN);
+		List<User> users = UserHandler.getUsers(UserHandler.WANT_EMAIL_ADMIN);
 		String tmpContent = content;
 		tmpContent = tmpContent + "\n/From SpaceRaze Administrator: " + theAdmin.getName();
 		sendMailToUsers("Admin message: " + title,tmpContent,users);
@@ -63,7 +63,7 @@ public class MailHandler {
 
 	public static void sendNewGameMessage(SR_Server aNewServer){
 		// get users who want new game mails
-		List<User> users = UserHandler.getUsers(User.WANT_EMAIL_GAME);
+		List<User> users = UserHandler.getUsers(UserHandler.WANT_EMAIL_GAME);
 		String title = aNewServer.getGameName() + " is open to join";
 		String content = "A new game has been started and is open to join.\n"; 
 		content = content + "Game name is: " + aNewServer.getGameName() + "\n";
@@ -103,7 +103,7 @@ public class MailHandler {
 			Logger.finer("aPlayer: " + aPlayer.getName());
 			User aUser = UserHandler.findUser(aPlayer.getName());
 			Logger.finer("aUser: " + aUser.getName());
-			if ((aUser != null) && (aUser.getRecieveMail(User.WANT_EMAIL_TURN))){
+			if ((aUser != null) && (UserHandler.getReceiveMail(aUser, UserHandler.WANT_EMAIL_TURN))){
 				if (aServer.getGalaxy().gameEnded || (!aPlayer.isDefeated() || (aPlayer.getTurnDefeated() + 1) == currentTurn)){
 					users.add(aUser);
 					Logger.finer("User added");

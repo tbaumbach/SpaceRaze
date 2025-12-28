@@ -5,6 +5,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="sr.server.ranking.*"%>
 <%@ page import="sr.server.*"%>
+<%@ page import="spaceraze.user.User" %>
 
 
 <%
@@ -51,11 +52,11 @@
 Paul Bodin - Lead Designer/Developer/Project Owner<br>
 Thobias Baumbach - Developer/Game Design<br>
 Ragnar Klinga - Developer/Game Design<br>
-Nicklas Ohlsén - Webb Developer/Game Design<br>
+Nicklas Ohlsï¿½n - Webb Developer/Game Design<br>
 Peter Jansson - Extreme Tester/Game Design<br>
 Annika Ericsson Extreme Tester<br>
 Tomas Norremo - Extreme Tester<br>
-Henrik Sjöstedt - Extreme Tester<br>
+Henrik Sjï¿½stedt - Extreme Tester<br>
 Markus gemstad - Hosting<br>
 </p>
 

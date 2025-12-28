@@ -7,6 +7,7 @@
 <%@ page import="spaceraze.webb.support.world.GameWorldHelper"%>
 <%@ page import="java.io.*"%>
 <%@ page import="spaceraze.map.GalaxyMap" %>
+<%@ page import="spaceraze.user.User" %>
 
 <!DOCTYPE html>
 <html>
