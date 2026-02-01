@@ -10,8 +10,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Player;
+import spaceraze.game.Galaxy;
+import spaceraze.game.Player;
 
 /**
  * @author WMPABOD
@@ -44,8 +44,6 @@ public class CheckServer {
           oos.writeObject("checkStatus");
           Player p = (Player)ois.readObject();
           System.out.println("Player recieved, errmsg: " + p.getErrorMessage());
-          g = p.getGalaxy();
-          playerInfos = getPlayerList(g);
           oos.writeObject(new Player("StatusCheck finished. Bye."));
           String msg = (String)ois.readObject();
           System.out.println("Server sais: " + msg);

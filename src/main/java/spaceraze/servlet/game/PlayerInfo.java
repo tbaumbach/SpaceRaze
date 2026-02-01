@@ -1,15 +1,16 @@
 package spaceraze.servlet.game;
 
 import spaceraze.servlethelper.handlers.GameWorldHandler;
-import spaceraze.world.Player;
+import spaceraze.game.Player;
+import spaceraze.world.GameWorld;
 
 public class PlayerInfo {
 	
 	private String name, faction;
 	
-	PlayerInfo(Player player){
+	PlayerInfo(Player player, GameWorld gameWorld){
 		name = player.getGovernorName();
-		faction = GameWorldHandler.getFactionByUuid(player.getFactionUuid(), player.getGalaxy().getGameWorld()).getName();
+		faction = GameWorldHandler.getFactionByUuid(player.getFactionUuid(), gameWorld).getName();
 	}
 
 	public String getName() {

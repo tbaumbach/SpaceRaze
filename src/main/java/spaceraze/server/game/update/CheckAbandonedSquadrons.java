@@ -10,23 +10,26 @@ import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Planet;
-import spaceraze.world.Player;
-import spaceraze.world.Spaceship;
+import spaceraze.game.Galaxy;
+import spaceraze.game.Planet;
+import spaceraze.game.Player;
+import spaceraze.game.Spaceship;
 import spaceraze.battlehandler.spacebattle.TaskForce;
+import spaceraze.world.GameWorld;
 import spaceraze.world.enums.SpaceShipSize;
-import spaceraze.world.orders.Orders;
+import spaceraze.game.orders.Orders;
 import sr.server.SpaceshipHelper;
 
 public class CheckAbandonedSquadrons {
 	
 	Galaxy galaxy;
     GalaxyMap galaxyMap;
+	GameWorld gameWorld;
 	
-	public CheckAbandonedSquadrons(Galaxy galaxy, GalaxyMap galaxyMap) {
+	public CheckAbandonedSquadrons(Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld) {
 		this.galaxy = galaxy;
         this.galaxyMap = galaxyMap;
+		this.gameWorld = gameWorld;
 	}
 	
 	/**
@@ -53,7 +56,7 @@ public class CheckAbandonedSquadrons {
 		} else {
 			Logger.finest("checkAbandonedSquadron in TaskForce called: neutral");
 		}
-		boolean sqdSurvive = galaxy.getGameWorld().isSquadronsSurviveOutsideCarriers();
+		boolean sqdSurvive = gameWorld.isSquadronsSurviveOutsideCarriers();
 		List<Spaceship> tfSpaceships = taskforce.getAllSpaceShips().stream().map(ship -> ship.getSpaceship()).collect(Collectors.toList());
 		Collections.shuffle(tfSpaceships);
 		List<Spaceship> removeShips = new LinkedList<Spaceship>();
@@ -131,15 +134,15 @@ public class CheckAbandonedSquadrons {
 				owner.addToGeneral("Your sguadron " + aShip.getName()
 						+ " has been scuttled by it's crew because they had no supporting carrier in the system "
 						+ PlanetPureFunctions.getPlanetName(galaxyMap, aShip.getLocation().getMapPlanetUuid()) + ".");
-				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo(), galaxy.getGameWorld());
-				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap);
+				SpaceshipHelper.addToLatestShipsLostInSpace(aShip, owner.getTurnInfo(), gameWorld);
+				VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap, gameWorld);
 			}
 			Player controllingPlayer = thePlanet.getPlayerInControl();
 			if (controllingPlayer != null) {
 				if (controllingPlayer != aShip.getOwner()) {
 					if (aShip.getOwner() != null) {
-						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName(), true) + " "
-								+ SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), galaxy.getGameWorld()).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
+						controllingPlayer.addToGeneral(Functions.getDeterminedForm(SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), gameWorld).getName(), true) + " "
+								+ SpaceshipPureFunctions.getSpaceshipTypeByUuid(aShip.getTypeUuid(), gameWorld).getName() + " belonging to Governor " + aShip.getOwner().getGovernorName()
 								+ " has been scuttled in the " + PlanetPureFunctions.getPlanetName(galaxyMap, thePlanet.getMapPlanetUuid())
 								+ " system, due to lack of carrier.");
 					} else {
@@ -156,7 +159,7 @@ public class CheckAbandonedSquadrons {
 
 	private void checkAbandonedSquadrons(Player aPlayer){
 	  	  Logger.finest("checkAbandonedSquadron called, player: " + aPlayer.getName());
-	  	  boolean sqdSurvive = galaxy.getGameWorld().isSquadronsSurviveOutsideCarriers();
+	  	  boolean sqdSurvive = gameWorld.isSquadronsSurviveOutsideCarriers();
 	  	  List<Spaceship> playerSpaceships = SpaceshipPureFunctions.getPlayersSpaceships(aPlayer, galaxy).stream().collect(Collectors.toList());
 	  	  Collections.shuffle(playerSpaceships);
 	  	  List<Spaceship> removeShips = new LinkedList<Spaceship>();
@@ -230,7 +233,7 @@ public class CheckAbandonedSquadrons {
 	  			}
 	  			Player owner = aShip.getOwner();
 	  			if (owner != null) {
-					VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap);
+					VipMutator.checkVIPsInDestroyedShips(aShip, owner, galaxy, galaxyMap, gameWorld);
 	  			}
 			  SpaceshipMutator.removeShip(aShip, galaxy);
 	  	  }

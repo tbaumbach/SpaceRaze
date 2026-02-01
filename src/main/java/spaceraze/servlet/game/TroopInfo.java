@@ -5,7 +5,7 @@ import java.util.List;
 
 import spaceraze.servlethelper.game.troop.TroopPureFunctions;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Troop;
+import spaceraze.game.Troop;
 import spaceraze.world.enums.TypeOfTroop;
 
 public class TroopInfo {

@@ -5,7 +5,7 @@ package spaceraze.server.game;
 
 import java.util.Comparator;
 
-import spaceraze.world.Planet;
+import spaceraze.game.Planet;
 
 public class PlanetProdComparator implements Comparator<Planet> {
 

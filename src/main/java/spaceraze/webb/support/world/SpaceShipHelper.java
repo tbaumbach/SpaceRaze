@@ -1,7 +1,7 @@
 package spaceraze.webb.support.world;
 
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
-import spaceraze.world.Spaceship;
+import spaceraze.game.Spaceship;
 import spaceraze.world.SpaceshipType;
 import spaceraze.world.enums.SpaceShipSize;
 

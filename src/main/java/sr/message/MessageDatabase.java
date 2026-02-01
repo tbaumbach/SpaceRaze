@@ -7,10 +7,11 @@ import java.util.List;
 
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Message;
-import spaceraze.world.Player;
-import spaceraze.world.UniqueIdCounter;
+import spaceraze.game.Galaxy;
+import spaceraze.game.Message;
+import spaceraze.game.Player;
+import spaceraze.game.UniqueIdCounter;
+import spaceraze.world.GameWorld;
 
 //TODO 2020-11-25 Change this to an entity and save in the database, guess messages should be a stand alone application.
 public class MessageDatabase implements Serializable{
@@ -38,9 +39,9 @@ public class MessageDatabase implements Serializable{
 	 * @param aGalaxy
 	 * @return
 	 */
-	public List<Message> addMessage(Message aMessage, Galaxy aGalaxy, int latestReadMessage){
+	public List<Message> addMessage(Message aMessage, Galaxy aGalaxy, int latestReadMessage, GameWorld gameWorld){
 		aMessage.setTurn(aGalaxy.getTurn());
-		allMessages.addAll(0, getPlayersUniqueMessages(aMessage, aGalaxy));
+		allMessages.addAll(0, getPlayersUniqueMessages(aMessage, aGalaxy, gameWorld));
 		new MessageDataBaseSaver().saveMessageDataBase(aGalaxy.getGameName(), this);
 		return  getPlayerNewMessages(aMessage.getSender(), latestReadMessage);
 	}
@@ -136,10 +137,10 @@ public class MessageDatabase implements Serializable{
 	   * @param aGalaxy
 	   * @return
 	   */
-	  public List<Message> getPlayersUniqueMessages(Message message, Galaxy aGalaxy){
-		  List<Message> recipientMessages = new ArrayList<Message>();
+	  public List<Message> getPlayersUniqueMessages(Message message, Galaxy aGalaxy, GameWorld gameWorld){
+		  List<Message> recipientMessages = new ArrayList<>();
 		  recipientMessages.add(getAsSentMessage(message, getUniqueMessageIDCounter().getUniqueId()));
-		  recipientMessages.addAll(getRecipientMessages(message, aGalaxy));
+		  recipientMessages.addAll(getRecipientMessages(message, aGalaxy, gameWorld));
 		  
 		  return recipientMessages;
 	  }
@@ -160,12 +161,12 @@ public class MessageDatabase implements Serializable{
 	   * @param aGalaxy
 	   * @return
 	   */
-	  private List<Message> getRecipientMessages(Message mesage, Galaxy aGalaxy){
-		  List<Message> recipientMessages = new ArrayList<Message>();
+	  private List<Message> getRecipientMessages(Message mesage, Galaxy aGalaxy, GameWorld gameWorld){
+		  List<Message> recipientMessages = new ArrayList<>();
 		  if(mesage.getType().equals("all")){
 			  List<Player> players = aGalaxy.getPlayers();
 			  for (Player player : players) {
-				  if(!player.isPlayer(mesage.getSender())){
+				  if(!player.getName().equalsIgnoreCase(mesage.getSender())){
 					  Logger.finer("Adding unique player mail to: " +player.getName() + " from:" + mesage.getSender());
 					  Message tempMessage = new Message(mesage, getUniqueMessageIDCounter().getUniqueId());
 					  tempMessage.setOwner(player.getName());
@@ -178,9 +179,9 @@ public class MessageDatabase implements Serializable{
 			  tempMessage.setOwner(mesage.getRecipientPlayer());
 			  recipientMessages.add(tempMessage);
 		  }else{ // meddelandet skall till alla i en Faction
-			  List<Player> players = aGalaxy.getFactionMember(GameWorldHandler.getFactionByName(mesage.getRecipientFaction(), aGalaxy.getGameWorld()));
+			  List<Player> players = aGalaxy.getFactionMember(GameWorldHandler.getFactionByName(mesage.getRecipientFaction(), gameWorld));
 			  for (Player player : players) {
-				  if(!player.isPlayer(mesage.getSender())){
+				  if(!player.getName().equalsIgnoreCase(mesage.getSender())){
 					  Logger.finer("Adding unique player mail to: " +player.getName() + " from:" + mesage.getSender());
 					  Message tempMessage = new Message(mesage, getUniqueMessageIDCounter().getUniqueId());
 					  tempMessage.setOwner(player.getName());

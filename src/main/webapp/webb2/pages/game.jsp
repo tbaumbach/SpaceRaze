@@ -37,7 +37,7 @@
 <h2>Status of game <%= aServer.getGameName() %></h2>
 Started by: <%= aServer.getStartedByPlayerName() %><br>
 Map filename: <%= MapHandler.getMapName(aServer.getMapFileName()) %><br>
-Gameworld: <%= aServer.getGalaxy().getGameWorld().getFullName() %><br>
+Gameworld: <%= aServer.getGameWorld().getFullName() %><br>
 <%
 	if ((aServer.getTurn() == 0) & (aServer.isPasswordProtected())){
 %>
@@ -53,7 +53,7 @@ Turn number is <%= aServer.getTurn() %>
 <p>
 Last updated:&nbsp;<%= aServer.getLastUpdatedString() %>
 <p>
-<%= ServerStatus.getStartingText(aServer.getGalaxy()) %>
+<%= ServerStatus.getStartingText(aServer.getGalaxy(), aServer.getGameWorld()) %>
 <%= ServerStatus.getGameOverText(aServer.getGalaxy()) %>
 <% if (aServer.getLastUpdateComplete()){ %>
 <%= ServerStatus.getUpdateText(aServer) %>
@@ -63,7 +63,7 @@ Game could not complete last turn due to an error.<p>
 <a href=view_last_game_log.jsp?gameid=<%= port %>>View last game log</a><p>
 <% } %>
 <% }%>
-<%= ServerStatus.getPlayerList(aServer.getGalaxy(),autoUser) %>
+<%= ServerStatus.getPlayerList(aServer.getGalaxy(),autoUser, aServer.getGameWorld()) %>
 <br>
 </body>
 </html>

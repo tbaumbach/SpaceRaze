@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import spaceraze.world.StatisticGameType;
+import spaceraze.game.StatisticGameType;
 import sr.server.SR_Server;
 
 public class GameParameters {

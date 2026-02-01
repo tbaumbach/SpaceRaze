@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import spaceraze.world.Player;
+import spaceraze.game.Player;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import spaceraze.user.User;

@@ -13,12 +13,13 @@ import spaceraze.map.GalaxyMap;
 import spaceraze.server.game.StartGameHandler;
 import spaceraze.servlethelper.game.GalaxyCreator;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
+import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.Faction;
-import spaceraze.world.Galaxy;
+import spaceraze.game.Galaxy;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Player;
-import spaceraze.world.StatisticGameType;
+import spaceraze.game.Player;
+import spaceraze.game.StatisticGameType;
 import spaceraze.world.enums.DiplomacyGameType;
 import sr.message.MessageDataBaseLoader;
 import sr.message.MessageDataBaseSaver;
@@ -43,6 +44,7 @@ public class SR_Server {
 	private long time = 0;
 	private Galaxy galaxy;
     private GalaxyMap galaxyMap;
+	private GameWorld gameWorld;
 	private GalaxyCreator gc = new GalaxyCreator();
 	private GalaxyLoader gl = new GalaxyLoader();
 	private GalaxySaver gs = new GalaxySaver();
@@ -167,6 +169,7 @@ public class SR_Server {
 		this.steps = steps;
 		// this.maxPlayers = maxPlayers;
 		this.sh = sh;
+		this.gameWorld = aGameWorld;
 		// this.ranked = bRanked;
 		// this.startedByPlayer = startedByPlayer;
 		Logger.finer("autoBalance: " + autoBalance);
@@ -239,7 +242,7 @@ public class SR_Server {
 		galaxy.setRanked(ranked);
 		if (selectableFactionNames == null) {
 			// all factions should be selectable
-			galaxy.setAllFactionsSelectable();
+			galaxy.setAllFactionsSelectable(gameWorld);
 		} else {
 			galaxy.setSelectableFactionNames(selectableFactionNames);
 		}
@@ -271,15 +274,16 @@ public class SR_Server {
 	public void updateGalaxy(boolean hasAutoUpdated) throws Exception {
 		galaxy = gl.loadGalaxy(nameOfGame);
         galaxyMap = MapHandler.getMap(galaxy.getMapFileName());
+		gameWorld = GameWorldHandler.getGameWorld(galaxy.getGameWorldUuid()); //TODO should be gameWorldFileName, Try repace this with the reading from the database instead.
 		Logger.info("Galaxy loaded. Turn is " + galaxy.getTurn());
-		updateGalaxy(galaxy, galaxyMap);
+		updateGalaxy(galaxy, galaxyMap, gameWorld);
 		galaxy.setHasAutoUpdated(hasAutoUpdated);
 		gs.saveGalaxy(nameOfGame, "saves", galaxy);
 		gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
 	}
 
-	private void updateGalaxy(Galaxy g, GalaxyMap galaxyMap) throws Exception {
-		GalaxyUpdater gu = new GalaxyUpdater(g, galaxyMap);
+	private void updateGalaxy(Galaxy g, GalaxyMap galaxyMap, GameWorld gameWorld) throws Exception {
+		GalaxyUpdater gu = new GalaxyUpdater(g, galaxyMap, gameWorld);
 		gu.performUpdate(this);
 	}
 
@@ -349,7 +353,7 @@ public class SR_Server {
 			} else if (!factionIsOpenAndSelectable(factionName)) {
 				message = "All slots in the " + factionName + " faction have just been taken. Choose another faction.";
 			} else {
-				Player player = (new StartGameHandler()).getNewPlayer(name, "", govenorName, factionName, galaxy, galaxyMap);
+				Player player = (new StartGameHandler()).getNewPlayer(name, "", govenorName, factionName, galaxy, galaxyMap, gameWorld);
 
 				if (player.getErrorMessage() != null) {
 					message = player.getErrorMessage();
@@ -399,16 +403,16 @@ public class SR_Server {
 						p = new Player("All slots in the " + factionName
 								+ " faction have just been taken. Choose another faction.");
 					} else {
-						p = (new StartGameHandler()).getNewPlayer(name, password, govenorName, factionName, galaxy, galaxyMap);
+						p = (new StartGameHandler()).getNewPlayer(name, password, govenorName, factionName, galaxy, galaxyMap, gameWorld);
 					}
 				}
 			} else {
 				p = galaxy.getPlayer(name, password);
 			}
 		} else if ((st.countTokens() == 1) && st.nextToken().equals("checkStatus")) {
-			p = new Player("Returning status.", galaxy);
+			p = new Player("Returning status.");
 		} else if ((st.countTokens() == 2) && st.nextToken().equals("update")) {
-			p = new Player("Updating server.", galaxy);
+			p = new Player("Updating server.");
 			// update server
 			int turns = Integer.parseInt(st.nextToken());
 			for (int i = 0; i < turns; i++) {
@@ -536,8 +540,8 @@ public class SR_Server {
 	 * @return open factions list
 	 */
 	public List<Faction> getOpenSelectableFactions() {
-		List<Faction> openFactions = new LinkedList<Faction>();
-		List<Faction> allFactions = galaxy.getFactions();
+		List<Faction> openFactions = new LinkedList<>();
+		List<Faction> allFactions = galaxy.getFactions(gameWorld);
 		// List<Player> allPlayers = g.getPlayers();
 		int maxPlayers = galaxy.getNrStartPlanets();
 		int nrSelectableFactions = galaxy.getSelectableFactionNames().size();
@@ -564,7 +568,7 @@ public class SR_Server {
 	public List<Faction> getSelectableFactions() {
 		List<Faction> selectableFactions = new LinkedList<Faction>();
 		for (String factionName : galaxy.getSelectableFactionNames()) {
-			selectableFactions.add(galaxy.findFaction(factionName));
+			selectableFactions.add(galaxy.findFaction(factionName, gameWorld));
 		}
 		return selectableFactions;
 	}
@@ -651,4 +655,8 @@ public class SR_Server {
     public GalaxyMap getGalaxyMap() {
         return galaxyMap;
     }
+
+	public GameWorld getGameWorld() {
+		return gameWorld;
+	}
 }

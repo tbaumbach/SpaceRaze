@@ -1,6 +1,8 @@
 package spaceraze.server.game.update;
 
-import spaceraze.servlethelper.game.BuildingPureFunctions;
+import spaceraze.game.*;
+import spaceraze.game.report.old.TurnInfo;
+import spaceraze.servlethelper.game.building.BuildingPureFunctions;
 import spaceraze.servlethelper.game.ResearchPureFunctions;
 import spaceraze.servlethelper.game.gameworld.GameWorldPureFunction;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
@@ -10,24 +12,24 @@ import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
 import spaceraze.world.enums.HighlightType;
-import spaceraze.world.orders.ResearchOrder;
+import spaceraze.game.orders.ResearchOrder;
 
 public class ResearchPerformer {
 
     private ResearchPerformer(){}
 
-    public static  void researchAdvantage(Faction faction, String advantageName, TurnInfo ti, Player p, Galaxy galaxy){
-        ResearchPerformer.research(ResearchPureFunctions.getAdvantage(faction, advantageName), ti, p, galaxy);
+    public static  void researchAdvantage(Faction faction, String advantageName, TurnInfo ti, Player p, GameWorld gameWorld){
+        ResearchPerformer.research(ResearchPureFunctions.getAdvantage(faction, advantageName), ti, p, gameWorld);
     }
 
-    public static  void performResearch(ResearchOrder researchOrder, TurnInfo ti, Player p, Galaxy galaxy){
+    public static  void performResearch(ResearchOrder researchOrder, TurnInfo ti, Player p, GameWorld gameWorld){
         Logger.finest( "performResearch: " + researchOrder.getAdvantageName() + " player: " + p.getName());
-        ResearchPerformer.researchAdvantage(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), galaxy.getGameWorld()), researchOrder.getAdvantageName(), ti, p, galaxy);
+        ResearchPerformer.researchAdvantage(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), gameWorld), researchOrder.getAdvantageName(), ti, p, gameWorld);
     }
 
-    public static void research(ResearchAdvantage researchAdvantage, TurnInfo ti, Player p, Galaxy galaxy){
+    public static void research(ResearchAdvantage researchAdvantage, TurnInfo ti, Player p, GameWorld gameWorld){
         ResearchProgress researchProgress = p.getResearchProgress(researchAdvantage.getName());
-        if(!researchAdvantage.isDeveloped(p)){
+        if(!ResearchPureFunctions.isDeveloped(p, researchAdvantage)){
             String researchInfoText="";
             Logger.finer("count up researchedTurns from " + researchProgress.getResearchedTurns());
             researchProgress.setResearchedTurns(researchProgress.getResearchedTurns() + 1);
@@ -66,13 +68,13 @@ public class ResearchPerformer {
                 }
                 if(researchAdvantage.getCorruptionPoint() != null){
 
-                    p.setCorruptionPoint(researchAdvantage.getCorruptionPoint());
-                    researchInfoText+="Corruption is now: " + p.getCorruptionPoint() != null ? p.getCorruptionPoint().getDescription() : "None" + "\n";
+                    p.setCorruptionPointUuid(researchAdvantage.getCorruptionPoint().getUuid());
+                    researchInfoText+="Corruption is now: " + p.getCorruptionPointUuid() != null ? PlayerPureFunctions.getCorruptionPoint(gameWorld, p.getFactionUuid(), p.getCorruptionPointUuid()).getDescription() : "None" + "\n";
                 }
 
                 // adding ships to the player
                 for(String uuid : researchAdvantage.getShips()) {
-                    SpaceshipType spaceshipType = SpaceshipPureFunctions.getSpaceshipTypeByUuid(uuid, p.getGalaxy().getGameWorld());
+                    SpaceshipType spaceshipType = SpaceshipPureFunctions.getSpaceshipTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findSpaceshipImprovement(uuid, p).setAvailableToBuild(true);
                     Logger.finer("adding a new ship typ : " + spaceshipType.getName());
                     researchInfoText+= "A new ship type: " + spaceshipType.getName() + ".\n";
@@ -80,7 +82,7 @@ public class ResearchPerformer {
 
                 //	removing old ships models from the player
                 for(String uuid : researchAdvantage.getReplaceShips()) {
-                    SpaceshipType spaceshipType = SpaceshipPureFunctions.getSpaceshipTypeByUuid(uuid, p.getGalaxy().getGameWorld());
+                    SpaceshipType spaceshipType = SpaceshipPureFunctions.getSpaceshipTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findSpaceshipImprovement(uuid, p).setAvailableToBuild(false);
                     Logger.finer("Removing old ship typ : " + spaceshipType.getName());
                     researchInfoText+= "The ship type: " + spaceshipType.getName() + " was removed.\n";
@@ -88,7 +90,7 @@ public class ResearchPerformer {
 
                 // adding troops to the player
                 for (String uuid : researchAdvantage.getTroops()) {
-                    TroopType troopType = TroopPureFunctions.getTroopTypeByUuid(uuid, p.getGalaxy().getGameWorld());
+                    TroopType troopType = TroopPureFunctions.getTroopTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findTroopImprovement(uuid, p).setAvailableToBuild(true);
                     Logger.finer("adding a new troop type: " + troopType.getName());
                     researchInfoText += "A new troop type: " + troopType.getName() + ".\n";
@@ -96,7 +98,7 @@ public class ResearchPerformer {
 
                 //	removing old troop types from the player
                 for(String uuid : researchAdvantage.getReplaceTroops()){
-                    TroopType troopType = TroopPureFunctions.getTroopTypeByUuid(uuid, p.getGalaxy().getGameWorld());
+                    TroopType troopType = TroopPureFunctions.getTroopTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findTroopImprovement(uuid, p).setAvailableToBuild(false);
                     Logger.finer("Removing old troop type : " + troopType.getName());
                     researchInfoText += "The troop type: " + troopType.getName() + " was removed.\n";
@@ -104,7 +106,7 @@ public class ResearchPerformer {
 
                 //adding Buildings to the player
                 for (String uuid : researchAdvantage.getBuildings()) {
-                    BuildingType buildingType = BuildingPureFunctions.getBuildingTypeByUuid(uuid, galaxy.getGameWorld());
+                    BuildingType buildingType = BuildingPureFunctions.getBuildingTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findBuildingImprovementByUuid(uuid, p).setDeveloped(true);
                     Logger.finer("adding a new building type: " + buildingType.getName());
                     researchInfoText += "A new building type: " + buildingType.getName() + ".\n";
@@ -112,7 +114,7 @@ public class ResearchPerformer {
 
                 //removing Buildings to the player
                 for (String uuid : researchAdvantage.getReplaceBuildings()) {
-                    BuildingType buildingType = BuildingPureFunctions.getBuildingTypeByUuid(uuid, galaxy.getGameWorld());
+                    BuildingType buildingType = BuildingPureFunctions.getBuildingTypeByUuid(uuid, gameWorld);
                     PlayerPureFunctions.findBuildingImprovementByUuid(uuid, p).setDeveloped(false);
                     Logger.finer("Removing old building type: " + buildingType.getName());
                     researchInfoText += "The building type: " + buildingType.getName() + " was removed.\n";
@@ -121,23 +123,23 @@ public class ResearchPerformer {
                 // check if a childe researchAdvantage have timeToResearch = 0 and ready to be research().
 
                 for(String childUuid : researchAdvantage.getChildren()){
-                    ResearchAdvantage child = GameWorldPureFunction.getResearchAdvantageByUuid(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), p.getGalaxy().getGameWorld()), childUuid);
-                    if(child.getTimeToResearch() == 0 && ResearchPureFunctions.isReadyToBeResearchedOn(childUuid, p,  GameWorldHandler.getFactionByUuid(p.getFactionUuid(), p.getGalaxy().getGameWorld()))){
+                    ResearchAdvantage child = GameWorldPureFunction.getResearchAdvantageByUuid(GameWorldHandler.getFactionByUuid(p.getFactionUuid(), gameWorld), childUuid);
+                    if(child.getTimeToResearch() == 0 && ResearchPureFunctions.isReadyToBeResearchedOn(childUuid, p,  GameWorldHandler.getFactionByUuid(p.getFactionUuid(), gameWorld))){
                         //TODO (Tobbe) add researchText.
-                        ResearchPerformer.research(child, ti, p, galaxy);
+                        ResearchPerformer.research(child, ti, p, gameWorld);
                     }
                 }
 
                 for(ResearchUpgradeShip researchUpgradeShip : researchAdvantage.getResearchUpgradeShip()){
-                    researchInfoText+= doResearch(researchUpgradeShip, PlayerPureFunctions.findSpaceshipImprovement(researchUpgradeShip.getTypeUuid(), p), galaxy.getGameWorld());
+                    researchInfoText+= doResearch(researchUpgradeShip, PlayerPureFunctions.findSpaceshipImprovement(researchUpgradeShip.getTypeUuid(), p), gameWorld);
                 }
 
                 for (ResearchUpgradeTroop aResearchUpgradeTroop : researchAdvantage.getResearchUpgradeTroop()) {
-                    researchInfoText += doResearch(aResearchUpgradeTroop, PlayerPureFunctions.findTroopImprovement(aResearchUpgradeTroop.getTypeUuid(), p), galaxy.getGameWorld());
+                    researchInfoText += doResearch(aResearchUpgradeTroop, PlayerPureFunctions.findTroopImprovement(aResearchUpgradeTroop.getTypeUuid(), p), gameWorld);
                 }
 
                 for (ResearchUpgradeBuilding aResearchUpgradeBuilding : researchAdvantage.getResearchUpgradeBuilding()) {
-                    researchInfoText += doResearch(aResearchUpgradeBuilding, PlayerPureFunctions.findBuildingImprovementByUuid(aResearchUpgradeBuilding.getTypeUuid(), p), galaxy.getGameWorld());
+                    researchInfoText += doResearch(aResearchUpgradeBuilding, PlayerPureFunctions.findBuildingImprovementByUuid(aResearchUpgradeBuilding.getTypeUuid(), p), gameWorld);
                 }
                 p.addToHighlights(researchAdvantage.getName(), HighlightType.TYPE_RESEARCH_DONE);
             }

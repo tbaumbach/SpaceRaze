@@ -1,8 +1,10 @@
 package spaceraze.server.game.update;
 
+import spaceraze.game.*;
 import spaceraze.servlethelper.game.AlignmentPureFunctions;
 import spaceraze.servlethelper.game.BlackMarketPureFunctions;
-import spaceraze.servlethelper.game.UniqueIdHandler;
+import spaceraze.servlethelper.game.blackMarket.BlackMarketMutator;
+import spaceraze.servlethelper.game.orders.OrderPureFunctions;
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
@@ -19,6 +21,7 @@ import spaceraze.world.enums.SpaceShipSize;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -34,7 +37,7 @@ public class BlackMarketPerformer {
 
     private BlackMarketPerformer(){}
 
-    public static void newTurn(Galaxy g){
+    public static void newTurn(Galaxy g, GameWorld gameWorld){
         int nrOffers;
         int nrPlayers = PlayerPureFunctions.getActivePlayers(g).size();
         if (nrPlayers == duelGame){
@@ -50,18 +53,18 @@ public class BlackMarketPerformer {
             nrOffers = Functions.getRandomInt(1,2);
         }
         for (int i = 0; i < nrOffers; i++){
-            BlackMarketOffer tempOffer = BlackMarketPerformer.createBlackMarketOffer(g, UniqueIdHandler.getUniqueIdCounter(g, CounterType.BLACK_MARKET).getUniqueId());
+            BlackMarketOffer tempOffer = BlackMarketPerformer.createBlackMarketOffer(g, gameWorld, UUID.randomUUID().toString());
             g.getCurrentOffers().add(tempOffer);
-            g.addBlackMarketMessages(null,"New item for sale: a " + tempOffer.getString() + " is for sale at the Black Market.");
+            BlackMarketMutator.addBlackMarketMessages(g,null,"New item for sale: a " + BlackMarketPureFunctions.getDescription(tempOffer, gameWorld) + " is for sale at the Black Market.");
         }
     }
 
-    public static BlackMarketOffer createBlackMarketOffer(Galaxy galaxy, int uniqueId) {
-        BlackMarketOffer blackMarketOffer = new BlackMarketOffer(uniqueId);
-        int randomType = galaxy.hasTroops() ? Functions.getRandomInt(1,12) : Functions.getRandomInt(1,9);
+    public static BlackMarketOffer createBlackMarketOffer(Galaxy galaxy, GameWorld gameWorld, String uuid) {
+        BlackMarketOffer blackMarketOffer = new BlackMarketOffer(uuid);
+        int randomType = galaxy.hasTroops(gameWorld) ? Functions.getRandomInt(1,12) : Functions.getRandomInt(1,9);
         blackMarketOffer.setLastTurnAction(galaxy.getTurn());
         if (randomType <= shipIndex){ // ship
-            blackMarketOffer.setSpaceshipType(getRandomCommonSpaceshipType(galaxy));
+            blackMarketOffer.setSpaceshipTypeUuid(getRandomCommonSpaceshipType(galaxy, gameWorld).getUuid());
         }else
         if (randomType <= hotStuffIndex){ // hot stuff
             blackMarketOffer.setHotStuffAmount(createHotStuffBid());
@@ -71,34 +74,34 @@ public class BlackMarketPerformer {
             boolean canBeUsed = false;
             int tries = 0;
             while (!canBeUsed & (tries < 100)){
-                blackMarketOffer.setVipType(VipPureFunctions.getRandomVIPType(galaxy));
+                blackMarketOffer.setVipTypeUuid(VipPureFunctions.getRandomVIPType(galaxy, gameWorld).getUuid());
                 tries++;
-                canBeUsed = vipCanBeUsed(blackMarketOffer.getVIPType(), galaxy);
+                canBeUsed = vipCanBeUsed(VipPureFunctions.getVipTypeByUuid(blackMarketOffer.getVipTypeUuid(), gameWorld), galaxy, gameWorld);
             }
             if(!canBeUsed){ // if no vip was found use a hot stuff instead
-                blackMarketOffer.setVipType(null);
+                blackMarketOffer.setVipTypeUuid(null);
                 blackMarketOffer.setHotStuffAmount(createHotStuffBid());
             }
         }else
         if (randomType == bluePrintShipIndex){ // shiptype blueprint
-            blackMarketOffer.setBlueprint(BlackMarketPerformer.getRandomShipBlueprint(galaxy));
+            blackMarketOffer.setBlueprint(BlackMarketPerformer.getRandomShipBlueprint(galaxy, gameWorld).getUuid());
             if (blackMarketOffer.getBlueprint() == null){ // if no shiptype was found use a hot stuff instead
                 blackMarketOffer.setHotStuffAmount(createHotStuffBid());
             }
         }else{ //TroopIndex 10-12
-            blackMarketOffer.setTroopType(getRandomCommonTroopType(galaxy));
+            blackMarketOffer.setTroopTypeUuid(getRandomCommonTroopType(galaxy, gameWorld).getUuid());
         }
 
         return blackMarketOffer;
     }
 
-    public static boolean vipCanBeUsed(VIPType aVIPType, Galaxy galaxy) {
+    public static boolean vipCanBeUsed(VIPType aVIPType, Galaxy galaxy, GameWorld gameWorld) {
         boolean found = false;
         int index = 0;
         List<Player> activePlayers = PlayerPureFunctions.getActivePlayers(galaxy);
         while (!found & (index < activePlayers.size())) {
             Player aPlayer = activePlayers.get(index);
-            if (AlignmentPureFunctions.canHaveVip(aVIPType.getAlignment(), AlignmentPureFunctions.getPlayerAlignment(aPlayer, galaxy.getGameWorld()))) {
+            if (AlignmentPureFunctions.canHaveVip(aVIPType.getAlignment(), AlignmentPureFunctions.getPlayerAlignment(aPlayer, gameWorld))) {
                 found = true;
             } else {
                 index++;
@@ -107,10 +110,10 @@ public class BlackMarketPerformer {
         return found;
     }
 
-    private static TroopType getRandomCommonTroopType(Galaxy galaxy) {
+    private static TroopType getRandomCommonTroopType(Galaxy galaxy, GameWorld gameWorld) {
         TroopType aTroopType = null;
         TroopType tempTroopType = null;
-        List<TroopType> allAvailableTroopTypes = getTroopTypesToBlackMarket(galaxy);
+        List<TroopType> allAvailableTroopTypes = getTroopTypesToBlackMarket(galaxy, gameWorld);
         int totalFrequencypoint = 0;
         for (TroopType troopType : allAvailableTroopTypes) {
             totalFrequencypoint += troopType.getBlackMarketFrequency().getFrequency();
@@ -137,17 +140,17 @@ public class BlackMarketPerformer {
      * @return list containing trooptypes. If a trooptype can be build by several
      *         factions it will appear several times in the list
      */
-    private static List<TroopType> getTroopTypesToBlackMarket(Galaxy galaxy) {
+    private static List<TroopType> getTroopTypesToBlackMarket(Galaxy galaxy, GameWorld gameWorld) {
         Logger.fine("getTroopTypesToBlackMarket() called");
-        List<TroopType> troopTypes = new LinkedList<TroopType>();
-        for (Faction aFaction : galaxy.getGameWorld().getFactions()) {
+        List<TroopType> troopTypes = new LinkedList<>();
+        for (Faction aFaction : gameWorld.getFactions()) {
             Logger.finer("Faction: " + aFaction.getName());
-            List<TroopType> factionTroopTypes = aFaction.getTroopTypes().stream().map(uuid -> TroopPureFunctions.getTroopTypeByUuid(uuid, galaxy.getGameWorld())).collect(Collectors.toList());
+            List<TroopType> factionTroopTypes = aFaction.getTroopTypes().stream().map(uuid -> TroopPureFunctions.getTroopTypeByUuid(uuid, gameWorld)).collect(Collectors.toList());
             Logger.finer("TroopTypes #: " + factionTroopTypes.size());
             for (TroopType aTroopType : factionTroopTypes) {
                 Logger.finer("TT: " + aTroopType.getName());
 
-                if (isReadyToUseInBlackMarket(galaxy, aTroopType)) {
+                if (isReadyToUseInBlackMarket(galaxy, aTroopType, gameWorld)) {
                     if (!troopTypes.contains(aTroopType)) {
                         troopTypes.add(aTroopType);
                     }
@@ -157,16 +160,16 @@ public class BlackMarketPerformer {
         return troopTypes;
     }
 
-    public static boolean isReadyToUseInBlackMarket(Galaxy aGalaxy, TroopType troopType){
+    public static boolean isReadyToUseInBlackMarket(Galaxy aGalaxy, TroopType troopType, GameWorld gameWorld){
         boolean isConstructable =  false;
         if(aGalaxy.getTurn() >= troopType.getBlackmarketFirstTurn()){
             if (troopType.isSpaceshipTravel()){
                 if (troopType.isCanAppearOnBlackMarket()){
                     if(!troopType.isPlayerUnique() && !troopType.isFactionUnique()){
-                        if(troopType.isWorldUnique() && !TroopPureFunctions.isWorldUniqueBuild(aGalaxy, troopType)){
+                        if(troopType.isWorldUnique() && !TroopPureFunctions.isWorldUniqueBuild(aGalaxy, troopType, gameWorld)){
                             boolean isAlreadyAoffer = false;
                             for (BlackMarketOffer aBlackMarketOffer : aGalaxy.getCurrentOffers()) {
-                                if(aBlackMarketOffer.isTroop() && aBlackMarketOffer.getTroopType().getName().equals(troopType.getName())){
+                                if(aBlackMarketOffer.isTroop() && aBlackMarketOffer.getTroopTypeUuid().equals(troopType.getUuid())){
                                     isAlreadyAoffer = true;
                                 }
                             }
@@ -174,7 +177,7 @@ public class BlackMarketPerformer {
                             if(!isAlreadyAoffer){
                                 boolean haveBuildingOrder = false;
                                 for (Player tempPlayer : aGalaxy.getPlayers()) {
-                                    if(tempPlayer.getOrders().haveTroopTypeBuildOrder(troopType)){
+                                    if(OrderPureFunctions.haveTroopTypeBuildOrder(tempPlayer.getOrders(), troopType)){
                                         haveBuildingOrder = true;
                                     }
                                 }
@@ -196,27 +199,43 @@ public class BlackMarketPerformer {
         return Functions.getRandomInt(1,6) + Functions.getRandomInt(1,6) + Functions.getRandomInt(1,6);
     }
 
-    public static void performBlackMarket(Galaxy galaxy){
-        galaxy.getCurrentOffers().removeIf(blackMarketOffer -> BlackMarketPerformer.performSelling(blackMarketOffer, galaxy) || blackMarketOffer.removeTooOldAndSendMessage(galaxy));
+    public static void performBlackMarket(Galaxy galaxy, GameWorld gameWorld){
+        galaxy.getCurrentOffers().removeIf(blackMarketOffer -> BlackMarketPerformer.performSelling(blackMarketOffer, galaxy, gameWorld) || removeTooOldAndSendMessage(galaxy, gameWorld, blackMarketOffer));
     }
 
-    public static boolean performSelling(BlackMarketOffer blackMarketOffer, Galaxy galaxy){
+    public static boolean removeTooOldAndSendMessage(Galaxy galaxy, GameWorld gameWorld, BlackMarketOffer blackMarketOffer){
+        boolean tooOld = blackMarketOfferTooOld(galaxy, blackMarketOffer);
+        if(tooOld){
+            BlackMarketMutator.createRemovedOldMessage(galaxy, gameWorld, blackMarketOffer);
+        }
+        return tooOld;
+    }
+
+    private static boolean blackMarketOfferTooOld(Galaxy galaxy, BlackMarketOffer blackMarketOffer){
+        boolean old = false;
+        if ((blackMarketOffer.getLastTurnAction() + 2) < galaxy.getTurn()){
+            old = true;
+        }
+        return old;
+    }
+
+    public static boolean performSelling(BlackMarketOffer blackMarketOffer, Galaxy galaxy, GameWorld gameWorld){
         boolean sold = false;
         if (blackMarketOffer.getBlackMarketBids().size() > 0){
             Logger.finest( "performSelling: bids.size(): " + blackMarketOffer.getBlackMarketBids().size());
             BlackMarketBid winningBid = blackMarketOffer.getHighestBidder(galaxy);
             if (winningBid == null){ // no-one won the offer
-                blackMarketOffer.sendDrawMessages(galaxy);
+                BlackMarketMutator.sendDrawMessages(galaxy, blackMarketOffer, gameWorld);
                 // send messages who failed to win this bidding
-                blackMarketOffer.sendRefundingMessages(winningBid, galaxy);
+                sendRefundingMessages(blackMarketOffer, winningBid.getUuid(), galaxy);
                 blackMarketOffer.resetBids();
             }else{
                 sold = true;
                 Planet destinationPlanet = galaxy.getPlanet(winningBid.getDestination());
-                Logger.finest( "performSelling: winningBid: " + BlackMarketBid.getBiddingText(blackMarketOffer, winningBid) + winningBid.getPlayerName());
-                Player winningPlayer = galaxy.getPlayerByUserName(winningBid.getPlayerName());
+                Player winningPlayer = PlayerPureFunctions.getPlayer(galaxy, winningBid.getPlayerUuid());
+                Logger.finest( "performSelling: winningBid: " + BlackMarketPureFunctions.getBiddingText(blackMarketOffer, winningBid, gameWorld) + winningBid.getPlayerUuid());
                 Logger.finest( "performSelling: winningPlayer: " + winningPlayer.getName());
-                winningPlayer.addToLatestBlackMarketMessages("You have won the bidding for a " + blackMarketOffer.getString() + " at the cost of " + winningBid.getCost() + ".");
+                winningPlayer.addToLatestBlackMarketMessages("You have won the bidding for a " + BlackMarketPureFunctions.getDescription(blackMarketOffer, gameWorld) + " at the cost of " + winningBid.getCost() + ".");
                 if (blackMarketOffer.isHotStuff()){
                     Logger.finest( "performSelling: hotStuff");
                     winningPlayer.removeFromTreasury(winningBid.getCost());
@@ -224,67 +243,79 @@ public class BlackMarketPerformer {
                     winningPlayer.addToLatestBlackMarketMessages("The Hot Stuff have given you +" + blackMarketOffer.getHotStuffAmount() + " extra income this turn.");
                     winningPlayer.addToHighlights(String.valueOf(blackMarketOffer.getHotStuffAmount()), HighlightType.TYPE_HOT_STUFF_WON);
                 }else
-                if (blackMarketOffer.getVipType() != null){ // is vip
-                    Logger.finest( "performSelling: vip: ");
-                    VIP newVIP = VipMutator.createNewVIP(blackMarketOffer.getVipType(), winningPlayer,destinationPlanet, true);
-                    galaxy.allVIPs.add(newVIP);
-                    winningPlayer.removeFromTreasury(winningBid.getCost());
-                    winningPlayer.addToLatestBlackMarketMessages("Your new " + blackMarketOffer.getVipType().getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
-                    winningPlayer.addToHighlights(String.valueOf(blackMarketOffer.getVipType().getName()),HighlightType.TYPE_VIP_BOUGHT);
+                if (blackMarketOffer.getVipTypeUuid() != null){ // is vip
+                    performSellingVip(blackMarketOffer, galaxy, gameWorld, winningPlayer, destinationPlanet, winningBid);
                 }else
-                if (blackMarketOffer.getSpaceshipType() != null){ // is spaceship
-                    Logger.finest("performSelling: ship: ");
-                    Spaceship newShip = SpaceshipMutator.createSpaceShip(blackMarketOffer.getSpaceshipType());
-                    newShip.setOwner(winningPlayer);
-                    newShip.setLocation(destinationPlanet);
-                    galaxy.addSpaceship(newShip);
-                    winningPlayer.removeFromTreasury(winningBid.getCost());
-                    winningPlayer.addToLatestBlackMarketMessages("Your new " + newShip.getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
-                    winningPlayer.addToHighlights(blackMarketOffer.getSpaceshipType().getName(),HighlightType.TYPE_SHIP_WON);
+                if (blackMarketOffer.getSpaceshipTypeUuid() != null){ // is spaceship
+                    performSellingSpaceship(blackMarketOffer, galaxy, gameWorld, winningPlayer, destinationPlanet, winningBid);
                 }else
                 if (blackMarketOffer.getBlueprint() != null){ // is spaceship blueprints
-                    Logger.finest("performSelling: shiptype blueprints: ");
-                    winningPlayer.removeFromTreasury(winningBid.getCost());
-                    //SpaceshipType aSST = winningPlayer.findOwnSpaceshipType(offeredShiptypeBlueprint.getName());
-                    PlayerSpaceshipImprovement ownPlayerSpaceshipImprovement = PlayerPureFunctions.findSpaceshipImprovement(blackMarketOffer.getBlueprint().getUuid(), winningPlayer);
-                    if (ownPlayerSpaceshipImprovement != null){
-                        if (ownPlayerSpaceshipImprovement.isAvailableToBuild()){ // check if the player already have the shiptype
-                            winningPlayer.addToLatestBlackMarketMessages("You already could build ships of the type " + blackMarketOffer.getBlueprint().getName() + ".");
-                        }else{
-                            ownPlayerSpaceshipImprovement.setAvailableToBuild(true);
-                            winningPlayer.addToLatestBlackMarketMessages("You can now build ships of the type " + blackMarketOffer.getBlueprint().getName() + ".");
-                        }
-                        winningPlayer.addToHighlights(blackMarketOffer.getBlueprint().getName(),HighlightType.TYPE_SHIPTYPE_WON);
-                    }else{
-                        winningPlayer.addSpaceshipImprovement(new PlayerSpaceshipImprovement(blackMarketOffer.getBlueprint().getUuid(), true));
-                        winningPlayer.addToLatestBlackMarketMessages("You can now build ships of the type " + blackMarketOffer.getBlueprint().getName() + ".");
-                        winningPlayer.addToHighlights(blackMarketOffer.getBlueprint().getName(),HighlightType.TYPE_SHIPTYPE_WON);
-                    }
+                    performSellingBluePrint(blackMarketOffer, gameWorld, winningPlayer, winningBid);
                 }else{ // is troop
-                    Logger.finest( "performSelling: troop: " + blackMarketOffer.getTroopType().getName());
+                    Logger.finest( "performSelling: troop: " + blackMarketOffer.getTroopTypeUuid());
                     //Create troop without player bonus/research
-                    Troop newTroop = TroopMutator.createTroop(TroopPureFunctions.getTroopTypeByUuid(blackMarketOffer.getTroopType().getUuid(), winningPlayer.getGalaxy().getGameWorld()), winningPlayer.getGalaxy());
+                    Troop newTroop = TroopMutator.createTroop(TroopPureFunctions.getTroopTypeByUuid(blackMarketOffer.getTroopTypeUuid(), gameWorld), galaxy, gameWorld);
                     newTroop.setOwner(winningPlayer);
                     newTroop.setPlanetLocation(destinationPlanet);
                     galaxy.addTroop(newTroop);
                     winningPlayer.removeFromTreasury(winningBid.getCost());
                     winningPlayer.addToLatestBlackMarketMessages("Your new " + newTroop.getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
-                    winningPlayer.addToHighlights(blackMarketOffer.getTroopType().getName(),HighlightType.TYPE_TROOP_WON);
+                    winningPlayer.addToHighlights(TroopPureFunctions.getTroopTypeByUuid(blackMarketOffer.getTroopTypeUuid(), gameWorld).getName(), HighlightType.TYPE_TROOP_WON);
                 }
                 // send messages to everyone except the winner
-                galaxy.addBlackMarketMessages(winningPlayer,blackMarketOffer.getString() + " sold to Govenor " + winningPlayer.getGovernorName() + " for cost: " + winningBid.getCost() + ".");
+                BlackMarketMutator.addBlackMarketMessages(galaxy, winningPlayer.getUuid(),BlackMarketPureFunctions.getDescription(blackMarketOffer, gameWorld) + " sold to Govenor " + winningPlayer.getGovernorName() + " for cost: " + winningBid.getCost() + ".");
                 // send messages who failed to win this bidding
-                blackMarketOffer.sendRefundingMessages(winningBid, galaxy);
+                sendRefundingMessages(blackMarketOffer, winningBid.getUuid(), galaxy);
             }
         }else{
-            galaxy.addBlackMarketMessages(null,blackMarketOffer.getString() + " not sold - not bids yet.");
+            BlackMarketMutator.addBlackMarketMessages(galaxy, null,BlackMarketPureFunctions.getDescription(blackMarketOffer, gameWorld) + " not sold - not bids yet.");
         }
         return sold;
     }
 
-    public static SpaceshipType getRandomShipBlueprint(Galaxy galaxy) {
+    private static void performSellingVip(BlackMarketOffer blackMarketOffer, Galaxy galaxy, GameWorld gameWorld, Player winningPlayer, Planet destinationPlanet, BlackMarketBid winningBid) {
+        Logger.finest( "performSelling: vip: ");
+        VIP newVIP = VipMutator.createNewVIP(VipPureFunctions.getVipTypeByUuid(blackMarketOffer.getVipTypeUuid(), gameWorld), winningPlayer, destinationPlanet, true);
+        galaxy.allVIPs.add(newVIP);
+        winningPlayer.removeFromTreasury(winningBid.getCost());
+        winningPlayer.addToLatestBlackMarketMessages("Your new " + VipPureFunctions.getVipTypeByUuid(blackMarketOffer.getVipTypeUuid(), gameWorld).getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
+        winningPlayer.addToHighlights(String.valueOf(VipPureFunctions.getVipTypeByUuid(blackMarketOffer.getVipTypeUuid(), gameWorld).getName()),HighlightType.TYPE_VIP_BOUGHT);
+    }
+
+    private static void performSellingSpaceship(BlackMarketOffer blackMarketOffer, Galaxy galaxy, GameWorld gameWorld, Player winningPlayer, Planet destinationPlanet, BlackMarketBid winningBid) {
+        Logger.finest("performSelling: ship: ");
+        Spaceship newShip = SpaceshipMutator.createSpaceShip(SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getSpaceshipTypeUuid(), gameWorld));
+        newShip.setOwner(winningPlayer);
+        newShip.setLocation(destinationPlanet);
+        galaxy.addSpaceship(newShip);
+        winningPlayer.removeFromTreasury(winningBid.getCost());
+        winningPlayer.addToLatestBlackMarketMessages("Your new " + newShip.getName() + " is awaiting your orders at " + winningBid.getDestination() + ".");
+        winningPlayer.addToHighlights(SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getSpaceshipTypeUuid(), gameWorld).getName(), HighlightType.TYPE_SHIP_WON);
+    }
+
+    private static void performSellingBluePrint(BlackMarketOffer blackMarketOffer, GameWorld gameWorld, Player winningPlayer, BlackMarketBid winningBid) {
+        Logger.finest("performSelling: shiptype blueprints: ");
+        winningPlayer.removeFromTreasury(winningBid.getCost());
+        //SpaceshipType aSST = winningPlayer.findOwnSpaceshipType(offeredShiptypeBlueprint.getName());
+        PlayerSpaceshipImprovement ownPlayerSpaceshipImprovement = PlayerPureFunctions.findSpaceshipImprovement(blackMarketOffer.getBlueprint(), winningPlayer);
+        if (ownPlayerSpaceshipImprovement != null){
+            if (ownPlayerSpaceshipImprovement.isAvailableToBuild()){ // check if the player already have the shiptype
+                winningPlayer.addToLatestBlackMarketMessages("You already could build ships of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getBlueprint(), gameWorld).getName() + ".");
+            }else{
+                ownPlayerSpaceshipImprovement.setAvailableToBuild(true);
+                winningPlayer.addToLatestBlackMarketMessages("You can now build ships of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getBlueprint(), gameWorld).getName() + ".");
+            }
+            winningPlayer.addToHighlights(SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getBlueprint(), gameWorld).getName(), HighlightType.TYPE_SHIPTYPE_WON);
+        }else{
+            winningPlayer.getSpaceshipImprovements().add(new PlayerSpaceshipImprovement(blackMarketOffer.getBlueprint(), true));
+            winningPlayer.addToLatestBlackMarketMessages("You can now build ships of the type " + SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getBlueprint(), gameWorld).getName() + ".");
+            winningPlayer.addToHighlights(SpaceshipPureFunctions.getSpaceshipTypeByUuid(blackMarketOffer.getBlueprint(), gameWorld).getName(),HighlightType.TYPE_SHIPTYPE_WON);
+        }
+    }
+
+    public static SpaceshipType getRandomShipBlueprint(Galaxy galaxy, GameWorld gameWorld) {
         List<SpaceshipType> possibleShipTypes = new LinkedList<>();
-        for (SpaceshipType aSpaceshipType : galaxy.getGameWorld().getShipTypes()) {
+        for (SpaceshipType aSpaceshipType : gameWorld.getShipTypes()) {
             boolean allhaveType = true;
             for (Player aPlayer : PlayerPureFunctions.getActivePlayers(galaxy)) {
                 if (PlayerPureFunctions.findSpaceshipImprovement(aSpaceshipType.getUuid(), aPlayer) == null) {
@@ -323,18 +354,18 @@ public class BlackMarketPerformer {
     }
 
     public static void addBlackMarketBid(BlackMarketBid aBid, Galaxy galaxy){
-        Logger.finer("BlackMarketBid: " + aBid.getOfferUniqueId());
-        BlackMarketOffer aOffer = BlackMarketPureFunctions.findBlackMarketOffer(aBid.getOfferUniqueId(), galaxy);
+        Logger.finer("BlackMarketBid: " + aBid.getOfferUuid());
+        BlackMarketOffer aOffer = BlackMarketPureFunctions.findBlackMarketOffer(aBid.getOfferUuid(), galaxy);
         if(aOffer != null){
             aOffer.addBid(aBid);
         }
 
     }
 
-    public static  SpaceshipType getRandomCommonSpaceshipType(Galaxy galaxy) {
+    public static  SpaceshipType getRandomCommonSpaceshipType(Galaxy galaxy, GameWorld gameWorld) {
         SpaceshipType returnType = null;
         SpaceshipType tempShipType = null;
-        List<SpaceshipType> allAvailableTypes = getSpaceshipTypesToBlackMarket(galaxy);
+        List<SpaceshipType> allAvailableTypes = getSpaceshipTypesToBlackMarket(galaxy, gameWorld);
         int totalFrequencypoint = 0;
         for (SpaceshipType spaceshipType : allAvailableTypes) {
             totalFrequencypoint += spaceshipType.getBlackMarketFrequency().getFrequency();
@@ -360,37 +391,37 @@ public class BlackMarketPerformer {
      *
      * @return
      */
-    private static List<SpaceshipType> getSpaceshipTypesToBlackMarket(Galaxy galaxy) {
+    private static List<SpaceshipType> getSpaceshipTypesToBlackMarket(Galaxy galaxy, GameWorld gameWorld) {
         Logger.fine("getSpaceshipTypesToBlackMarket() called");
         List<SpaceshipType> ssTypes = new LinkedList<SpaceshipType>();
         // LoggingHandler.fine("Faction: " + aFaction.getName(),this);
         // LoggingHandler.fine("Ships nr: " + tmpSsTypes.size(),this);
-        for (SpaceshipType spaceshipType : galaxy.getGameWorld().getShipTypes()) {
-            if (isReadyToUseInBlackMarket(spaceshipType, galaxy)) {
+        for (SpaceshipType spaceshipType : gameWorld.getShipTypes()) {
+            if (isReadyToUseInBlackMarket(spaceshipType, galaxy, gameWorld)) {
                 ssTypes.add(spaceshipType);
             }
         }
         return ssTypes;
     }
 
-    private static boolean isReadyToUseInBlackMarket(SpaceshipType spaceshipType, Galaxy aGalaxy){
+    private static boolean isReadyToUseInBlackMarket(SpaceshipType spaceshipType, Galaxy aGalaxy, GameWorld gameWorld){
         boolean constructible =  false;
 
         if (aGalaxy.getTurn() >= spaceshipType.getBlackmarketFirstTurn()){
             if (spaceshipType.getRange().canMove() || spaceshipType.getSize() == SpaceShipSize.SQUADRON){
                 if (spaceshipType.isCanAppearOnBlackMarket()){
                     if(!spaceshipType.isPlayerUnique() && !spaceshipType.isFactionUnique()){
-                        if(spaceshipType.isWorldUnique() && !SpaceshipPureFunctions.isWorldUniqueBuild(aGalaxy, spaceshipType)){
+                        if(spaceshipType.isWorldUnique() && !SpaceshipPureFunctions.isWorldUniqueBuild(aGalaxy, spaceshipType, gameWorld)){
                             boolean isAlreadyAoffer = false;
                             for (BlackMarketOffer aBlackMarketOffer : aGalaxy.getCurrentOffers()) {
-                                if(aBlackMarketOffer.isShip() && aBlackMarketOffer.getSpaceshipType().getName().equals(spaceshipType.getName())){
+                                if(aBlackMarketOffer.isShip() && SpaceshipPureFunctions.getSpaceshipTypeByUuid(aBlackMarketOffer.getSpaceshipTypeUuid(), gameWorld).getName().equals(spaceshipType.getName())){
                                     isAlreadyAoffer = true;
                                 }
                             }
                             if(!isAlreadyAoffer){
                                 boolean haveBuildingOrder = false;
                                 for (Player tempPlayer : aGalaxy.getPlayers()) {
-                                    if(tempPlayer.getOrders().haveSpaceshipTypeBuildOrder(spaceshipType)){
+                                    if(OrderPureFunctions.haveSpaceshipTypeBuildOrder(tempPlayer.getOrders(), spaceshipType)){
                                         haveBuildingOrder = true;
                                     }
                                 }
@@ -420,5 +451,11 @@ public class BlackMarketPerformer {
         }
 
         return constructible;
+    }
+
+    public static void sendRefundingMessages(BlackMarketOffer blackMarketOffer, String winningBidUuid, Galaxy galaxy){
+        blackMarketOffer.getBlackMarketBids().stream()
+                .filter(blackMarketBid -> !blackMarketBid.getUuid().equalsIgnoreCase(winningBidUuid))
+                .forEach(blackMarketBid -> PlayerPureFunctions.getPlayer(galaxy, blackMarketBid.getUuid()).addToLatestBlackMarketMessages("Your bid of " + blackMarketBid.getCost() + " have been refunded."));
     }
 }

@@ -3,6 +3,7 @@ package spaceraze.servlet.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import spaceraze.game.*;
 import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.DiplomacyPureFunctions;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
@@ -63,7 +64,7 @@ public class PlanetInfo {
 	//PlanetInfo(){};
 	
 	
-	PlanetInfo(Planet planet, Player player, GalaxyMap galaxyMap) {
+	PlanetInfo(Planet planet, GameWorld gameWorld, Player player, GalaxyMap galaxyMap, Galaxy galaxy) {
 		buildings = new ArrayList<>();
 		vips = new ArrayList<>();
 		ships = new ArrayList<>();
@@ -79,25 +80,24 @@ public class PlanetInfo {
 		// Kanske enkelt att bara skapa en länkad list i player med planet name som nyckel. Vänta med att göra det tills det går att spela på siten.
 		// Vill inte förstöra möjligheten att använda spel körde i swing klienten.
 		notes = PlanetPureFunctions.findPlanetInfo(planet.getMapPlanetUuid(), player.getPlanetInformations()).getNotes();
-		
-		Galaxy galaxy = player.getGalaxy();
-		boolean haveSpy = VipPureFunctions.findVIPSpy(planet,player, galaxy) != null;
-		boolean alliedSpy = PlanetPureFunctions.isItAlliedSpyOnPlanet(player, planet, galaxy);
+
+		boolean haveSpy = VipPureFunctions.findVIPSpy(planet,player, galaxy, gameWorld) != null;
+		boolean alliedSpy = PlanetPureFunctions.isItAlliedSpyOnPlanet(player, planet, galaxy, gameWorld);
 		boolean spy = haveSpy || alliedSpy;
-		boolean surveyShip = SpaceshipPureFunctions.findSurveyShip(planet,player, galaxy.getSpaceships(), galaxy.getGameWorld()) != null;
-		boolean alliedSurveyShip = PlanetPureFunctions.isItAlliesSurveyShipsOnPlanet(player, planet, galaxy);
-		boolean surveyVIP = VipPureFunctions.findSurveyVIPonShip(planet, player, galaxy) != null;
-		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy);
+		boolean surveyShip = SpaceshipPureFunctions.findSurveyShip(planet,player, galaxy.getSpaceships(), gameWorld) != null;
+		boolean alliedSurveyShip = PlanetPureFunctions.isItAlliesSurveyShipsOnPlanet(player, planet, galaxy, gameWorld);
+		boolean surveyVIP = VipPureFunctions.findSurveyVIPonShip(planet, player, galaxy, gameWorld) != null;
+		boolean alliedSurveyVIP = PlanetPureFunctions.isItAlliesSurveyVipOnPlanet(player, planet, galaxy, gameWorld);
 		boolean survey = surveyShip || alliedSurveyShip || surveyVIP || alliedSurveyVIP;
 		boolean shipInSystem = PlayerPureFunctions.playerHasShipsInSystem(player,planet, galaxy);
 		boolean alliedShipsInSystem = PlanetPureFunctions.isItAlliedShipsInSystem(player, planet, galaxy);
 		
 		
 		if(shipInSystem){
-			addShips(player, planet, galaxy);
+			addShips(player, planet, galaxy, gameWorld);
 		}
 		
-		addTroops(player, planet, galaxy);
+		addTroops(player, planet, galaxy, gameWorld);
 		
 		boolean haveTroopsOnTheGround = (troops.size() > 0);
 		
@@ -130,16 +130,16 @@ public class PlanetInfo {
 				//lastKnownMaxShipSize = null;
 				//lastKnownRazed = false;
 				
-				getOthersFleets(planet, player, galaxy);
+				getOthersFleets(planet, player, galaxy, gameWorld);
 								
-				addVIPs(player, planet, galaxy, isAllied, spy, survey, haveTroopsOnTheGround);
+				addVIPs(player, planet, galaxy, isAllied, spy, survey, haveTroopsOnTheGround, gameWorld);
 				
 				// Information from the ground.
 				if(isOwner || isAllied || spy || survey || haveTroopsOnTheGround){
-					getOthersArmys(planet, player, galaxy, true);
+					getOthersArmys(planet, player, galaxy, true, gameWorld);
 					addBuildings(planet.getBuildings());
 				} else if(open || shipInSystem || alliedShipsInSystem){// Information from orbit, can't see cloaked units.
-					getOthersArmys(planet, player, galaxy, false);
+					getOthersArmys(planet, player, galaxy, false, gameWorld);
 					addBuildings(GalaxyMapPureFunctions.getBuildingsByVisibility(planet, true)); // bara buildings som syns på kartan.
 				}
 				
@@ -161,12 +161,12 @@ public class PlanetInfo {
 		
 	}
 	
-	private void getOthersFleets(Planet planet, Player player, Galaxy g){
+	private void getOthersFleets(Planet planet, Player player, Galaxy g, GameWorld gameWorld){
         // loopa igenom alla spelare och kolla efter flottor
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
-        		int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer, g);
-        		boolean civilianExists = !GalaxyMapPureFunctions.getLargestShipSizeOnPlanet(planet,tempPlayer,true, player.getGalaxy()).equals("");
+        		int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,tempPlayer, g, gameWorld);
+        		boolean civilianExists = !GalaxyMapPureFunctions.getLargestShipSizeOnPlanet(planet,tempPlayer,true, g, gameWorld).equals("");
         		if ((shipSize > -1) | civilianExists){
         			FleetInfo fleet = new FleetInfo(tempPlayer.getGovernorName(),shipSize,civilianExists);
         			fleets.add(fleet);
@@ -174,7 +174,7 @@ public class PlanetInfo {
         	}
         }
         // kolla efter neutrala skepp
-        int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,null, g);
+        int shipSize = GalaxyMapPureFunctions.getLargestLookAsMilitaryShipSizeOnPlanet(planet,null, g, gameWorld);
         if (shipSize > -1){
         	FleetInfo fleet = new FleetInfo(null,shipSize,false);
     		fleets.add(fleet);
@@ -182,45 +182,45 @@ public class PlanetInfo {
         
     }
 	
-	private void getOthersArmys(Planet planet, Player player, Galaxy g, boolean showUnVisible){
+	private void getOthersArmys(Planet planet, Player player, Galaxy g, boolean showUnVisible, GameWorld gameWorld){
         // loopa igenom alla spelare och kolla efter troops
         for (Player tempPlayer : g.getPlayers()) {
         	if (tempPlayer != player){
-        		List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, tempPlayer, showUnVisible, g.getTroops());
+        		List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, tempPlayer, showUnVisible, g.getTroops(), gameWorld);
         		if(troopsOnPlanet.size()> 0){
         			armys.add(new ArmyInfo(tempPlayer.getGovernorName(),troopsOnPlanet.size()));
         		}
         	}
         }
-        List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, null, showUnVisible, g.getTroops());
+        List<Troop> troopsOnPlanet = TroopPureFunctions.getTroopsOnPlanet(planet, null, showUnVisible, g.getTroops(), gameWorld);
         if(troopsOnPlanet.size()> 0){
 			armys.add(new ArmyInfo("Neutral",troopsOnPlanet.size()));
 		}
     }
 	
-	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isAllied, boolean haveSpy, boolean survey, boolean haveTroopsOnTheGround){
+	private void addVIPs(Player player, Planet planet, Galaxy galaxy, boolean isAllied, boolean haveSpy, boolean survey, boolean haveTroopsOnTheGround, GameWorld gameWorld){
 		
 		for (VIP aVIP : galaxy.getAllVIPs()) {
-			VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), galaxy.getGameWorld());
+			VIPType vipType = VipPureFunctions.getVipTypeByUuid(aVIP.getTypeUuid(), gameWorld);
 			if (aVIP.getPlanetLocation() == planet){
 				if(aVIP.getBoss() == player || DiplomacyPureFunctions.checkAllianceWithAllInConfederacy(player, aVIP.getBoss(), galaxy)){
-					vips.add(new VIPInfo(aVIP, player));
+					vips.add(new VIPInfo(aVIP, player, galaxy, gameWorld));
 				}else if(open || isAllied ||haveSpy || survey || haveTroopsOnTheGround){ // VIPar som  tillhör fiender. Alltså VIPar som inte finns på spelarens eller dess allierades planeter. 
 					if (vipType.getShowOnOpenPlanet()){
-						vips.add(new VIPInfo(aVIP, player));
+						vips.add(new VIPInfo(aVIP, player, galaxy, gameWorld));
 					}
 				}
 			}//Check if VIP are on a ship 
 			else if(aVIP.getShipLocation() != null && aVIP.getBoss() == player){
 				ShipInfo aShip = findShip(aVIP.getShipLocation().getUniqueName());
 				if(aShip != null){
-					aShip.addVIP(new VIPInfo(aVIP, player));
+					aShip.addVIP(new VIPInfo(aVIP, player, galaxy, gameWorld));
 				}
 			}//Check if VIP are on a troop
 			else if(aVIP.getTroopLocation() != null && aVIP.getBoss() == player){
 				TroopInfo troop = findTroop(aVIP.getTroopLocation().getName());
 				if(troop != null){
-					troop.addVIP(new VIPInfo(aVIP, player));
+					troop.addVIP(new VIPInfo(aVIP, player, galaxy, gameWorld));
 				}
 			}
 		}
@@ -273,17 +273,17 @@ public class PlanetInfo {
 	}
 	
 	//The owners ships.
-	private void addShips(Player player, Planet planet, Galaxy galaxy){
+	private void addShips(Player player, Planet planet, Galaxy galaxy, GameWorld gameWorld){
 		//TODO kolla upp att även squadroner som befinner sig i en carrier följer med i listan.
 		List<Spaceship> spaceShips = SpaceshipPureFunctions.getPlayersSpaceshipsOnPlanet(player, planet, galaxy.getSpaceships());
-		List<Spaceship> squdronsOnShip = new ArrayList<Spaceship>();
+		List<Spaceship> squdronsOnShip = new ArrayList<>();
 		
 		//Add all ships to the planets
 		for (Spaceship spaceship : spaceShips) {
 			if(spaceship.getSize() == SpaceShipSize.SQUADRON && spaceship.getCarrierLocation() != null){
 				squdronsOnShip.add(spaceship);
 			}else{
-				ships.add(new ShipInfo(spaceship, galaxy.getGameWorld()));
+				ships.add(new ShipInfo(spaceship, gameWorld));
 			}
 		}
 		
@@ -300,15 +300,15 @@ public class PlanetInfo {
 	
 	
 	//The owners Troops.
-	private void addTroops(Player player, Planet planet, Galaxy galaxy){
+	private void addTroops(Player player, Planet planet, Galaxy galaxy, GameWorld gameWorld){
 		List<Troop> troopsOnPlanet = TroopPureFunctions.getPlayersTroopsOnPlanet(player, planet, galaxy.getTroops());
 		
 		for (Troop troop : troopsOnPlanet) {
 			if(troop.getShipLocation() != null){
 				ShipInfo ship = findShip(troop.getShipLocation().getUniqueName());
-				ship.addTroop(new TroopInfo(troop, galaxy.getGameWorld()));
+				ship.addTroop(new TroopInfo(troop, gameWorld));
 			}else{
-				troops.add(new TroopInfo(troop, galaxy.getGameWorld()));
+				troops.add(new TroopInfo(troop, gameWorld));
 			}
 		}
 	}

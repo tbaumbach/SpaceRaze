@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spaceraze.servlethelper.game.player.PlayerPureFunctions;
-import spaceraze.world.Planet;
-import spaceraze.world.Player;
+import spaceraze.game.Planet;
+import spaceraze.game.Player;
 import sr.server.SR_Server;
 
 public class GameTurn {
@@ -32,18 +32,18 @@ public class GameTurn {
 		planets = new ArrayList<>(server.getGalaxy().getPlanets().size());
 		List<Planet> listOfPlanets = server.getGalaxy().getPlanets();
 		for (Planet planet : listOfPlanets) {
-			planets.add(new PlanetInfo(planet, server.getGalaxy().getPlayerByUserName(playerName), server.getGalaxyMap()));
+			planets.add(new PlanetInfo(planet, server.getGameWorld(), server.getGalaxy().getPlayerByUserName(playerName), server.getGalaxyMap(), server.getGalaxy()));
 		}
 	}
 
 	private void addPlayers(SR_Server server, String playerName) {
-		players = new ArrayList<PlayerInfo>(PlayerPureFunctions.getActivePlayers(server.getGalaxy()).size());
+		players = new ArrayList<>(PlayerPureFunctions.getActivePlayers(server.getGalaxy()).size());
 		
 		List<Player> activePlayers = PlayerPureFunctions.getActivePlayers(server.getGalaxy());
 		
 		for (Player player : activePlayers) {
 			if(!player.getName().equalsIgnoreCase(playerName)){
-				players.add(new PlayerInfo(player));
+				players.add(new PlayerInfo(player, server.getGameWorld()));
 			}
 		}
 	}

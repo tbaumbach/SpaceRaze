@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Planet;
+import spaceraze.game.Planet;
 import spaceraze.servlethelper.gameworlds.TheLastGreatWar;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;

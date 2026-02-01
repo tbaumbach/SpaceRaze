@@ -7,7 +7,7 @@ import java.util.zip.GZIPOutputStream;
 
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
-import spaceraze.world.Galaxy;
+import spaceraze.game.Galaxy;
 
 public class GalaxySaver{ 
 

@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import spaceraze.world.Player;
+import spaceraze.game.Player;
 
 public class Connection implements Runnable{
     protected Socket client;

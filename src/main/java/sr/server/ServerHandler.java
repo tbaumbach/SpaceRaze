@@ -16,11 +16,11 @@ import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.Faction;
-import spaceraze.world.Galaxy;
+import spaceraze.game.Galaxy;
 import spaceraze.world.GameWorld;
 import spaceraze.map.GalaxyMap;
-import spaceraze.world.Player;
-import spaceraze.world.StatisticGameType;
+import spaceraze.game.Player;
+import spaceraze.game.StatisticGameType;
 import spaceraze.world.enums.DiplomacyGameType;
 import sr.server.map.MapHandler;
 import sr.server.persistence.PHash;
@@ -163,7 +163,7 @@ public class ServerHandler {
 					}		
 					
 					if (addGame){
-						GameWorld gw = aServer.getGalaxy().getGameWorld();
+						GameWorld gw = aServer.getGameWorld();
 						retStr = retStr + "<tr class='ListTextRow' style='height:21px' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',12,1);\" onMouseOut=\"TranparentRow('" + RowName + "',12,0);\"  onclick=\"location.href='Master.jsp?action=current_game&port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'\"  >" +
 								"<td id='" + RowName + "1' width='3' class='ListText'></td>" +
 								"<td id='" + RowName + "2' width='48' valign='middle' class='ListText'><div class='SolidText'><img src=\"images/" + iconName + ".gif\" vspace=\"0\" hspace=\"0\"  border=\"0\">"+ mail +"</div></td>" +
@@ -250,7 +250,7 @@ public class ServerHandler {
 							addGame = true;
 						}
 						if (addGame){
-//							GameWorld gw = aServer.getGalaxy().getGameWorld();
+//							GameWorld gw = gameWorld;
 							
 							String tempName = aServer.getGameName();
 							if (tempName.length() >10)
@@ -302,7 +302,7 @@ public class ServerHandler {
 			for (int i = 0; i < allSerArr.length; i++) {
 			String RowName = i + "CurrentListRow";
 				SR_Server aServer = allSerArr[i];
-				GameWorld gw = aServer.getGalaxy().getGameWorld();
+				GameWorld gw = aServer.getGameWorld();
 				if (aServer.getTurn() == 0){
 					count++;
 					if (!aServer.isPlayerParticipating(aUser)){
@@ -374,7 +374,7 @@ public class ServerHandler {
 //		int countAlreadyParticipating = 0;
 		for (int i = 0; i < allSerArr.length; i++) {
 			SR_Server aServer = allSerArr[i];
-			GameWorld gw = aServer.getGalaxy().getGameWorld();
+			GameWorld gw = aServer.getGameWorld();
 			if (aServer.getTurn() == 0){
 				count++;
 				if (!aServer.isPlayerParticipating(aUser)){
@@ -462,7 +462,7 @@ public class ServerHandler {
 					}
 					if (addGame)
 					{
-						GameWorld gw = aServer.getGalaxy().getGameWorld();
+						GameWorld gw = aServer.getGameWorld();
 						retStr = retStr + "<tr valign=\"bottom\"><td><img src=\"images/" + iconName + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + PlayerPureFunctions.getActivePlayers(aServer.getGalaxy()).size() + "/" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td>" + nextUpdate + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='current_game.jsp?port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;";
 						retStr = retStr + "</td></tr>\n";
 						count++;
@@ -530,7 +530,7 @@ public class ServerHandler {
 					}
 					if (addGame)
 					{
-						GameWorld gw = aServer.getGalaxy().getGameWorld();
+						GameWorld gw = aServer.getGameWorld();
 						retStr = retStr + "<tr valign=\"bottom\"><td><img src=\"images/" + iconName + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + PlayerPureFunctions.getActivePlayers(aServer.getGalaxy()).size() + "/" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td>" + nextUpdate + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='current_game.jsp?port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;";
 						retStr = retStr + "</td></tr>\n";
 						count++;
@@ -605,7 +605,7 @@ public class ServerHandler {
 		Logger.finer("aServer.getGameId(): " + aServer.getId());
 		gameData.setGameName(aServer.getGameName());
 		Logger.finer("Notifier returning game: " + aServer.getGameName());
-		gameData.setGameWorldName(aServer.getGalaxy().getGameWorld().getFullName());
+		gameData.setGameWorldName(aServer.getGameWorld().getFullName());
         GalaxyMap map = MapHandler.getMap(aServer.getMapFileName());
 		gameData.setMapName(map.getName());
 		gameData.setMaxTurn(aServer.getEndTurn());
@@ -639,7 +639,7 @@ public class ServerHandler {
 		}
 		gameData.setTurn(aServer.getTurn());
 		gameData.setUpdatesWeek(UpdateRunner.getShortDescription(aServer.getGalaxy().getTime()));
-		gameData.setPlayers(aServer.getGalaxy().getPlayers());
+		gameData.setPlayers(aServer.getGalaxy().getPlayers(), aServer.getGameWorld());
 		gameData.setPassword(aServer.getGalaxy().getPassword());
 		return gameData;
 	}
@@ -733,7 +733,7 @@ public class ServerHandler {
 						addGame = true;
 					}
 					if (addGame){
-						GameWorld gw = aServer.getGalaxy().getGameWorld();
+						GameWorld gw = aServer.getGameWorld();
 						retStr = retStr + "<tr valign=\"bottom\"><td><img src=\"images/" + iconName + ".gif\" width=\"20\" height=\"20\" vspace=\"0\" hspace=\"0\"  border=\"0\">" + aServer.getGameName() + "</td><td>" + gw.getFileName() + "</td><td>" + aServer.getMapFileName() + "</td><td>" + PlayerPureFunctions.getActivePlayers(aServer.getGalaxy()).size() + "/" + aServer.getGalaxy().getNrPlayers() + "</td><td>" + aServer.getStatus() + "</td><td>" + aServer.getTurn() + "</td><td>" + nextUpdate + "</td><td>" + aServer.getStartedByPlayerName() + "</td><td><a href='current_game.jsp?port=" + aServer.getId() + "&gamename=" + aServer.getGameName() + "&autouser=true&returnto=startpage.jsp'>Details</a></td><td>&nbsp;";
 						retStr = retStr + "</td></tr>\n";
 						count++;

@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Planet;
+import spaceraze.game.Planet;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 

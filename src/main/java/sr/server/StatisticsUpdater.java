@@ -1,5 +1,8 @@
 package sr.server;
 
+import spaceraze.game.*;
+import spaceraze.game.report.old.CanBeLostInSpace;
+import spaceraze.game.report.old.Report;
 import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.StatisticsHandler;
 import spaceraze.servlethelper.game.player.CostPureFunctions;
@@ -17,43 +20,43 @@ public class StatisticsUpdater {
 
     private StatisticsUpdater(){}
 
-    public static void performStatistics(Galaxy galaxy, GalaxyMap galaxyMap) {
-        setStatisticsIncome(galaxy, galaxyMap);
-        setStatisticsProduction(galaxy);
+    public static void performStatistics(Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld) {
+        setStatisticsIncome(galaxy, galaxyMap, gameWorld);
+        setStatisticsProduction(galaxy, gameWorld);
         setStatisticsVIPs(galaxy);
-        setStatisticsShipSize(galaxy);
+        setStatisticsShipSize(galaxy, gameWorld);
         setStatisticsShipNumber(galaxy);
         setStatisticsTroopUnits(galaxy);
         setStatisticsPlanetsCount(galaxy);
-        setStatisticsShipsKilled(galaxy);
+        setStatisticsShipsKilled(galaxy, gameWorld);
         setStatisticsShipKills(galaxy);
     }
 
-    private static void setStatisticsIncome(Galaxy galaxy, GalaxyMap galaxyMap) {
+    private static void setStatisticsIncome(Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld) {
         int tempIncome;
         for (Player player : galaxy.getPlayers()) {
             if (!player.isDefeated()) {
-                tempIncome = IncomePureFunctions.getPlayerIncome(player, false, galaxyMap);
-                tempIncome -= CostPureFunctions.getPlayerUpkeepShips(player, galaxy.getPlanets(), galaxy.getSpaceships(), galaxy.getGameWorld());
+                tempIncome = IncomePureFunctions.getPlayerIncome(player, false, galaxyMap, gameWorld, galaxy);
+                tempIncome -= CostPureFunctions.getPlayerUpkeepShips(player, galaxy.getPlanets(), galaxy.getSpaceships(), gameWorld);
                 tempIncome -= CostPureFunctions.getPlayerUpkeepTroops(player, galaxy.getPlanets(), galaxy.getTroops());
                 tempIncome -= CostPureFunctions.getPlayerUpkeepVIPs(player, galaxy.getAllVIPs());
                 if (tempIncome < 0) { // if broke set net income to 0
                     tempIncome = 0;
                 }
-                StatisticsHandler.addStatistics(StatisticType.NET_INCOME, player.getName(), tempIncome, false, galaxy);
+                StatisticsHandler.addStatistics(spaceraze.game.StatisticType.NET_INCOME, player.getName(), tempIncome, false, galaxy);
             } else {
-                StatisticsHandler.addStatistics(StatisticType.NET_INCOME, player.getName(), 0, false, galaxy);
+                StatisticsHandler.addStatistics(spaceraze.game.StatisticType.NET_INCOME, player.getName(), 0, false, galaxy);
             }
         }
     }
 
-    private static void setStatisticsProduction(Galaxy galaxy) {
+    private static void setStatisticsProduction(Galaxy galaxy, GameWorld gameWorld) {
         // skapa en map för factionernas totala pop
         java.util.Map<String, Integer> factionProductions = new HashMap<>(); // String = faction name
         // nollsätt totalpop för alla factioner
         for (Player aPlayer : galaxy.getPlayers()) {
             aPlayer.setTotalPop(0);
-            factionProductions.putIfAbsent(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()).getName(), 0);
+            factionProductions.putIfAbsent(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), gameWorld).getName(), 0);
         }
         int neutralPop = 0; // räkna popen på alla neutrala planeter
         // lägg till factionerna
@@ -64,8 +67,8 @@ public class StatisticsUpdater {
         // räkna popen för alla spelare
         for (Planet planet : galaxy.getPlanets()) {
             if (planet.getPlayerInControl() != null) {
-                Faction planetFaction = GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), galaxy.getGameWorld());
-                if (GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), galaxy.getGameWorld()).isAlien()) {
+                Faction planetFaction = GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), gameWorld);
+                if (GameWorldHandler.getFactionByUuid(planet.getPlayerInControl().getFactionUuid(), gameWorld).isAlien()) {
                     planet.getPlayerInControl()
                             .setTotalPop(planet.getPlayerInControl().getTotalPop() + planet.getResistance());
                     factionProductions.put(planetFaction.getName(),
@@ -88,18 +91,18 @@ public class StatisticsUpdater {
             totalPop = totalPop + player.getTotalPop();
         }
         // uppdatera player statistiken
-        StatisticsHandler.addStatistics(StatisticType.PRODUCTION_PLAYER, "Neutral", neutralPop, false, galaxy);
-        StatisticsHandler.addStatistics(StatisticType.PRODUCTION_FACTION, "Neutral", neutralPop, false, galaxy);
+        StatisticsHandler.addStatistics(spaceraze.game.StatisticType.PRODUCTION_PLAYER, "Neutral", neutralPop, false, galaxy);
+        StatisticsHandler.addStatistics(spaceraze.game.StatisticType.PRODUCTION_FACTION, "Neutral", neutralPop, false, galaxy);
         for (Player player : galaxy.getPlayers()) {
-            StatisticsHandler.addStatistics(StatisticType.PRODUCTION_PLAYER, player.getName(), player.getTotalPop(), false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.PRODUCTION_PLAYER, player.getName(), player.getTotalPop(), false, galaxy);
         }
         // uppdatera faction statistiken
         Set<String> keys = factionProductions.keySet();
         for (Object aFactionName : keys.toArray()) {
-            Faction aFaction = galaxy.getGameWorld().findFaction((String) aFactionName);
+            Faction aFaction = gameWorld.findFaction((String) aFactionName);
             Logger.fine(aFaction.getName());
             //TODO 2020-11-23 Don't use faction name as key, a user can use the same name as faction
-            StatisticsHandler.addStatistics(StatisticType.PRODUCTION_FACTION, aFaction.getName(), factionProductions.get(aFactionName), false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.PRODUCTION_FACTION, aFaction.getName(), factionProductions.get(aFactionName), false, galaxy);
         }
     }
 
@@ -115,11 +118,11 @@ public class StatisticsUpdater {
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer value = data.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.VIPS, aPlayer.getName(), value, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.VIPS, aPlayer.getName(), value, false, galaxy);
         }
     }
 
-    private static void setStatisticsShipSize(Galaxy galaxy) {
+    private static void setStatisticsShipSize(Galaxy galaxy, GameWorld gameWorld) {
         java.util.Map<String, Integer> dataSize = new HashMap<>();
         for (Player aPlayer : galaxy.getPlayers()) {
             dataSize.put(aPlayer.getName(), 0);
@@ -129,12 +132,12 @@ public class StatisticsUpdater {
                 String shipOwner = aSpaceship.getOwner().getName();
                 // size
                 Integer valueSize = dataSize.get(shipOwner);
-                dataSize.put(shipOwner, valueSize + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), galaxy.getGameWorld()).getSize().getSlots());
+                dataSize.put(shipOwner, valueSize + SpaceshipPureFunctions.getSpaceshipTypeByUuid(aSpaceship.getTypeUuid(), gameWorld).getSize().getSlots());
             }
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer valueSize = dataSize.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.SHIP_SIZE, aPlayer.getName(), valueSize, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.SHIP_SIZE, aPlayer.getName(), valueSize, false, galaxy);
         }
     }
 
@@ -153,7 +156,7 @@ public class StatisticsUpdater {
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer valueNumber = dataNumber.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.SHIP_NUMBER, aPlayer.getName(), valueNumber, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.SHIP_NUMBER, aPlayer.getName(), valueNumber, false, galaxy);
         }
     }
 
@@ -172,7 +175,7 @@ public class StatisticsUpdater {
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer valueNumber = dataNumber.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.TROOPS_NUMBER, aPlayer.getName(), valueNumber, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.TROOPS_NUMBER, aPlayer.getName(), valueNumber, false, galaxy);
         }
     }
 
@@ -191,19 +194,19 @@ public class StatisticsUpdater {
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer valueNumber = dataNumber.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.PLANETS, aPlayer.getName(), valueNumber, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.PLANETS, aPlayer.getName(), valueNumber, false, galaxy);
         }
     }
 
-    private static void setStatisticsShipsKilled(Galaxy galaxy) {
+    private static void setStatisticsShipsKilled(Galaxy galaxy, GameWorld gameWorld) {
         for (Player aPlayer : galaxy.getPlayers()) {
             Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
-            String factionName = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()).getName();
-            List<CanBeLostInSpace> lisOwn = SpaceshipPureFunctions.getShipsLostInSpace(galaxy, lastReport.getLostShips(), factionName, true); // egna förlorade
+            String factionName = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), gameWorld).getName();
+            List<CanBeLostInSpace> lisOwn = SpaceshipPureFunctions.getShipsLostInSpace(galaxy, gameWorld, lastReport.getLostShips(), factionName, true); // egna förlorade
             // skepp
-            StatisticsHandler.addStatistics(StatisticType.SHIPS_LOST, aPlayer.getName(), lisOwn.size(), true, galaxy);
-            List<CanBeLostInSpace> lisOther = SpaceshipPureFunctions.getShipsLostInSpace(galaxy, lastReport.getLostShips(), factionName, false);
-            StatisticsHandler.addStatistics(StatisticType.SHIPS_KILLED, aPlayer.getName(), lisOther.size(), true, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.SHIPS_LOST, aPlayer.getName(), lisOwn.size(), true, galaxy);
+            List<CanBeLostInSpace> lisOther = SpaceshipPureFunctions.getShipsLostInSpace(galaxy, gameWorld, lastReport.getLostShips(), factionName, false);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.SHIPS_KILLED, aPlayer.getName(), lisOther.size(), true, galaxy);
         }
     }
 
@@ -225,7 +228,7 @@ public class StatisticsUpdater {
         }
         for (Player aPlayer : galaxy.getPlayers()) {
             Integer valueNumber = dataNumber.get(aPlayer.getName());
-            StatisticsHandler.addStatistics(StatisticType.SHIPS_MOST_KILLS, aPlayer.getName(), valueNumber, false, galaxy);
+            StatisticsHandler.addStatistics(spaceraze.game.StatisticType.SHIPS_MOST_KILLS, aPlayer.getName(), valueNumber, false, galaxy);
         }
     }
 }

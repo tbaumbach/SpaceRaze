@@ -5,8 +5,9 @@ package sr.webb;
 
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Galaxy;
-import spaceraze.world.Player;
+import spaceraze.game.Galaxy;
+import spaceraze.game.Player;
+import spaceraze.world.GameWorld;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
 
@@ -15,11 +16,11 @@ import sr.server.UpdateRunner;
  */
 public class ServerStatus {
 
-	public static String getStartingText(Galaxy g){
+	public static String getStartingText(Galaxy g, GameWorld gameWorld){
 		String retStr = "";
 		if (g.getTurn() == 0){
 			retStr = "New game is starting.<p>";
-            String[] playerInfos = getPlayerStrings(g,false);
+            String[] playerInfos = getPlayerStrings(g,false, gameWorld);
 			int freeSlots = g.getNrStartPlanets() - playerInfos.length; 
 			if (freeSlots > 0){
 				retStr = retStr + " There are " + freeSlots + " player slots not taken (yet).<p>";
@@ -60,14 +61,14 @@ public class ServerStatus {
 		return retStr;
 	}
 	
-    private static String[] getPlayerStrings(Galaxy g,boolean showUser){
+    private static String[] getPlayerStrings(Galaxy g,boolean showUser, GameWorld gameWorld){
     	String[] allPlayerStrings = new String[g.getNrStartPlanets()];
     	Logger.fine("getPlayerList: " + allPlayerStrings.length);
 		Logger.finer("getPlayerList (boolean): " + showUser);
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = g.getPlayers().get(i);
-        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()).getColorHexValue();
+        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), gameWorld).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
@@ -105,14 +106,14 @@ public class ServerStatus {
         return allPlayerStrings;
     }
 
-    private static String[] getPlayerStringsNO(Galaxy g,boolean showUser){
+    private static String[] getPlayerStringsNO(Galaxy g,boolean showUser, GameWorld gameWorld){
     	String[] allPlayerStrings = new String[g.getNrStartPlanets()];
     	Logger.fine("getPlayerList: " + allPlayerStrings.length);
 		Logger.finer("getPlayerList (boolean): " + showUser);
     	int longestName = g.getLongestGovenorName();
         for (int i = 0; i < g.getPlayers().size(); i++){
         	Player temp = (Player)g.getPlayers().get(i);
-        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), g.getGameWorld()).getColorHexValue();
+        	String color = GameWorldHandler.getFactionByUuid(temp.getFactionUuid(), gameWorld).getColorHexValue();
         	String aPlayerStr = "<font color=\"" + color + "\">" + temp.getGovernorName();
         	if (showUser){
             	aPlayerStr = aPlayerStr + " (" + temp.getName() + ")"; 
@@ -151,13 +152,13 @@ public class ServerStatus {
     }
     
     
-	public static String getPlayerList(Galaxy g, String showUserStr){
+	public static String getPlayerList(Galaxy g, String showUserStr, GameWorld gameWorld){
 		Logger.finer("getPlayerList: " + showUserStr);
 		boolean showUser = showUserStr.equalsIgnoreCase("true");
 		Logger.finer("getPlayerList: " + showUser);
 		String retStr = "<h3>Players:</h3>";
 		retStr = retStr + "<table>";
-		String[] playerList = getPlayerStringsNO(g,!showUser);
+		String[] playerList = getPlayerStringsNO(g,!showUser, gameWorld);
 		for (int i = 0; i < playerList.length; i++) {
 			if ((g.getTurn() == 0) || !playerList[i].equals("Unnamed<span></span>Free slot")){
 				retStr = retStr + "<tr>";
@@ -171,13 +172,13 @@ public class ServerStatus {
 		return retStr;
 	}
 
-	public static String getPlayerListNO(Galaxy g, String showUserStr){
+	public static String getPlayerListNO(Galaxy g, String showUserStr, GameWorld gameWorld){
 		Logger.finer("getPlayerList: " + showUserStr);
 		boolean showUser = showUserStr.equalsIgnoreCase("true");
 		Logger.finer("getPlayerList: " + showUser);
 		String retStr = "";
 		retStr = retStr + "<table>";
-		String[] playerList = getPlayerStrings(g,!showUser);
+		String[] playerList = getPlayerStrings(g,!showUser, gameWorld);
 		for (int i = 0; i < playerList.length; i++) {
 			if ((g.getTurn() == 0) || !playerList[i].equals("Unnamed<span></span>Free slot")){
 				retStr = retStr + "<tr>";

@@ -5,7 +5,7 @@ import java.util.List;
 
 import spaceraze.servlethelper.game.spaceship.SpaceshipPureFunctions;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Spaceship;
+import spaceraze.game.Spaceship;
 import spaceraze.world.enums.SpaceShipSize;
 
 public class ShipInfo {

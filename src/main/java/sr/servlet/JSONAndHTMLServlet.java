@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.world.GameWorld;
-import spaceraze.world.Planet;
+import spaceraze.game.Planet;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 
@@ -49,7 +49,7 @@ public class JSONAndHTMLServlet extends HttpServlet {
 		//SR_Server aGame = sh.findGame("test");
 		SR_Server aGame = sh.findGame(gameName);
 		
-		GameWorld gameWorld = aGame.getGalaxy().getGameWorld();
+		GameWorld gameWorld = aGame.getGameWorld();
 		
 		Planet planet1 = aGame.getGalaxy().getPlanets().get(0);
 		

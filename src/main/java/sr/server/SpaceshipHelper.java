@@ -1,5 +1,11 @@
 package sr.server;
 
+import spaceraze.game.Galaxy;
+import spaceraze.game.Planet;
+import spaceraze.game.Spaceship;
+import spaceraze.game.report.old.CanBeLostInSpace;
+import spaceraze.game.report.old.Report;
+import spaceraze.game.report.old.TurnInfo;
 import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.planet.PlanetPureFunctions;
 import spaceraze.servlethelper.game.spaceship.SpaceshipMutator;
@@ -8,8 +14,8 @@ import spaceraze.servlethelper.game.troop.TroopMutator;
 import spaceraze.servlethelper.game.vip.VipMutator;
 import spaceraze.util.general.Logger;
 import spaceraze.world.*;
-import spaceraze.world.orders.ShipMovement;
-import spaceraze.world.orders.ShipToCarrierMovement;
+import spaceraze.game.orders.ShipMovement;
+import spaceraze.game.orders.ShipToCarrierMovement;
 
 public class SpaceshipHelper {
 
@@ -35,17 +41,17 @@ public class SpaceshipHelper {
                 + " to " + spaceshipToMove.getCarrierLocation().getName() + ".");
     }
 
-    public static void performMove(ShipMovement shipMovement,  TurnInfo ti, Galaxy aGalaxy, GalaxyMap galaxyMap) {
+    public static void performMove(ShipMovement shipMovement,  TurnInfo ti, Galaxy aGalaxy, GalaxyMap galaxyMap, GameWorld gameWorld) {
         Spaceship spaceship = aGalaxy.findSpaceshipByUuid(shipMovement.getSpaceshipKey());
         if (spaceship != null) {
             String spaceShipname = spaceship.getName();
             Logger.finest("performMove: " + spaceShipname + " destination: " + shipMovement.getDestination());
-            moveShip(spaceship, shipMovement.getDestination(), ti, aGalaxy, galaxyMap);
+            moveShip(spaceship, shipMovement.getDestination(), ti, aGalaxy, galaxyMap, gameWorld);
         }
 
     }
 
-    public static void moveShip(Spaceship spaceship, String planetUuid, TurnInfo ti, Galaxy galaxy, GalaxyMap galaxyMap){
+    public static void moveShip(Spaceship spaceship, String planetUuid, TurnInfo ti, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld){
         Planet destination = galaxy.getPlanet(planetUuid);
         if (spaceship.getOwner() != null){
             Logger.finer("Called, spaceship: " + spaceship.toString() + " destination: " + destination + " retreating: " + spaceship.isRetreating());
@@ -70,13 +76,13 @@ public class SpaceshipHelper {
             }else{ // ship continues to retreat
                 // find a planet to run to
                 spaceship.setLocation(destination);
-                spaceship.setRunningTo(PlanetPureFunctions.getEscapePlanet(spaceship, galaxy));
+                spaceship.setRunningTo(PlanetPureFunctions.getEscapePlanet(spaceship, galaxy, gameWorld));
                 if (spaceship.getRetreatingTo() == null){ // there is no planet to retreat to
                     ti.addToLatestGeneralReport("Your ship " + spaceship.getName() + " has been scuttled by it's crew because they had nowhere to retreat to.");
                     if (spaceship.getOwner() != null) {
-                        VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap);
-                        TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap);
-                        addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
+                        VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap, gameWorld);
+                        TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap, gameWorld);
+                        addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), gameWorld);
                     }
                     SpaceshipMutator.removeShip(spaceship, galaxy);
                 }else{ // there is a planet to retreat to
@@ -110,7 +116,7 @@ public class SpaceshipHelper {
         report.getShipsLostInSpace().add(CanBeLostInSpace.builder().lostInSpaceString(SpaceshipPureFunctions.getSpaceshipTypeByUuid(ss.getTypeUuid(), gameWorld).getName()).owner(ss.getOwner() != null ? ss.getOwner().getGovernorName() : null).build()); // TODO 2020-11-28 This should be replaced by EvenReport logic. So add the lost ships to the new specific created Report (for the typ of event) extending EvenReport. Try to reuse the EnemySpaceship and OwnSpaceship
     }
 
-    public static void moveRetreatingSquadron(Spaceship spaceship, TurnInfo ti, Galaxy galaxy, GalaxyMap galaxyMap) {
+    public static void moveRetreatingSquadron(Spaceship spaceship, TurnInfo ti, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld) {
         // The only ships without range who can be retreating are squadrons
         // in a retreating carrier, and they move to where the carrier has
         // moved. And is destroyed if the cartrier is destroyed.
@@ -123,9 +129,9 @@ public class SpaceshipHelper {
                     + spaceship.getCarrierLocation().getName()
                     + " was scuttled by it's crew.");
             if (spaceship.getOwner() != null) {
-                VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap);
-                TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap);
-                addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), galaxy.getGameWorld());
+                VipMutator.checkVIPsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap, gameWorld);
+                TroopMutator.checkTroopsInDestroyedShips(spaceship, spaceship.getOwner(), galaxy, galaxyMap, gameWorld);
+                addToLatestShipsLostInSpace(spaceship, spaceship.getOwner().getTurnInfo(), gameWorld);
             }
             SpaceshipMutator.removeShip(spaceship, galaxy);
         } else if (spaceship.getCarrierLocation().isRetreating()) { // carrier is still

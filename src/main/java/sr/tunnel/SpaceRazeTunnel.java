@@ -22,8 +22,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import spaceraze.map.GalaxyMap;
 import spaceraze.servlethelper.game.TransferWrapper;
 import spaceraze.util.general.Logger;
-import spaceraze.world.Message;
-import spaceraze.world.Player;
+import spaceraze.game.Message;
+import spaceraze.game.Player;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import sr.server.map.MapHandler;
@@ -155,7 +155,7 @@ public class SpaceRazeTunnel extends HttpServlet {
 					}else{
 						tw.setMessage("choosefaction");
 					}
-					tw.setGameWorld(aServer.getGalaxy().getGameWorld());
+					tw.setGameWorld(aServer.getGameWorld());
 				}else if(tw.getMessage().equals("setMessagesRead")){
 					List<Message> newMessages = setMessagesRead(tw, sh);
 					tw.setReturnObject(newMessages);
@@ -340,7 +340,7 @@ public class SpaceRazeTunnel extends HttpServlet {
 	private List<Message> addMessage(TransferWrapper tw, ServerHandler sh){
 		int gameid = tw.getPort();
 		SR_Server aServer = sh.findGame(gameid);
-		return aServer.getMessageDatabase().addMessage(tw.getMailMessage(), aServer.getGalaxy(), tw.getLatestReadMessage());
+		return aServer.getMessageDatabase().addMessage(tw.getMailMessage(), aServer.getGalaxy(), tw.getLatestReadMessage(), aServer.getGameWorld());
 	}
 	
 	

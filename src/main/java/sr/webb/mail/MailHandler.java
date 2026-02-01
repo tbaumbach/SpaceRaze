@@ -13,12 +13,17 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import spaceraze.game.Galaxy;
+import spaceraze.game.Player;
+import spaceraze.game.report.old.ReportLevel;
+import spaceraze.game.report.old.CanBeLostInSpace;
+import spaceraze.game.report.old.Highlight;
+import spaceraze.game.report.old.Report;
 import spaceraze.servlethelper.handlers.GameWorldHandler;
 import spaceraze.util.general.Functions;
 import spaceraze.util.general.Logger;
 import spaceraze.util.properties.PropertiesHandler;
 import spaceraze.world.*;
-import spaceraze.world.spacebattle.ReportLevel;
 import sr.server.SR_Server;
 import sr.server.UpdateRunner;
 import spaceraze.user.User;
@@ -67,14 +72,14 @@ public class MailHandler {
 		String title = aNewServer.getGameName() + " is open to join";
 		String content = "A new game has been started and is open to join.\n"; 
 		content = content + "Game name is: " + aNewServer.getGameName() + "\n";
-		content = content + "GameWorld: " + aNewServer.getGalaxy().getGameWorld().getFullName() + "\n";
+		content = content + "GameWorld: " + aNewServer.getGameWorld().getFullName() + "\n";
 		content = content + "Game map is: " + aNewServer.getGalaxy().mapVersion() + "\n";
 		content = content + "Max # players: " + aNewServer.getGalaxy().getNrStartPlanets() + "\n";
 		content = content + "Autobalance: " + Functions.getYesNo(aNewServer.getAutoBalance()) + "\n";
 		content = content + "Min number of steps: " + aNewServer.getGalaxy().getSteps() + "\n";
 		content = content + "Group players from same faction: " + Functions.getYesNo(aNewServer.getGalaxy().isGroupSameFaction()) + "\n";
 		content = content + "Random factions: " + Functions.getYesNo(aNewServer.getGalaxy().isRandomFaction()) + "\n";
-		content = content + "Open factions: " + aNewServer.getGalaxy().getFactionListString() + "\n";
+		content = content + "Open factions: " + aNewServer.getGalaxy().getFactionListString(aNewServer.getGameWorld()) + "\n";
 		content = content + "Scheduled updates: " + UpdateRunner.getUpdateDescription((int)aNewServer.getGalaxy().getTime()) + "\n";
 		content = content + "Automated updates: yes\n";
 		for (User aUser : users) {
@@ -157,14 +162,14 @@ public class MailHandler {
 			content2 = content2 + "Lost In Space\n";
 			content2 = content2 + "-------------\n";
 			content2 = content2 + "\n";
-			content2 = content2 + getLostInSpace(aPlayer, aServer.getGalaxy());
+			content2 = content2 + getLostInSpace(aPlayer, aServer.getGalaxy(), aServer.getGameWorld());
 			// add turn info to content
 			content2 = content2 + "\n";
 			content2 = content2 + "---------\n";
 			content2 = content2 + "Turn Info\n";
 			content2 = content2 + "---------\n";
 			content2 = content2 + "\n";
-			content2 = content2 + getTurnInfo(aPlayer);
+			content2 = content2 + getTurnInfo(aPlayer, aServer.getGalaxy());
 			sendMailToUser("[SR]" + title,content2,aUser);
 		}
 	}
@@ -195,13 +200,13 @@ public class MailHandler {
 	   * Returns a list with all LiS from a certain faction.
 	   * Same as in HighlightPanel.
 	   */
-	private static List<CanBeLostInSpace> getLostInSpaceByFaction(List<CanBeLostInSpace> allLostInSpace, String aFactionName, Galaxy galaxy){
-		return allLostInSpace.stream().filter(canBeLostInSpace -> isOwnedByFaction(canBeLostInSpace, aFactionName, galaxy)).collect(Collectors.toList());
+	private static List<CanBeLostInSpace> getLostInSpaceByFaction(List<CanBeLostInSpace> allLostInSpace, String aFactionName, Galaxy galaxy, GameWorld gameWorld){
+		return allLostInSpace.stream().filter(canBeLostInSpace -> isOwnedByFaction(canBeLostInSpace, aFactionName, galaxy, gameWorld)).collect(Collectors.toList());
 	}
 
-	private static boolean isOwnedByFaction(CanBeLostInSpace canBeLostInSpace, String aFactionName, Galaxy galaxy) {
+	private static boolean isOwnedByFaction(CanBeLostInSpace canBeLostInSpace, String aFactionName, Galaxy galaxy, GameWorld gameWorld) {
 		if (canBeLostInSpace.getOwner() != null){
-			if (GameWorldHandler.getFactionByUuid(galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFactionUuid(), galaxy.getGameWorld()).getName().equalsIgnoreCase(aFactionName)){
+			if (GameWorldHandler.getFactionByUuid(galaxy.getPlayerByGovenorName(canBeLostInSpace.getOwner()).getFactionUuid(), gameWorld).getName().equalsIgnoreCase(aFactionName)){
 				return true;
 			}
 		}else
@@ -211,45 +216,45 @@ public class MailHandler {
 		return false;
 	}
 
-	private static String getLostInSpace(Player aPlayer, Galaxy galaxy){
+	private static String getLostInSpace(Player aPlayer, Galaxy galaxy, GameWorld gameWorld){
 		StringBuffer sb = new StringBuffer();
 		boolean lisExist = false;
 		Report lastReport = aPlayer.getTurnInfo().getLatestGeneralReport();
 		List<CanBeLostInSpace> lostShips = lastReport.getLostShips();
 		List<CanBeLostInSpace> lostTrops = lastReport.getLostTroops();
 		// print players own losses
-  		String playerFactionName = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()).getName();
-  		List<CanBeLostInSpace> tmpList = getLostInSpaceByFaction(lostShips, playerFactionName, galaxy);
+  		String playerFactionName = GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), gameWorld).getName();
+  		List<CanBeLostInSpace> tmpList = getLostInSpaceByFaction(lostShips, playerFactionName, galaxy, gameWorld);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own ships lost"));
   			lisExist = true;
   		}
-  		tmpList = getLostInSpaceByFaction(lostTrops, playerFactionName, galaxy);
+  		tmpList = getLostInSpaceByFaction(lostTrops, playerFactionName, galaxy, gameWorld);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Own troop lost"));
   			lisExist = true;
   		}
   		// print neutral ships destroyed
-  		tmpList = getLostInSpaceByFaction(lostShips,null, galaxy);
+  		tmpList = getLostInSpaceByFaction(lostShips,null, galaxy, gameWorld);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral ships destroyed"));
   			lisExist = true;
   		}
-  		tmpList = getLostInSpaceByFaction(lostTrops,null, galaxy);
+  		tmpList = getLostInSpaceByFaction(lostTrops,null, galaxy, gameWorld);
   		if (tmpList.size() > 0){
   			sb.append(drawFactionLis(tmpList,"Neutral troops destroyed"));
   			lisExist = true;
   		}
   		// print ships from other factions
-  		List<Faction> allFactions = galaxy.getActiveFactions(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), galaxy.getGameWorld()));
+  		List<Faction> allFactions = galaxy.getActiveFactions(GameWorldHandler.getFactionByUuid(aPlayer.getFactionUuid(), gameWorld), gameWorld);
   		for (Faction aFaction : allFactions) {
 
-  			tmpList = getLostInSpaceByFaction(lostShips,aFaction.getName(), galaxy);
+  			tmpList = getLostInSpaceByFaction(lostShips,aFaction.getName(), galaxy, gameWorld);
   	  		if (tmpList.size() > 0){
   	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " ships destroyed"));
   	  			lisExist = true;
   	  		}
-  	  	tmpList = getLostInSpaceByFaction(lostTrops,aFaction.getName(), galaxy);
+  	  	tmpList = getLostInSpaceByFaction(lostTrops,aFaction.getName(), galaxy, gameWorld);
 	  		if (tmpList.size() > 0){
 	  			sb.append(drawFactionLis(tmpList,aFaction.getName() + " troops destroyed"));
 	  			lisExist = true;
@@ -293,9 +298,9 @@ public class MailHandler {
 	    return highlightsText.toString();
 	}
 	
-	private static String getTurnInfo(Player aPlayer){
+	private static String getTurnInfo(Player aPlayer, Galaxy galaxy){
 		String turnInfoText = "";
-		turnInfoText = aPlayer.getTurnInfoText(aPlayer.getGalaxy().getTurn(),ReportLevel.SHORT);
+		turnInfoText = aPlayer.getTurnInfoText(galaxy.getTurn(), ReportLevel.SHORT);
 		return turnInfoText;
 	}
 

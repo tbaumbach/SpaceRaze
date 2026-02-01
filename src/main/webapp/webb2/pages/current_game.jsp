@@ -112,7 +112,7 @@
 	<td></td>
 	<td width=50></td>
 	<td rowspan=12 valign=top>
-		<%= ServerStatus.getPlayerListNO(aServer.getGalaxy(),autoUser) %>
+		<%= ServerStatus.getPlayerListNO(aServer.getGalaxy(),autoUser, aServer.getGameWorld()) %>
 	</td>
 </tr>	
 
@@ -129,7 +129,7 @@
 
 <tr>
 	<td>Gameworld:</td>
-	<td><%= aServer.getGalaxy().getGameWorld().getFullName() %></td>
+	<td><%= aServer.getGameWorld().getFullName() %></td>
 </tr>
 <tr>
 	<td>Diplomacy:</td>
@@ -220,19 +220,19 @@
 <% } %>
 <% }%>
 
-<%= ServerStatus.getStartingText(aServer.getGalaxy()) %><br>
+<%= ServerStatus.getStartingText(aServer.getGalaxy(), aServer.getGameWorld()) %><br>
 <%= ServerStatus.getGameOverText(aServer.getGalaxy()) %><br>
 <br>
 <!--
 <h2>Status of game <%= aServer.getGameName() %></h2>
 Started by: <%= aServer.getStartedByPlayerName() %><br>
 Map filename: <%= MapHandler.getMapName(aServer.getMapFileName()) %><br>
-Gameworld: <%= aServer.getGalaxy().getGameWorld().getFullName() %><br>
+Gameworld: <%= aServer.getGameWorld().getFullName() %><br>
 Autobalance: <%= Functions.getYesNo(aServer.getGalaxy().getAutoBalance()) %><br>
 Min number of steps: <%= aServer.getGalaxy().getSteps() %><br>
 Group players from same faction: <%= Functions.getYesNo(aServer.getGalaxy().isGroupSameFaction()) %><br>
 Random factions: <%= Functions.getYesNo(aServer.getGalaxy().isRandomFaction()) %><br>
-Open factions: <%= aServer.getGalaxy().getFactionListString() %><br>
+Open factions: <%= aServer.getGalaxy().getFactionListString(aServer.getGameWorld()) %><br>
 <%
 	if ((aServer.getTurn() == 0) & (aServer.isPasswordProtected())){
 %>

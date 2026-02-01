@@ -1,6 +1,6 @@
 package spaceraze.servlet.game;
 
-import spaceraze.world.Building;
+import spaceraze.game.Building;
 
 public class BuildingInfo {
 
