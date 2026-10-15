@@ -42,7 +42,7 @@ public class Connection implements Runnable{
             if (!message.equals("checkStatus")){
             	System.out.println("Mottar meddelande: " + message);
             }
-            Player sendplayer = s.getPlayer(message);
+            Player sendplayer = s.playerMessage(message);
             oos.writeObject(sendplayer);
             Player p = (Player)ois.readObject();
             String statusmsg = s.updatePlayer(p);

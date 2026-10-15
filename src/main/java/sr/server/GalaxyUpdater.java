@@ -1189,7 +1189,7 @@ public class GalaxyUpdater {
         messageText += tmpText + "\n";
 
         //TODO varför skapar vi nu player och planet?  Kan vi inte använda oss av den riktiga player (aPlayer)? Ser ut att vara faction meddelande skickas till
-        Message newMessage = new Message(messageText, aPlayer, new Player(f.getName() + " Headquarters", "password", "govname", f, new Planet( 0, 0, true), new ArrayList<>()), galaxy);
+        Message newMessage = new Message(messageText, aPlayer, new Player(f.getName() + " Headquarters", "govname", f, new Planet( 0, 0, true), new ArrayList<>()), galaxy);
 
         aMessageDatabase.addMessage(newMessage, galaxy, 0, gameWorld);
 

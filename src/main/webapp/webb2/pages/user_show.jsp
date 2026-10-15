@@ -37,19 +37,15 @@ This page allows administrators to view the data of a user.
 </tr>
 <tr>
 <td>Login:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getLogin() %></td>
-</tr>
-<tr>
-<td>Password:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getPassword() %></td>
+<td><%= aUser.getAlias() %></td>
 </tr>
 <tr>
 <td>Role:&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getRole().getOldId() %></td>
+<td><%= aUser.getRole().getName() %></td>
 </tr>
 <tr>
 <td>E-mail (separate multiple addresses with blanks):&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getEmails() %></td>
+<td><%= aUser.getEmail() %></td>
 </tr>
 <tr>
 <td>Turn email:&nbsp;&nbsp;&nbsp;</td>
@@ -66,7 +62,7 @@ This page allows administrators to view the data of a user.
 </table>
 <br>
 <p>
-<a href="pages/user_edit.jsp?login=<%= aUser.getLogin() %>">Edit User</a>
+<a href="pages/user_edit.jsp?login=<%= aUser.getAlias() %>">Edit User</a>
 <p>
 <a href="pages/user_list.jsp">Back to User List</a>
 <!--/form-->

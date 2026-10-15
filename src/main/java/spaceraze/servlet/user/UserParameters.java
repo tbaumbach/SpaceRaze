@@ -3,7 +3,7 @@ package spaceraze.servlet.user;
 public class UserParameters {
 	
 	
-	String name, login, role, email, turnEmail, gameEmail, adminEmail, password, repeatedPassword;
+	String name, login, role, email, turnEmail, gameEmail, adminEmail;
 	boolean rulesOk = Boolean.FALSE;
 	
 	public UserParameters(){}
@@ -72,27 +72,11 @@ public class UserParameters {
 		this.rulesOk = rulesOk;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getRepeatedPassword() {
-		return repeatedPassword;
-	}
-
-	public void setRepeatedPassword(String repeatedPassword) {
-		this.repeatedPassword = repeatedPassword;
-	}
-
 	@Override
 	public String toString() {
 		return "UserParameters [name=" + name + ", login=" + login + ", role=" + role + ", email=" + email
-				+ ", turnEmail=" + turnEmail + ", gameEmail=" + gameEmail + ", adminEmail=" + adminEmail + ", password="
-				+ password + ", repeatedPassword=" + repeatedPassword + ", rulesOk=" + rulesOk + "]";
+				+ ", turnEmail=" + turnEmail + ", gameEmail=" + gameEmail + ", adminEmail=" + adminEmail +
+				", rulesOk=" + rulesOk + "]";
 	}
 
 	

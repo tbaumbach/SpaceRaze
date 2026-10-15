@@ -62,7 +62,7 @@ public class MapEditorTunnel extends HttpServlet {
 					// always set author, since the map can be a "copy" of another players published map
                     if (tw.getPlayerLogin() != null) {
                         User curUser = UserHandler.findUser(tw.getPlayerLogin());
-                        aMap.setAuthor(curUser.getLogin());
+                        aMap.setAuthor(curUser.getAlias());
                         aMap.setAuthorName(curUser.getName());
                     }
 					// set map
@@ -112,7 +112,7 @@ public class MapEditorTunnel extends HttpServlet {
 						String path = tw.getMapFileName() + ".properties";
 						success = MapHandler.saveMapToFile(theMap,path);
 					}else
-					if (anotherMap.getAuthor().equals(curUser.getLogin())){ // ok to save map, if confirm overwrite exists
+					if (anotherMap.getAuthor().equals(curUser.getAlias())){ // ok to save map, if confirm overwrite exists
 						// check if file exists with same name
 						if (tw.isOwerwriteConfirm()){
 							System.out.println("pub existingMap: " + anotherMap);

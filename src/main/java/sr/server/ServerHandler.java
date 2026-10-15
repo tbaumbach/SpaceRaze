@@ -113,7 +113,7 @@ public class ServerHandler {
 				SR_Server aServer = allSerArr[i];
 				
 				if (aServer.isPlayerParticipating(aUser)){
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+					Player tmpPlayer = PlayerPureFunctions.getPlayerByUserUuid(aServer.getGalaxy(), aUser.getUuid());
 					String nextUpdate = "None";
 					UpdateRunner ur = aServer.getUpdateRunner();
 					if (ur != null){
@@ -210,7 +210,7 @@ public class ServerHandler {
 					
 					SR_Server aServer = allSerArr[i];
 					if (aServer.isPlayerParticipating(aUser)){
-						Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+						Player tmpPlayer = aServer.getPlayer(aUser.getUuid());
 						String nextUpdate = "None";
 						UpdateRunner ur = aServer.getUpdateRunner();
 						if (ur != null){
@@ -554,7 +554,7 @@ public class ServerHandler {
 			for (int i = 0; i < allSerArr.length; i++) {
 				SR_Server aServer = allSerArr[i];
 				if (aServer.isPlayerParticipating(aUser)){
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+					Player tmpPlayer = aServer.getPlayer(aUser.getUuid());
 					if (!aServer.getLastUpdateComplete()){
 						// do nothing
 					}else
@@ -626,7 +626,7 @@ public class ServerHandler {
 		}
 		gameData.setStatus(aServer.getStatus());
 		if (aServer.getGalaxy().isGameOver()){
-			Player player = aServer.getPlayer(aUser.getLogin(), aUser.getPassword());
+			Player player = aServer.getPlayer(aUser.getUuid());
 			if (player.isDefeated()){
 				gameData.setGameOverStatus("defeated");
 			}else{
@@ -656,7 +656,7 @@ public class ServerHandler {
 			for (int i = 0; i < allSerArr.length; i++) {
 				SR_Server aServer = allSerArr[i];
 				if (aServer.isPlayerParticipating(aUser)){
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+					Player tmpPlayer = aServer.getPlayer(aUser.getUuid());
 					if (!aServer.getLastUpdateComplete()){
 						// do nothing
 					}else
@@ -693,7 +693,7 @@ public class ServerHandler {
 			for (int i = 0; i < allSerArr.length; i++) {
 				SR_Server aServer = allSerArr[i];
 				if (aServer.isPlayerParticipating(aUser)){
-					Player tmpPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+					Player tmpPlayer = aServer.getPlayer(aUser.getUuid());
 					String nextUpdate = "None";
 					UpdateRunner ur = aServer.getUpdateRunner();
 					if (ur != null){
@@ -1114,19 +1114,6 @@ public class ServerHandler {
 		System.exit(0);
 	}
 */
-	
-	//TODO varför måste password finns för spelaren i pågående spel? borde inte det tas bort så behövs inte detta göras?
-	/**
-	 * Called when a player has changed his password.
-	 * Update all games so that the players new password will be used.
-	 * @param login
-	 * @param newPassword
-	 */
-	public void newPlayerPassword(String login, String newPassword){
-		for (SR_Server aServer : allServers) {
-			aServer.newPlayerPassword(login,newPassword);
-		}
-	}
 
 	// called to find if a certain player already has a game started
 	// returns null if no game was found, otherwise return the first game found
@@ -1135,7 +1122,7 @@ public class ServerHandler {
 		int index = 0;
 		while ((found == null) && (index < allServers.size())){
 			SR_Server aGame = (SR_Server)allServers.get(index);
-			if (aGame.getStartedByPlayer().equals(curUser.getLogin())){
+			if (aGame.getStartedByPlayer().equals(curUser.getAlias())){
 				found = aGame;
 			}else{
 				index++;

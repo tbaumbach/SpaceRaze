@@ -71,7 +71,7 @@ public class GameServlet {
 		if(server != null){
 			if(server.isPlayerParticipating(user)){
 				
-				GameTurn turnInfo = new GameTurn(server, user.getLogin(), turn);
+				GameTurn turnInfo = new GameTurn(server, user.getAlias(), turn);
 				
 				return turnInfo;
 			}

@@ -30,16 +30,12 @@
 		User:
 	</td>
     <td valign="top">
-		<%= user.getName() %>&nbsp;(<%= user.getRole().getOldId() %>)
+		<%= user.getName() %>&nbsp;(<%= user.getRole().getName() %>)
 	</td>
   </tr>
   <tr>
     <td>&nbsp;</td>
     <td valign="top">
-    	<% if (!user.isGuest()){ %>
-		<a href="change_password.jsp" target="mainFrame">Change Password</a>
-		<% }%>
-		<!--&nbsp;&nbsp;-->
 	</td>
     <td valign="top">
 		<a href="logout.jsp" target="_top">Log out</a>

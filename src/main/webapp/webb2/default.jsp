@@ -206,8 +206,7 @@ function MoveOrigo(event)
 				// user loggrd in
 				// get a User instance
 				String lgn = request.getParameter("login");
-				String pwd = request.getParameter("password");
-				theUser = UserHandler.getUser(lgn,pwd);
+				theUser = UserHandler.getUser(lgn);
 				// also log in player by using session object
 				session.setAttribute("user",theUser);
 			}

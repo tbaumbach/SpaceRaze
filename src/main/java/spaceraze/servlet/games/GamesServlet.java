@@ -14,6 +14,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import spaceraze.game.Player;
+import spaceraze.servlethelper.game.player.PlayerPureFunctions;
 import sr.server.SR_Server;
 import sr.server.ServerHandler;
 import spaceraze.user.User;
@@ -63,7 +64,7 @@ public class GamesServlet{
 	 	for (SR_Server aServer : servers) {
 	 		
 	 		if (aServer.isPlayerParticipating(user)){
-	 			Player tmpPlayer = aServer.getPlayer(user.getLogin(),user.getPassword());
+	 			Player tmpPlayer = PlayerPureFunctions.getPlayerByUserUuid(aServer.getGalaxy(), user.getUuid());
 	 			String iconName = null;
 				
 				boolean addGame = false;
@@ -154,7 +155,7 @@ public class GamesServlet{
 		if(user.isPlayerOrAdmin()){
 			SR_Server aServer = sh.findGame(gameId);
 			if(aServer != null){
-				message = aServer.join(user.getName(), govenorName, factionName);
+				message = aServer.join(user.getUuid(), govenorName, factionName);
 			}else{
 				message = "Can't find a game with id: " + gameId;
 			}

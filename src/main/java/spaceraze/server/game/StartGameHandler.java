@@ -112,15 +112,15 @@ public class StartGameHandler {
 		}
 	}
 	
-	public Player getNewPlayer(String name, String password, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld){
-    	Logger.finer("getNewPlayer: " + name + " " + password + " " + govenorName);
+	public Player getNewPlayer(String uuid, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld){
+    	Logger.finer("getNewPlayer: " + uuid + " " + govenorName);
         Player p;
         if (galaxy.getNrStartPlanets() == galaxy.getPlayers().size()){
             p = new Player("All starting planets already taken");
         }else{
         	Faction playerFaction = galaxy.findFaction(factionName, gameWorld);
             Planet homeplanet = getStartPlanet(galaxy.getSteps(),playerFaction, galaxy, galaxyMap);
-            p = createPlayer(name,password,homeplanet,govenorName,factionName, galaxy, galaxyMap, gameWorld);
+            p = createPlayer(uuid,homeplanet,govenorName,factionName, galaxy, galaxyMap, gameWorld);
             Logger.finer("Galaxy.getNewPlayer");
             homeplanet.setPlayerInControl(p);
             Logger.finer("Galaxy.getNewPlayer2");
@@ -200,8 +200,8 @@ public class StartGameHandler {
 }
 	
 //  gissar att TurnInfo texten inte visas någon stan?  den är tok fel i alla fall.
-    private Player createPlayer(String name, String password, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld){
-		Player p = new Player(name, password, govenorName, GameWorldHandler.getFactionByName(factionName, gameWorld) , homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
+    private Player createPlayer(String name, Planet homeplanet, String govenorName, String factionName, Galaxy galaxy, GalaxyMap galaxyMap, GameWorld gameWorld){
+		Player p = new Player(name, govenorName, GameWorldHandler.getFactionByName(factionName, gameWorld) , homeplanet, PlanetOrderStatusMutator.createPlanetOrderStatuses(galaxy.getPlanets()));
         p.getTurnInfo().addToLatestGeneralReport("Welcome to this SpaceRaze Game.");
         p.getTurnInfo().addToLatestGeneralReport("You have 1 planet under your control - the planet " + PlanetPureFunctions.getPlanetName(galaxyMap, homeplanet.getMapPlanetUuid()) + ".");
         p.getTurnInfo().addToLatestGeneralReport("");

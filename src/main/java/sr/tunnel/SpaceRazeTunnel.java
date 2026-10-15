@@ -264,7 +264,7 @@ public class SpaceRazeTunnel extends HttpServlet {
 	    	SR_Server aServer = sh.findGame(port);
 	    	
 	    	Logger.finest("aServer.getGameName(): " + aServer.getGameName());
-	    	tmpPlayer = aServer.getPlayer(message);
+	    	tmpPlayer = aServer.playerMessage(message);
 	    	Logger.finest("tmpPlayer.getName(): " + tmpPlayer.getName());
 	    	int turn = aServer.getTurn();
 	    	// if turn = 0, immediately save new player

@@ -125,9 +125,8 @@
 				// user loggrd in
 				// get a User instance
 				String lgn = request.getParameter("login");
-				String pwd = request.getParameter("password");
 				// also log in player by using session object
-				session.setAttribute("user", UserHandler.getUser(lgn,pwd));
+				session.setAttribute("user", UserHandler.getUser(lgn));
 			}
 		}else
 		if (PageURL.equals("logout")){
@@ -297,7 +296,6 @@ return;
 				<tr>
 				    <td colspan="2">
 				    	<a class="Login" href="Master.jsp?action=settings">Settings</a>&nbsp;&nbsp;&nbsp;
-				    	<a class="Login" href="Master.jsp?action=change_password">Change Password</a>
 				    	<input class="InputText" id="password" name="password" type="hidden" value=""/>
 				    </td>
 				    <td></td>
@@ -331,7 +329,6 @@ Logged in user name: <%= theUser.getName() %><br>
 <a href=Master.jsp?action=admin_only> admin_only</a><br>
 <a href=Master.jsp?action=battle_sim> battle_sim</a><br>
 <a href=Master.jsp?action=battle_sim_list> battle_sim_list</a><br>
-<a href=Master.jsp?action=change_password> change_password</a><br>
 <a href=Master.jsp?action=checklogin> checklogin</a><br>
 <a href=Master.jsp?action=checklogin2> checklogin2</a><br>
 <a href=Master.jsp?action=contact> contact</a><br>

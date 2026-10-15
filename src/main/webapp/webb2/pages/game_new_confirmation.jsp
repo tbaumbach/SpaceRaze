@@ -46,7 +46,7 @@ Player	=	<%=theUser.isPlayerOrAdmin()%>
 Admin	=	<%=theUser.isAdmin()%>
 GUEST	=	<%=theUser.isGuest()%>
 Name	=	<%=theUser.getName()%>
-Login	=	<%=theUser.getLogin()%>
+Login	=	<%=theUser.getAlias()%>
  -->
 
 
@@ -74,7 +74,7 @@ Login	=	<%=theUser.getLogin()%>
 		String time = request.getParameter("time");
 		String nrPlayers = request.getParameter("maxnrplayers");
 		String randomFaction = request.getParameter("randomfaction");
-		String login = theUser.getLogin();
+		String login = theUser.getAlias();
 		String diplomacy = request.getParameter("diplomacy");
 		GameWorld gw = GameWorldHandler.getGameWorld(gameWorld);
 		String ranked = request.getParameter("ranked");

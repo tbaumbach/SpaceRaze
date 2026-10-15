@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import spaceraze.game.Galaxy;
@@ -84,16 +83,7 @@ public class MailHandler {
 		content = content + "Automated updates: yes\n";
 		for (User aUser : users) {
 			String content2 = content;
-			// print link to site including encrypted password
-			String baseurl = PropertiesHandler.getProperty("baseurl");
-			// encrypt password
-			byte[] passwordBytes = aUser.getPassword().getBytes();
-			String encPassword = Base64.encodeBytes(passwordBytes);
-			//TODO 2020-02-27  Lösen ord i länken är inte bra, även om det är kryperat, räcker det inte att enbart länka till sidan med användarnamn?
-			String completeloginurl = baseurl + "/webb2/Master.jsp?action=login&login=" + aUser.getLogin() + "&password=" + encPassword; 
 			content2 = content2 + "\n";
-			content2 = content2 + "Link to the SpaceRaze site:\n";
-			content2 = content2 + completeloginurl + "\n";
 			sendMailToUser("[SR]New Game: " + title,content2,aUser);
 		}
 //		sendMailToUsers("New Game: " + title,content,users);
@@ -139,16 +129,8 @@ public class MailHandler {
 		// then send the mail
 		for (User aUser : users) {
 			String content2 = content;
-			Player aPlayer = aServer.getPlayer(aUser.getLogin(),aUser.getPassword());
+			Player aPlayer = aServer.getPlayer(aUser.getUuid());
 			// print link to site including encrypted password
-			String baseurl = PropertiesHandler.getProperty("baseurl");
-			// encrypt password
-			byte[] passwordBytes = aUser.getPassword().getBytes();
-			String encPassword = Base64.encodeBytes(passwordBytes);
-			String completeloginurl = baseurl + "/webb2/Master.jsp?action=login&login=" + aUser.getLogin() + "&password=" + encPassword;
-			content2 = content2 + "\n";
-			content2 = content2 + "Link to the SpaceRaze site:\n";
-			content2 = content2 + completeloginurl + "\n";
 			// add highlights
 			content2 = content2 + "\n";
 			content2 = content2 + "----------\n";
@@ -311,13 +293,7 @@ public class MailHandler {
 			roleString = "n Administrator";
 		}
 		tmpContent = tmpContent + "You have been added as a" + roleString + " to the SpaceRaze game site.\n";
-		tmpContent = tmpContent + "You have the following login: " + aUser.getLogin() + "\n";
-		tmpContent = tmpContent + "You have the following password: " + aUser.getPassword() + "\n";
-		tmpContent = tmpContent + "To activate your account you need to change your passeword.\n";
-		tmpContent = tmpContent + "The URL to change the password is:\n";
-		String baseurl = PropertiesHandler.getProperty("baseurl");
-		String completeloginurl = baseurl + "/webb2/Master.jsp?action=change_password"; 
-		tmpContent = tmpContent + completeloginurl + " \n";
+		tmpContent = tmpContent + "You have the following login: " + aUser.getAlias() + "\n";
 		sendMailToUser("[SR]Welcome to SpaceRaze!",tmpContent,aUser);
 	}
 
@@ -328,13 +304,10 @@ public class MailHandler {
 	}
 	
 	private static void sendMailToUser(String title, String content, User recipientUser){
-		String eMailAddresses = recipientUser.getEmails();
+		String eMailAddresses = recipientUser.getEmail();
 		if (!eMailAddresses.equals("")){
-			StringTokenizer st = new StringTokenizer(eMailAddresses);
-			while(st.hasMoreTokens()){
-				//TODO 2020-11-30 Test and activate this.
-				//sendAMail(title,content,st.nextToken());
-			}
+			//TODO 2020-11-30 Test and activate this.
+			//sendAMail(title,content,st.nextToken());
 		}
 	}
 

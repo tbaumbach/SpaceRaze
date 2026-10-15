@@ -14,14 +14,13 @@
 <%
 	String userName = request.getParameter("name");
 	String userLogin = request.getParameter("login");
-	String userPassword = request.getParameter("password");
 	String userRole = request.getParameter("role");
 	String email = request.getParameter("email");
 	String turnEmail = request.getParameter("turn_email");
 	String gameEmail = request.getParameter("newgame_email");
 	String adminEmail = request.getParameter("admin_email");
 	ServerHandler sh = (ServerHandler)application.getAttribute("serverhandler");
-	UserHandler.saveUser(userName,userLogin,userPassword,userRole,email,turnEmail,gameEmail,adminEmail,sh);
+	UserHandler.saveUser(userName,userLogin,userRole,email,turnEmail,gameEmail,adminEmail,sh);
 %>
 
 <body background="images/spaze.gif">

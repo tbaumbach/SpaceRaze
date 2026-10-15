@@ -1,4 +1,5 @@
 <%@ page import="spaceraze.user.User" %>
+<%@ page import="spaceraze.user.UserRole" %>
 <!-- Start register.jsp fragment -->
 
 <%
@@ -9,8 +10,7 @@
 			// user loggrd in
 			// get a User instance
 			String lgn = request.getParameter("login");
-			String pwd = request.getParameter("password");
-			session.setAttribute("user", UserHandler.getUser(lgn,pwd));
+			session.setAttribute("user", UserHandler.getUser(lgn));
 		}
 	}else
 	if ("logout".equals(request.getParameter("action"))){
@@ -38,7 +38,6 @@
 	String userLogin = "";
 	//String userPassword = "";
 	//String userPassword2 = "";
-	String userRole = User.ROLE_PLAYER;
 	String email = "";
 	String turnEmail = "checked";
 	String gameEmail = "checked";
@@ -50,14 +49,13 @@
 		userLogin = request.getParameter("new_login");
 		//userPassword = request.getParameter("new_password");
 		//userPassword2 = request.getParameter("new_password2");
-		userRole = User.ROLE_PLAYER;
 		email = request.getParameter("email");
 		turnEmail = request.getParameter("turn_email");
 		gameEmail = request.getParameter("newgame_email");
 		adminEmail = request.getParameter("admin_email");
 		rulesOk = request.getParameter("rules") == "checked" ? true : false;
-		userMessage = UserHandler.addUser(userName2, userLogin, userRole, email, turnEmail, gameEmail, adminEmail, rulesOk);
-		//TODO UserHandler.addUser(userName2,userLogin,userPassword,userPassword2,userRole,email,turnEmail,gameEmail,adminEmail,rulesOk); Removed the password, need to secure the logic first around password.
+		userMessage = UserHandler.addUser(userName2, userLogin, UserRole.PLAYER.getId(), email, turnEmail, gameEmail, adminEmail, rulesOk);
+		//TODO UserHandler.addUser(userName2,userLogin,userPassword,userPassword2,User.ROLE_PLAYER,email,turnEmail,gameEmail,adminEmail,rulesOk); Removed the password, need to secure the logic first around password.
 	}
 %>
 <!--table width='710' border='0' cellpadding='0' cellspacing='0'>

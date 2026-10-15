@@ -154,7 +154,7 @@ public class MapHandler {
 			String RowName = i + "MapListRow";
 //			LoggingHandler.finer("in loop: " + aMap.getName());
 			String editStr = "";
-			if (aMap.getAuthor().equals(aUser.getLogin())){
+			if (aMap.getAuthor().equals(aUser.getAlias())){
 				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_PUB + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 //				editStr = editStr + "<a href=\"map_files.jsp?action=delete&mapname=map." + aMap.getFileName() + "\">Delete</a>";
@@ -168,9 +168,9 @@ public class MapHandler {
 	}
 	
 	public static String getMapDraftFiles(User aUser){
-		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
+		Logger.finer("getMapDraftFiles called, user: " + aUser.getAlias());
 		String retStr = "";
-		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getAlias());
 		Collections.sort(tmpMaps);
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
 		for (GalaxyMap aMap : tmpMaps) {
@@ -181,9 +181,9 @@ public class MapHandler {
 	}
 
 	public static String getMapDraftFilesNO(User aUser){
-		Logger.finer("getMapDraftFiles called, user: " + aUser.getLogin());
+		Logger.finer("getMapDraftFiles called, user: " + aUser.getAlias());
 		String retStr = "";
-		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getLogin());
+		List<GalaxyMap> tmpMaps = MapHandler.getMapDrafts(aUser.getAlias());
 		Collections.sort(tmpMaps);
 		Logger.finer("tmpMaps.size(): " + tmpMaps.size());
 		int i=0;
@@ -191,7 +191,7 @@ public class MapHandler {
 			i = i + 1;
 			String RowName = i + "MapDraftListRow";
 			String editStr = "";
-			if (aMap.getAuthor().equals(aUser.getLogin())){
+			if (aMap.getAuthor().equals(aUser.getAlias())){
 				editStr = "<a href=\"MapEditor.jsp?action=" + TransferWrapper.LOAD_DRAFT + "&mapname=" + aMap.getFileName() + "\" target=\"_top\">Edit</a>";
 				editStr = editStr + " / ";
 				editStr = editStr + "<a href=\"map_confirm_delete.jsp?mapname=" + aMap.getFileName() + "\">Delete</a>";

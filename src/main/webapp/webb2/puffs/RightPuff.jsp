@@ -182,7 +182,7 @@
 	
 				<tr class='ListTextRow'>
 					<td class='ListText' width="5">&nbsp;</td>
-					<td colspan=2 class="ListText" width=240><div class="SolidText">The Spaceraze notifier vill tell you when you have an unfinished move in any of your games.<br><a href="notifier/userfiles/notifier_<%= userRightPuff.getLogin() %>.jnlp">Download notifier</a></div></td>
+					<td colspan=2 class="ListText" width=240><div class="SolidText">The Spaceraze notifier vill tell you when you have an unfinished move in any of your games.<br><a href="notifier/userfiles/notifier_<%= userRightPuff.getAlias() %>.jnlp">Download notifier</a></div></td>
 					<td class='ListText' width="5">&nbsp;</td>
 				</tr>
 				</table>

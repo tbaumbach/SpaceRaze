@@ -115,7 +115,7 @@ table.sr td {
 
 		<%if (!theUserNO.isGuest()){%>
 			<%= MapHandler.getMapDraftFilesNO(theUserNO) %>
-			<%	if (MapHandler.getNrMapDrafts(theUserNO.getLogin()) == 0){%>
+			<%	if (MapHandler.getNrMapDrafts(theUserNO.getAlias()) == 0){%>
 			<%	}%>
 		<%	}%>
 		</table>

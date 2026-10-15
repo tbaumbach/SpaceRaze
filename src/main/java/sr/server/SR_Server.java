@@ -89,10 +89,7 @@ public class SR_Server {
 	/**
 	 * Use this to start a new game that updates automatically when all players is
 	 * finished with a turn Not used any more!?
-	 * 
-	 * @param command
-	 * @param nameOfGame
-	 * @param port
+	 *
 	 */
 	/*
 	 * public SR_Server(String command,String nameOfGame,String nameOfMap,int id,int
@@ -135,13 +132,13 @@ public class SR_Server {
 	public boolean isPlayerParticipating(User aUser) {
 		boolean found = false;
 		if (aUser != null) {
-			Logger.finest("isPlayerParticipating - User: " + aUser.getLogin());
+			Logger.finest("isPlayerParticipating - User: " + aUser.getAlias());
 			List<Player> players = galaxy.getPlayers();
 			int index = 0;
 			while ((!found) && (index < players.size())) {
 				Player tmpPlayer = (Player) players.get(index);
 				Logger.finest("  tmpPlayer: " + tmpPlayer.getName());
-				if (tmpPlayer.getName().equalsIgnoreCase(aUser.getLogin())) {
+				if (tmpPlayer.getName().equalsIgnoreCase(aUser.getAlias())) {
 					found = true;
 				} else {
 					index++;
@@ -340,20 +337,20 @@ public class SR_Server {
 	/*
 	 * Used then a player joins a game(this). The password is removed and set to "".
 	 */
-	public String join(String name, String govenorName, String factionName) {
+	public String join(String uuid, String govenorName, String factionName) {
 
 		String message = "";
 
 		if (galaxy.getTurn() > 0) {
 			message = "Game has already begun. No more players can join.";
 		} else { // turn == 0
-			if ((galaxy.getPlayer(name, "")).getErrorMessage() == null) {
+			if (PlayerPureFunctions.getPlayer(galaxy, uuid) != null) {
 				Logger.fine("Player already exists.");
 				message = "Player already exists.";
 			} else if (!factionIsOpenAndSelectable(factionName)) {
 				message = "All slots in the " + factionName + " faction have just been taken. Choose another faction.";
 			} else {
-				Player player = (new StartGameHandler()).getNewPlayer(name, "", govenorName, factionName, galaxy, galaxyMap, gameWorld);
+				Player player = (new StartGameHandler()).getNewPlayer(uuid, govenorName, factionName, galaxy, galaxyMap, gameWorld);
 
 				if (player.getErrorMessage() != null) {
 					message = player.getErrorMessage();
@@ -363,11 +360,11 @@ public class SR_Server {
 		return message;
 	}
 
-	public Player getPlayer(String pName, String pPassword) {
-		return galaxy.getPlayer(pName, pPassword);
+	public Player getPlayer(String uuid) {
+		return PlayerPureFunctions.getPlayer(getGalaxy(), uuid);
 	}
 
-	public Player getPlayer(String message) throws Exception {
+	public Player playerMessage(String message) throws Exception {
 		Logger.fine("message: " + message);
 		StringTokenizer st = new StringTokenizer(message);
 		Logger.fine("st " + st.toString());
@@ -375,7 +372,7 @@ public class SR_Server {
 		Logger.fine("st.countTokens() " + st.countTokens());
 		if (st.countTokens() >= 3) {
 			String command = st.nextToken();
-			String name = st.nextToken();
+			String uuid = st.nextToken();
 			Logger.fine("command " + command);
 			String password = st.nextToken();
 			String govenorName = "";
@@ -396,18 +393,18 @@ public class SR_Server {
 				if (galaxy.getTurn() > 0) {
 					p = new Player("Game has already begun. No more players can join.");
 				} else { // turn == 0
-					if ((galaxy.getPlayer(name, password)).getErrorMessage() == null) {
+					if (PlayerPureFunctions.getPlayer(galaxy, uuid).getErrorMessage() == null) {
 						Logger.fine("Player already exists.");
 						p = new Player("Player already exists.");
 					} else if (!factionIsOpenAndSelectable(factionName)) {
 						p = new Player("All slots in the " + factionName
 								+ " faction have just been taken. Choose another faction.");
 					} else {
-						p = (new StartGameHandler()).getNewPlayer(name, password, govenorName, factionName, galaxy, galaxyMap, gameWorld);
+						p = (new StartGameHandler()).getNewPlayer(uuid, govenorName, factionName, galaxy, galaxyMap, gameWorld);
 					}
 				}
 			} else {
-				p = galaxy.getPlayer(name, password);
+				p = PlayerPureFunctions.getPlayer(galaxy, uuid);
 			}
 		} else if ((st.countTokens() == 1) && st.nextToken().equals("checkStatus")) {
 			p = new Player("Returning status.");
@@ -440,7 +437,7 @@ public class SR_Server {
 		if (p.getName() != null) {
 			Logger.info("updatePlayer(server): " + p.getName());
 		}
-		String msg = galaxy.replacePlayer(p);
+		String msg =  replacePlayer(p);
 		if (msg.equalsIgnoreCase("Player data inserted successfully.")) {
 			gs.saveGalaxy(nameOfGame, "saves", galaxy);
 			gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
@@ -490,6 +487,26 @@ public class SR_Server {
 			}
 		}
 		return msg;
+	}
+
+	// extract Order from Player and insert it into the original Player instance
+	// and do the same for PlanetInfos
+	private String replacePlayer(Player p) {
+		Logger.finer("replaceplayer(galaxy): " + p.getName());
+		if (p.getErrorMessage() != null) {
+			return "Insert failed: " + p.getErrorMessage();
+		} else {
+			Player temp = getPlayer(p.getName());
+			temp.setOrders(p.getOrders());
+			temp.setPlanetInformations(p.getPlanetInformations());
+			temp.setNotes(p.getNotes());
+			if (galaxy.getTurn() > 0) {
+				temp.setUpdatedThisTurn(true);
+				temp.setFinishedThisTurn(p.isFinishedThisTurn());
+				Logger.finer("p.isFinishedThisTurn(): " + p.isFinishedThisTurn());
+			}
+			return "Player data inserted successfully.";
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -579,14 +596,6 @@ public class SR_Server {
 
 	public UpdateRunner getUpdateRunner() {
 		return ur;
-	}
-
-	public void newPlayerPassword(String login, String newPassword) {
-		galaxy.newPlayerPassword(login, newPassword);
-		Logger.info("Saving Galaxy after changing password");
-		gs.saveGalaxy(nameOfGame, "saves", galaxy);
-		gs.saveGalaxy(nameOfGame + "_" + galaxy.getTurn(), "saves/previous", galaxy);
-
 	}
 
 	public boolean getLastUpdateComplete() {

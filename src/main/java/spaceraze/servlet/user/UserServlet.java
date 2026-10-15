@@ -54,10 +54,10 @@ public class UserServlet{
 		System.out.println("Call aginst user/login: " + parameters.toString());
 		
 
-		String message = UserHandler.loginUser(parameters.getLogin(), parameters.getPassword(), response);
+		String message = UserHandler.loginUser(parameters.getLogin(), response);
 		
 		if(message.equalsIgnoreCase("ok")){
-			User aUser= UserHandler.getUser(parameters.getLogin(), parameters.getPassword());
+			User aUser= UserHandler.getUser(parameters.getLogin());
 			request.getSession().setAttribute("user",aUser);
 		}
 		
@@ -89,20 +89,20 @@ public class UserServlet{
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String activate(UserParameters parameters, @Context HttpServletResponse response, @Context HttpServletRequest request) throws JsonProcessingException {
 		
-		System.out.println("Call aginst user/activate: " + parameters.toString());
+		System.out.println("Call against user/activate: " + parameters.toString());
 		
 		String message = "ok";
 		
-		message = UserHandler.activateUser(parameters.getLogin(), parameters.getPassword(), parameters.getRepeatedPassword());
+		message = UserHandler.activateUser(parameters.getLogin());
 		if(message.equalsIgnoreCase("ok")){
 			
-			message = UserHandler.loginUser(parameters.getLogin(), parameters.getPassword(), response);
+			message = UserHandler.loginUser(parameters.getLogin(), response);
 			
 			if(message.equalsIgnoreCase("ok")){
 				
-				message = UserHandler.loginUser(parameters.getLogin(), parameters.getPassword(), response);
+				message = UserHandler.loginUser(parameters.getLogin(), response);
 				if(message.equalsIgnoreCase("ok")){
-					User aUser= UserHandler.getUser(parameters.getLogin(), parameters.getPassword());
+					User aUser= UserHandler.getUser(parameters.getLogin());
 					request.getSession().setAttribute("user",aUser);
 				}
 			}

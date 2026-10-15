@@ -44,11 +44,7 @@ This page allows administrators to edit a user.
 </tr>
 <tr>
 <td>Login (can't be changed):&nbsp;&nbsp;&nbsp;</td>
-<td><%= aUser.getLogin() %><input type="hidden" name="login" value="<%= aUser.getLogin() %>"></td>
-</tr>
-<tr>
-<td>Password:&nbsp;&nbsp;&nbsp;</td>
-<td><input type="text" name="password" value="<%= aUser.getPassword() %>"></td>
+<td><%= aUser.getAlias() %><input type="hidden" name="login" value="<%= aUser.getAlias() %>"></td>
 </tr>
 <tr>
 <td>Role:&nbsp;&nbsp;&nbsp;</td>
@@ -60,8 +56,8 @@ This page allows administrators to edit a user.
 </td>
 </tr>
 <tr>
-<td>E-mail (separate multiple addresses with blanks):&nbsp;&nbsp;&nbsp;</td>
-<td><input type="text" name="email" value="<%= aUser.getEmails() %>"></td>
+<td>E-mail:&nbsp;&nbsp;&nbsp;</td>
+<td><input type="text" name="email" value="<%= aUser.getEmail() %>"></td>
 </tr>
 <tr>
 <td>Turn email:&nbsp;&nbsp;&nbsp;</td>
@@ -80,6 +76,6 @@ This page allows administrators to edit a user.
 <input name="todo" type="submit" value="Save User">
 </form>
 <p>
-<a href="user_show.jsp?login=<%= aUser.getLogin() %>">Back to View User</a>
+<a href="user_show.jsp?login=<%= aUser.getAlias() %>">Back to View User</a>
 </body>
 </html>

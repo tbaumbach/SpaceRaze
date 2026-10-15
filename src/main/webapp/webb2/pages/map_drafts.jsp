@@ -50,7 +50,7 @@ The list below show all your saved drafts of maps.
 <%= MapHandler.getMapDraftFiles(tmpUser) %>
 
 </table>
-<%	if (MapHandler.getNrMapDrafts(tmpUser.getLogin()) == 0){%>
+<%	if (MapHandler.getNrMapDrafts(tmpUser.getAlias()) == 0){%>
 &nbsp;You have no map drafts
 <%	}%>
 

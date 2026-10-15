@@ -51,26 +51,25 @@ public class UserHandler {
 	 */
 	public static String loginUser(HttpServletRequest request, HttpServletResponse response){
 		String loginParam = request.getParameter("login");
-		String pwdParam = request.getParameter("password");
 		
-		return loginUser(loginParam, pwdParam, response);
+		return loginUser(loginParam, response);
 		
 	}
 	
-	public static String loginUser(String loginParam, String pwdParam, HttpServletResponse response){
+	public static String loginUser(String loginParam, HttpServletResponse response){
 		String message;
 		String userExists;
-		System.out.println(loginParam + " " + pwdParam);
-		if ((loginParam != null) && (pwdParam != null)){
-			userExists = UserHandler.isUser(loginParam,pwdParam);
+		System.out.println(loginParam );
+		if ((loginParam != null)){
+			userExists = UserHandler.isUser(loginParam);
 			if (userExists.equals("yes")){
 			    System.out.println("userExists = yes");
-				User loggedInUser = UserHandler.getUser(loginParam,pwdParam);
+				User loggedInUser = UserHandler.getUser(loginParam);
 				System.out.println(loggedInUser.getName());
 				long timestamp = new Date().getTime();
 				System.out.println(timestamp);
-				sessions.put(loggedInUser.getLogin(), timestamp);
-				Cookie userCookie = new Cookie(COOKIE_LOGIN,loggedInUser.getLogin());
+				sessions.put(loggedInUser.getAlias(), timestamp);
+				Cookie userCookie = new Cookie(COOKIE_LOGIN,loggedInUser.getAlias());
 				userCookie.setMaxAge(60*60*24*365);
 				Cookie idCookie = new Cookie(COOKIE_TIMESTAMP,String.valueOf(timestamp));
 				idCookie.setMaxAge(60*60*24*365);
@@ -167,64 +166,37 @@ public class UserHandler {
 		return tmpUser;
 	}
 
-	public static String isUser(String userLogin, String password){
+	public static String isUser(String userLogin){
 		String message = "";
 		User foundUser = findUser(userLogin);
 		if (foundUser != null){
-			boolean passwordOk = checkPassword(foundUser, password);
-			if (passwordOk){
-				message = "yes";
-			}else{
-				message = "User found but password is incorrect";
-			}
+			message = "User found but password is incorrect";
+		}else{
+			message = "User not found";
+		}
+		return message;
+	}
+	
+	public static String isTempUser(String userLogin){
+		String message = "";
+		User foundUser = findTempUser(userLogin);
+		if (foundUser != null){
+			message = "yes";
+
 		}else{
 			message = "User not found";
 		}
 		return message;
 	}
 
-    public static boolean checkPassword(User user, String aPassword){
-        boolean same = false;
-        if (user.getPassword() != null && aPassword != null){
-            if (!user.getPassword().equalsIgnoreCase(aPassword)){ // password may be encrypted
-                // encrypt password
-                byte[] passwordBytes = user.getPassword().getBytes();
-                String encPassword = Base64.encodeBytes(passwordBytes);
-                same = aPassword.equals(encPassword);
-            }
-        }
-        return same;
-    }
-	
-	public static String isTempUser(String userLogin, String password){
-		String message = "";
-		User foundUser = findTempUser(userLogin);
-		if (foundUser != null){
-			boolean passwordOk = checkPassword(foundUser, password);
-			if (passwordOk){
-				message = "yes";
-			}else{
-				message = "User found but password is incorrect";
-			}
-		}else{
-			message = "User not found";
-		}
-		return message;
-	}
-
-	public static User getUser(String userLogin, String password){
+	public static User getUser(String userLogin){
 		User foundUser = findUser(userLogin);
-		return foundUser;
-	}
-	
-	public static User getTempUser(String userLogin, String password){
-		User foundUser = findTempUser(userLogin);
 		return foundUser;
 	}
 
     public static boolean isUser(User user, String aUserLogin){
-        if (user.getLogin() != null && aUserLogin != null){
-            return user.getLogin().equalsIgnoreCase(aUserLogin);
+        if (user.getAlias() != null && aUserLogin != null){
+            return user.getAlias().equalsIgnoreCase(aUserLogin);
         }
         return false;
     }
@@ -287,12 +259,12 @@ public class UserHandler {
 	private static boolean isUserUniqueLogin(String login){
 		
 		for (User user : allUsers) {
-			if(user.getLogin().equals(login)){
+			if(user.getAlias().equals(login)){
 				return false;
 			}
 		}
 		for (User user : allTempUsers) {
-			if(user.getLogin().equals(login)){
+			if(user.getAlias().equals(login)){
 				return false;
 			}
 		}
@@ -302,12 +274,12 @@ public class UserHandler {
 	private static boolean isUserUniqueEmail(String email){
 		
 		for (User user : allUsers) {
-			if(user.getEmails().equals(email)){
+			if(user.getEmail().equals(email)){
 				return false;
 			}
 		}
 		for (User user : allTempUsers) {
-			if(user.getEmails().equals(email)){
+			if(user.getEmail().equals(email)){
 				return false;
 			}
 		}
@@ -336,16 +308,16 @@ public class UserHandler {
         User user = new User();
         user.setUuid(stpp.nextToken());
         user.setName(stpp.nextToken());
-        user.setLogin(stpp.nextToken());
-        user.setPassword(stpp.nextToken());
-        user.setRole(UserRole.getUserRoleByOldId(stpp.nextToken()));
+        user.setAlias(stpp.nextToken());
+        stpp.nextToken(); // Password
+        user.setRole(UserRole.getUserRoleById(stpp.nextToken().toUpperCase()));
         if (stpp.hasMoreTokens()){
-            user.setEmails(stpp.nextToken());
+            user.setEmail(stpp.nextToken());
             user.setReceiveTurnMail(stpp.nextToken().equals("true"));
             user.setReceiveGameMail(stpp.nextToken().equals("true"));
             user.setReceiveAdminMail(stpp.nextToken().equals("true"));
         }else{
-            user.setEmails("");
+            user.setEmail("");
             user.setReceiveTurnMail(true);
             user.setReceiveGameMail(true);
             user.setReceiveAdminMail(true);
@@ -353,28 +325,12 @@ public class UserHandler {
         return user;
     }
 	
-	public static String activateUser(String userLogin, String userPassword,  String userPassword2){
+	public static String activateUser(String userLogin){
 		String message = "";
-		
-		if (userPassword == null){
-			message = "Password is required";
-		}else
-		if (userPassword.equals("")){
-			message = "Password can not be empty";
-		}else
-		if (userPassword2 == null){
-			message = "Repeat password is required";
-		}else
-		if (userPassword2.equals("")){
-			message = "Repeat password can not be empty";
-		}else
-		if (!userPassword.equals(userPassword2)){
-			message = "Password does not match Repeat password";
-		}else{
 			// get user from tempUser, set the password, remove tempUser, save the user. 
 			getTempList();
 			User theUser = findTempUser(userLogin);
-			theUser.setPassword(userPassword);
+			//theUser.setPassword(userPassword);
 			
 			
 			
@@ -385,7 +341,6 @@ public class UserHandler {
 			deleteTempUser(userLogin);
 			
 			message = "ok";
-		}
 		
 	
 		return message;
@@ -474,19 +429,18 @@ public class UserHandler {
 		saveTempUsers();
 	}
 
-	public static void saveUser(String userName, String userLogin, String userPassword, String userRole,String email,String turnEmail,String gameEmail,String adminEmail,ServerHandler sh){
+	public static void saveUser(String userName, String userLogin, String userRole,String email,String turnEmail,String gameEmail,String adminEmail,ServerHandler sh){
 		getList();
 		User user = findUser(userLogin);
         user.setName(userName);
-        user.setLogin(userLogin);
-        user.setPassword(userPassword);
-        user.setRole(UserRole.getUserRoleByOldId(userRole));
-        user.setEmails(email);
+        user.setAlias(userLogin);
+        //user.setPassword(userPassword);
+        user.setRole(UserRole.getUserRoleById(userRole.toUpperCase()));
+        user.setEmail(email);
         user.setReceiveTurnMail("true".equals(turnEmail));
         user.setReceiveGameMail("true".equals(gameEmail));
         user.setReceiveAdminMail("true".equals(adminEmail));
 		saveUsers();
-		sh.newPlayerPassword(userLogin,userPassword);
 	}
 
 	public static String getRemovableUsers(){
@@ -497,7 +451,7 @@ public class UserHandler {
 			if (counter <= 1){
 				counter++;
 			}else{
-				remUserStr = remUserStr + "<option value=\"" + aUser.getLogin() + "\">" + aUser.getName() + " / " + aUser.getLogin() + "</option>\n";
+				remUserStr = remUserStr + "<option value=\"" + aUser.getAlias() + "\">" + aUser.getName() + " / " + aUser.getAlias() + "</option>\n";
 			}
 		}
 		return remUserStr;
@@ -507,7 +461,7 @@ public class UserHandler {
 		String userListStr = "";
 		getList();
 		for (User aUser : allUsers) {
-			userListStr = userListStr + "<a href=\"user_show.jsp?login=" + aUser.getLogin() + "\">" + aUser.getName() + " / " + aUser.getLogin() + "</a><br>\n";
+			userListStr = userListStr + "<a href=\"user_show.jsp?login=" + aUser.getAlias() + "\">" + aUser.getName() + " / " + aUser.getAlias() + "</a><br>\n";
 		}
 		return userListStr;
 	}
@@ -525,35 +479,10 @@ public class UserHandler {
 			RowName = i + "UserListRow";
 			
 			User aUser = iter.next();
-			userListStr = userListStr + "<tr class='ListTextRow' style='height:21px' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',3,1);\" onMouseOut=\"TranparentRow('" + RowName + "',3,0);\"  onclick=\"location.href='Master.jsp?action=user_show&login=" + aUser.getLogin() + "'\"  ><td class='ListText' id='" + RowName + "1'>&nbsp;</td><td class='ListText' id='" + RowName + "2'><div class='SolidText'>" + aUser.getName() + "</div></td><td class='ListText' id='" + RowName + "3'><div class='SolidText'>" + aUser.getLogin() + "</a></div></td></tr>\n";
+			userListStr = userListStr + "<tr class='ListTextRow' style='height:21px' valign='middle'  onMouseOver=\"TranparentRow('" + RowName + "',3,1);\" onMouseOut=\"TranparentRow('" + RowName + "',3,0);\"  onclick=\"location.href='Master.jsp?action=user_show&login=" + aUser.getAlias() + "'\"  ><td class='ListText' id='" + RowName + "1'>&nbsp;</td><td class='ListText' id='" + RowName + "2'><div class='SolidText'>" + aUser.getName() + "</div></td><td class='ListText' id='" + RowName + "3'><div class='SolidText'>" + aUser.getAlias() + "</a></div></td></tr>\n";
 		}
 		userListStr = userListStr + "</table>";
 		return userListStr;
-	}
-
-	
-	/*
-	public static String getEditableUserList(){
-		String userListStr = "";
-		getList();
-		int counter = 0;
-		for (Iterator iter = allUsers.iterator(); iter.hasNext();) {
-			User aUser = (User) iter.next();
-			if (counter <= 1){
-				counter++; // cannot edit administrator & guest
-			}else{
-				userListStr = userListStr + "<a href=\"user_show.jsp?login=" + aUser.getLogin() + "\">" + aUser.getName() + " / " + aUser.getLogin() + "</a><br>\n";
-			}
-		}
-		return userListStr;
-	}
-*/
-	public static void newPassword(String login, String newPassword, ServerHandler sh){
-		getList();
-		User theUser = findUser(login);
-		theUser.setPassword(newPassword);
-		saveUsers();
-		sh.newPlayerPassword(login,newPassword);
 	}
 
 	private static void saveUsers(){
@@ -585,14 +514,13 @@ public class UserHandler {
 
 	}
 
-    public static String getSaveString(User user, int index){
+    public static String getSaveString(User user, int index){//TODO this method is not matching the user.properties
         String saveString = "user" + index + " = ";
         saveString = saveString + user.getName() + "\t";
-        saveString = saveString + user.getLogin() + "\t";
-        saveString = saveString + user.getPassword() + "\t";
-        saveString = saveString + user.getRole().getOldId() + "\t";
-        saveString = saveString + UserRole.getUserRoleByLevel(user.getAccessLevel()).getOldId() + "\t";
-        saveString = saveString + user.getEmails() + "\t";
+        saveString = saveString + user.getAlias() + "\t";
+        //saveString = saveString + user.getPassword() + "\t";
+        saveString = saveString + user.getRole().getId() + "\t";
+        saveString = saveString + user.getEmail() + "\t";
         saveString = saveString + user.isReceiveTurnMail() + "\t";
         saveString = saveString + user.isReceiveGameMail() + "\t";
         saveString = saveString + user.isReceiveAdminMail() + "\t";
